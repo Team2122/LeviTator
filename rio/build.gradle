@@ -1,0 +1,79 @@
+apply plugin: "java"
+apply plugin: org.teamtators.rioplugin.RioPlugin
+
+//def common = project(":common")
+
+rio {
+    teamNumber = rootProject.teamNumber
+    robotClass = 'org.teamtators.limbo.TatorRobot'
+    deployDir = "/home/lvuser/Limbo"
+    runArgs = "${rio.configDir}"
+    jvmArgs = ""
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "WPI"
+        url = "http://first.wpi.edu/FRC/roborio/maven/release"
+    }
+    maven {
+        name = "Jaci"
+        url = "http://dev.imjac.in/maven/"
+    }
+    maven {
+        name = "Eclipse Paho"
+        url = "https://repo.eclipse.org/content/repositories/paho-releases/"
+    }
+    flatDir {
+        dirs file("lib")
+    }
+}
+
+configurations {
+}
+
+dependencies {
+
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.5'
+    compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.1.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.2'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.2'
+    compile group: 'com.google.guava', name: 'guava', version: '21.0'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-ext', version: '1.7.25'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.11'
+//    compile common
+
+    // WPILIB/CTRE jars
+   compile "edu.wpi.first.wpilibj:wpilibj-java:${wpilibVersion}"
+//    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:arm"
+//    compile name: "CTRE_Phoenix"
+//    compile "thirdparty.frc.ctre:Toolsuite-Java:${talonSrxVersion}"
+//    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:desktop"
+//    compile "org.opencv:opencv-java:${opencvVersion}"
+//    compile "edu.wpi.cscore.java:cscore:${wpilibVersion}:arm"
+
+    // WPILIB/CTRE native libraries
+
+
+    //nativeZip "edu.wpi.first.wpilibj:athena-jni:${wpilibVersion}"
+    //nativeZip "edu.wpi.first.wpilib:athena-runtime:${wpilibVersion}@zip"
+//    nativeLib name: "libCTRE_PhoenixCCI", ext: "so"
+//    nativeZip "thirdparty.frc.ctre:Toolsuite-Zip:${talonSrxVersion}@zip"
+//    nativeZip "org.opencv:opencv-jni:${opencvVersion}:linux-arm"
+//    nativeZip "edu.wpi.cscore.java:cscore:${wpilibVersion}:athena-uberzip@zip"
+
+    // WPILIB/CTRE sources
+//    source "edu.wpi.first.wpilibj:athena:${wpilibVersion}:sources"
+    source "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:sources"
+    source name: "CTRE_Phoenix-sources"
+    source name: "CTRE_Phoenix-javadoc"
+
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
+}
+
+//evaluationDependsOn(":common")
