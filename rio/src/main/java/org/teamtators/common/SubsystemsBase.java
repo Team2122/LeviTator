@@ -16,6 +16,4 @@ public abstract class SubsystemsBase {
     public abstract void configure(ConfigLoader configLoader);
 
     public abstract List<Updatable> getControllers();
-
-    public abstract MqttAsyncClient getMqttClient();
 }
