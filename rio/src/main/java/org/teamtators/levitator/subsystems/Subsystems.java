@@ -13,15 +13,18 @@ public class Subsystems extends SubsystemsBase {
     private List<Subsystem> subsystems;
 
     private Drive drive;
+    private Picker picker;
     //private YourSubsytem yourSubsystem;
 
     public Subsystems() {
         drive = new Drive();
 
+        picker = new Picker();
+
         //your subsystems here
 
 
-        subsystems = Arrays.asList(drive /*, yourSubsystem */);
+        subsystems = Arrays.asList(drive, picker /*, yourSubsystem */);
     }
 
 
@@ -38,5 +41,13 @@ public class Subsystems extends SubsystemsBase {
     @Override
     public List<Updatable> getControllers() {
         return null;
+    }
+
+    public Drive getDrive() {
+        return drive;
+    }
+
+    public Picker getPicker() {
+        return picker;
     }
 }
