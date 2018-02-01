@@ -14,17 +14,18 @@ public class Subsystems extends SubsystemsBase {
 
     private Drive drive;
     private Picker picker;
+    private Lift lift;
     //private YourSubsytem yourSubsystem;
 
     public Subsystems() {
         drive = new Drive();
-
+        lift = new Lift();
         picker = new Picker();
 
         //your subsystems here
 
 
-        subsystems = Arrays.asList(drive, picker /*, yourSubsystem */);
+        subsystems = Arrays.asList(drive, picker, lift /*, yourSubsystem */);
     }
 
 
