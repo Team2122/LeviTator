@@ -1,21 +1,21 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PWMSpeedController;
+import edu.wpi.first.wpilibj.SpeedController;
+import org.teamtators.common.control.PidController;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.scheduler.Subsystem;
 
 public class Drive extends Subsystem {
 
-    private PWMSpeedController leftMotor;
-    private PWMSpeedController rightMotor;
+    private SpeedController leftMotor;
+    private SpeedController rightMotor;
     private Encoder rightEncoder;
     private Encoder leftEncoder;
     private ADXRS453 gyro;
-    private PIDController rotationController;
-    private PIDController leftController;
-    private PIDController rightController;
+    private PidController rotationController;
+    private PidController leftController;
+    private PidController rightController;
 
     public Drive() {
         super("Drive");
@@ -51,7 +51,7 @@ public class Drive extends Subsystem {
     }
 
     public double getAverageDistance() {
-        return (getLeftDistance() + getRightDistance())/2.0;
+        return (getLeftDistance() + getRightDistance()) / 2.0;
     }
 
     public void resetDistance() {

@@ -3,15 +3,21 @@ package org.teamtators.levitator;
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.levitator.subsystems.Subsystems;
 
 public class TatorRobot extends TatorRobotBase {
+
+    private Subsystems subsystems;
+
     public TatorRobot(String configDir) {
         super(configDir);
+
+        subsystems = new Subsystems();
     }
 
     @Override
     public SubsystemsBase getSubsystemsBase() {
-        return null;
+        return subsystems;
     }
 
     @Override
