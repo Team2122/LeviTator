@@ -87,9 +87,9 @@ public class SpeedControllerConfig {
             case TALON:
                 speedController = new Talon(channel);
                 break;
-            case TALONSRX:
+            /*case TALONSRX:
                 speedController = new TalonSRX(channel);
-                break;
+                break;*/
             case VICTOR:
                 speedController = new Victor(channel);
                 break;
@@ -109,6 +109,7 @@ public class SpeedControllerConfig {
         SPARK,
         TALON,
         TALONSRX,
+        VICTORSPX,
         VICTOR,
         VICTORSP
     }

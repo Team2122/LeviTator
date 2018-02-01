@@ -25,6 +25,10 @@ repositories {
         name = "Eclipse Paho"
         url = "https://repo.eclipse.org/content/repositories/paho-releases/"
     }
+    maven {
+        name = "OpenRIO"
+        url = "https://raw.githubusercontent.com/Open-RIO/Maven-Mirror/master/m2"
+    }
     flatDir {
         dirs file("lib")
     }
@@ -49,7 +53,9 @@ dependencies {
 //    compile common
 
     // WPILIB/CTRE jars
-   compile "edu.wpi.first.wpilibj:wpilibj-java:${wpilibVersion}"
+    compile "edu.wpi.first.wpilibj:wpilibj-java:${wpilibVersion}"
+    compile "openrio.mirror.third.ctre:CTRE-phoenix-java:${talonSrxVersion}"
+    compile "edu.wpi.first.ntcore:ntcore-java:${ntcoreVersion}"
 //    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:arm"
 //    compile name: "CTRE_Phoenix"
 //    compile "thirdparty.frc.ctre:Toolsuite-Java:${talonSrxVersion}"
@@ -61,7 +67,9 @@ dependencies {
 
 
     //nativeZip "edu.wpi.first.wpilibj:athena-jni:${wpilibVersion}"
-    //nativeZip "edu.wpi.first.wpilib:athena-runtime:${wpilibVersion}@zip"
+    //nativeZip "edu.wpi.first.wpilib:athena-runtime:${wpilibVersion}@zip
+    nativeZip "openrio.mirror.third.ctre:CTRE-phoenix-java:${talonSrxVersion}"
+
 //    nativeLib name: "libCTRE_PhoenixCCI", ext: "so"
 //    nativeZip "thirdparty.frc.ctre:Toolsuite-Zip:${talonSrxVersion}@zip"
 //    nativeZip "org.opencv:opencv-jni:${opencvVersion}:linux-arm"
@@ -69,7 +77,7 @@ dependencies {
 
     // WPILIB/CTRE sources
 //    source "edu.wpi.first.wpilibj:athena:${wpilibVersion}:sources"
-    source "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:sources"
+//    source "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:sources"
     source name: "CTRE_Phoenix-sources"
     source name: "CTRE_Phoenix-javadoc"
 
