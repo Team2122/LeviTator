@@ -11,6 +11,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
@@ -18,7 +19,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +46,7 @@ public class Robot {
     protected final String configDir;
     private org.teamtators.common.scheduler.RobotState robotState = null;
     private TatorRobotBase robot;
+    private NetworkTableInstance inst;
 
     /**
      * Constructor for a generic robot program. User code should be placed in the constructor that
@@ -60,14 +61,14 @@ public class Robot {
         // TODO: StartCAPI();
         // TODO: See if the next line is necessary
         // Resource.RestartProgram();
-
-        NetworkTable.setNetworkIdentity("Robot");
-        NetworkTable.setPersistentFilename("/home/lvuser/networktables.ini");
-        NetworkTable.setServerMode();// must be before b
+        inst = NetworkTableInstance.getDefault();
+        inst.setNetworkIdentity("Robot");
+        inst.startServer("/home/lvuser/networktables.ini");// must be before b
         m_ds = DriverStation.getInstance();
-        NetworkTable.getTable(""); // forces network tables to initialize
-        NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+        inst.getTable(""); // forces network tables to initialize
+        inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
         this.configDir = configDir;
+        LiveWindow.setEnabled(true);
     }
 
     /**
