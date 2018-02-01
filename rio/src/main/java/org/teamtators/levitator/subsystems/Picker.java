@@ -23,26 +23,23 @@ public class Picker extends Subsystem {
 
     }
 
-    public void setDeathGrip(boolean isGrip){
+    public void setDeathGrip(boolean isGrip) {
 
     }
 
-    public void setPickerRetract(boolean isRetract){
+    public void setPickerRetract(boolean isRetract) {
 
     }
 
-    public boolean isCubeIn(){
+    public boolean isCubeIn() {
         return false;
     }
 
-    public enum State{
+    public enum State {
         IN,
         PICKING,
         GRIP_IN,
         GRIP_OUT,
         RELEASING
     }
-
 }
-
-
