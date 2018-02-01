@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.SolenoidTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
 
 public class Picker extends Subsystem {
 
@@ -33,6 +37,19 @@ public class Picker extends Subsystem {
 
     public boolean isCubeIn() {
         return false;
+    }
+
+    @Override
+    public ManualTestGroup createManualTests() {
+        ManualTestGroup tests = super.createManualTests();
+
+        tests.addTest(new SpeedControllerTest("leftPickerMotor", leftPickerMotor));
+        tests.addTest(new SpeedControllerTest("rightPickerMotor", rightPickerMotor));
+        tests.addTest(new SolenoidTest("deathGripSolenoid", deathGripSolenoid));
+        tests.addTest(new SolenoidTest("pickerRetractSolenoid", pickerRetractSolenoid));
+        tests.addTest(new DigitalSensorTest("cubeStatusSensor", cubeStatusSensor));
+
+        return tests;
     }
 
     public enum State {
