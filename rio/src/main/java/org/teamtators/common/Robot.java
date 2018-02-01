@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class Robot {
     protected final String configDir;
     private org.teamtators.common.scheduler.RobotState robotState = null;
     private TatorRobotBase robot;
-    private NetworkTableInstance inst;
+    private NetworkTableInstance networkTables;
 
     /**
      * Constructor for a generic robot program. User code should be placed in the constructor that
@@ -61,12 +62,12 @@ public class Robot {
         // TODO: StartCAPI();
         // TODO: See if the next line is necessary
         // Resource.RestartProgram();
-        inst = NetworkTableInstance.getDefault();
-        inst.setNetworkIdentity("Robot");
-        inst.startServer("/home/lvuser/networktables.ini");// must be before b
+        networkTables = NetworkTableInstance.getDefault();
+        networkTables.setNetworkIdentity("Robot");
+        networkTables.startServer("/home/lvuser/networktables.ini");// must be before b
         m_ds = DriverStation.getInstance();
-        inst.getTable(""); // forces network tables to initialize
-        inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
+        networkTables.getTable(""); // forces network tables to initialize
+        networkTables.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
         this.configDir = configDir;
         LiveWindow.setEnabled(true);
     }
@@ -328,6 +329,7 @@ public class Robot {
                         break;
                 }
                 robot.onDriverStationData();
+                SmartDashboard.updateValues();
             }
             // Enable LiveWindow if in test mode
 //            LiveWindow.setEnabled(robotState == RobotState.TEST);
