@@ -103,8 +103,8 @@ public class Robot {
      * Common initialization for all robot programs.
      */
     public static void initializeHardwareConfiguration() {
-        int rv = HAL.initialize(0);
-        assert rv == 1;
+        boolean rv = HAL.initialize(0, 0);
+        assert rv;
 
         // Set some implementations so that the static methods work properly
         Timer.SetImplementation(new HardwareTimer());
