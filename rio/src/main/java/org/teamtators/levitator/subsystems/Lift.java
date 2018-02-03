@@ -25,7 +25,7 @@ public class Lift extends Subsystem {
     /**
      * @return height in inches
      */
-    public double getCurrenHeight() {
+    public double getCurrentHeight() {
         return liftEncoder.getDistance();
     }
 
@@ -43,7 +43,7 @@ public class Lift extends Subsystem {
         this.desiredHeight = desiredHeight;
     }
 
-    public void setDesiredHeightPresent(HeightPresent desiredHeight) {
+    public void setDesiredHeightPreset(HeightPreset desiredHeight) {
 
     }
 
@@ -59,18 +59,18 @@ public class Lift extends Subsystem {
         this.desiredPivotAngle = desiredAngle;
     }
 
-    public void setDesiredAnglePresent(AnglePresent desiredPivotAngle) {
+    public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
 
     }
 
-    public enum HeightPresent {
+    public enum HeightPreset {
         PICK,
         SWITCH,
-        SACLE_LOW,
+        SCALE_LOW,
         SCALE_HIGH;
     }
 
-    public enum AnglePresent {
+    public enum AnglePreset {
         LEFT,
         CENTER,
         RIGHT;
