@@ -1,66 +1,76 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSpeedController;
+import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
 
 public class Lift extends Subsystem {
 
     private PWMSpeedController liftMotor;
-    private DigitalOutput limitSensor;
+    private DigitalSensor limitSensorTop;
+    private DigitalSensor limitSensorBottom;
     private PWMSpeedController pivotMotor;
     private AnalogPotentiometer pivotEncoder;
     private Encoder liftEncoder;
 
-    private double desiredPickerAngle;
-    private double desiredLiftHeight;
+    private double desiredPivotAngle;
+    private double desiredHeight;
 
     public Lift() {
-        super("lift");
+        super("Lift");
     }
 
-    public double getCurrentLiftPositionInInches() {
+    /**
+     * @return height in inches
+     */
+    public double getCurrenHeight() {
         return liftEncoder.getDistance();
     }
 
-    public double getDesiredLiftPositionInInches() {
-        return desiredLiftHeight;
+    /**
+     * @return height in inches
+     */
+    public double getDesiredHeight() {
+        return desiredHeight;
     }
 
-    public void setDesiredLiftPositionInInches(double desiredPosition) {
-        this.desiredLiftHeight = desiredPosition;
+    /**
+     * @param desiredHeight height in inches
+     */
+    public void setDesiredHeight(double desiredHeight) {
+        this.desiredHeight = desiredHeight;
     }
 
-    public void setDesiredLiftKnownPosition(KnownLiftPosition desiredPosition) {
+    public void setDesiredHeightPresent(HeightPresent desiredHeight) {
 
     }
 
-    public double getCurrentPickerAngle() {
+    public double getCurrentPivotAngle() {
         return pivotEncoder.get();
     }
 
-    public double getDesiredPickerAngler() {
-        return desiredPickerAngle;
+    public double getDesiredPivotAngle() {
+        return desiredPivotAngle;
     }
 
-    public void setDesiredPickerAngle(double desiredAngle) {
-        this.desiredPickerAngle = desiredAngle;
+    public void setDesiredPivotAngle(double desiredAngle) {
+        this.desiredPivotAngle = desiredAngle;
     }
 
-    public void setDesiredKnownPickerPosition(KnownPickerPosition desiredPosition) {
+    public void setDesiredAnglePresent(AnglePresent desiredPivotAngle) {
 
     }
 
-    public enum KnownLiftPosition {
+    public enum HeightPresent {
         PICK,
         SWITCH,
         SACLE_LOW,
         SCALE_HIGH;
     }
 
-    public enum KnownPickerPosition {
+    public enum AnglePresent {
         LEFT,
         CENTER,
         RIGHT;

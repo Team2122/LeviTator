@@ -19,8 +19,8 @@ public class Subsystems extends SubsystemsBase {
 
     public Subsystems() {
         drive = new Drive();
-        lift = new Lift();
         picker = new Picker();
+        lift = new Lift();
 
         //your subsystems here
 
