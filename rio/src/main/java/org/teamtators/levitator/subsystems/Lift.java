@@ -1,10 +1,15 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.components.AnalogPotentiometerTest;
+import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.EncoderTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
 
 public class Lift extends Subsystem {
 
@@ -74,5 +79,19 @@ public class Lift extends Subsystem {
         LEFT,
         CENTER,
         RIGHT;
+    }
+
+    @Override
+    public ManualTestGroup createManualTests() {
+        ManualTestGroup tests = super.createManualTests();
+
+        tests.addTest(new SpeedControllerTest("liftMotor", liftMotor));
+        tests.addTest(new DigitalSensorTest("limitSensorTop", limitSensorTop));
+        tests.addTest(new DigitalSensorTest("limitSensorBottom", limitSensorBottom));
+        tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
+        tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
+        tests.addTest(new EncoderTest("liftEncoder", liftEncoder));
+
+        return tests;
     }
 }
