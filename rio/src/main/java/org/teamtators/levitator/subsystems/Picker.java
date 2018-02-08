@@ -2,6 +2,10 @@ package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import org.teamtators.common.config.Configurable;
+import org.teamtators.common.config.DigitalSensorConfig;
+import org.teamtators.common.config.SolenoidConfig;
+import org.teamtators.common.config.SpeedControllerConfig;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -9,7 +13,7 @@ import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
-public class Picker extends Subsystem {
+public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     private SpeedController leftPickerMotor;
     private SpeedController rightPickerMotor;
@@ -24,19 +28,20 @@ public class Picker extends Subsystem {
     }
 
     public void setRollerPower(double rollerPower) {
-
+        leftPickerMotor.set(rollerPower);
+        rightPickerMotor.set(rollerPower);
     }
 
     public void setDeathGrip(boolean isGrip) {
-
+        deathGripSolenoid.set(isGrip);
     }
 
     public void setPickerRetract(boolean isRetract) {
-
+        pickerRetractSolenoid.set(isRetract);
     }
 
     public boolean isCubeIn() {
-        return false;
+        return cubeStatusSensor.get();
     }
 
     @Override
@@ -50,11 +55,28 @@ public class Picker extends Subsystem {
         return tests;
     }
 
+    @Override
+    public void configure(Config config) {
+        this.leftPickerMotor = config.leftPickerMotor.create();
+        this.rightPickerMotor = config.rightPickerMotor.create();
+        this.deathGripSolenoid = config.deathGripSolenoid.create();
+        this.pickerRetractSolenoid = config.pickerRetractSolenoid.create();
+        this.cubeStatusSensor = config.cubeStatusSensor.create();
+    }
+
     public enum State {
         IN,
         PICKING,
         GRIP_IN,
         GRIP_OUT,
         RELEASING
+    }
+
+    public class Config {
+        SpeedControllerConfig leftPickerMotor;
+        SpeedControllerConfig rightPickerMotor;
+        SolenoidConfig deathGripSolenoid;
+        SolenoidConfig pickerRetractSolenoid;
+        DigitalSensorConfig cubeStatusSensor;
     }
 }
