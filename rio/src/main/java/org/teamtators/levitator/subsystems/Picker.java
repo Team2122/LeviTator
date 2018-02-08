@@ -44,6 +44,14 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return cubeStatusSensor.get();
     }
 
+    public void setState(State desiredState) {
+        state = desiredState;
+    }
+
+    public State getState(){
+        return state;
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
