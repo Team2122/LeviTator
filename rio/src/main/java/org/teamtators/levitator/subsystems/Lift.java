@@ -30,7 +30,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public Lift() {
         super("Lift");
-        config.ticksPerInch = 360;
+        config.ticksPerInch = 0.05249;
         config.angleOffset = 360;
     }
 
@@ -112,15 +112,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         */return tests;
     }
 
-    public class Config {
-        SpeedControllerConfig liftMotor;
-        DigitalSensorConfig limitSensorTop;
-        DigitalSensorConfig limitSensorBottom;
-        SpeedControllerConfig pivotMotor;
-        AnalogPoteniometerConfig pivotEncoder;
-        EncoderConfig liftEncoder;
+    public static class Config {
+        public SpeedControllerConfig liftMotor;
+        public DigitalSensorConfig limitSensorTop;
+        public DigitalSensorConfig limitSensorBottom;
+        public SpeedControllerConfig pivotMotor;
+        public AnalogPoteniometerConfig pivotEncoder;
+        public EncoderConfig liftEncoder;
 
-        private double ticksPerInch;
-        private double angleOffset;
+        public double ticksPerInch;
+        public double angleOffset;
     }
 }
