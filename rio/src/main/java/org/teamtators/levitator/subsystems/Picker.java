@@ -80,11 +80,11 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         RELEASING
     }
 
-    public class Config {
-        SpeedControllerConfig leftPickerMotor;
-        SpeedControllerConfig rightPickerMotor;
-        SolenoidConfig deathGripSolenoid;
-        SolenoidConfig pickerRetractSolenoid;
-        DigitalSensorConfig cubeStatusSensor;
+    public static class Config {
+        public SpeedControllerConfig leftPickerMotor;
+        public SpeedControllerConfig rightPickerMotor;
+        public SolenoidConfig deathGripSolenoid;
+        public SolenoidConfig pickerRetractSolenoid;
+        public DigitalSensorConfig cubeStatusSensor;
     }
 }
