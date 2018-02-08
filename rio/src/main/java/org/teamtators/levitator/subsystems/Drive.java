@@ -177,14 +177,14 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         gyro.startCalibration();
     }
 
-    public class Config {
-        SpeedControllerConfig leftMotor;
-        SpeedControllerConfig rightMotor;
-        EncoderConfig leftEncoder;
-        EncoderConfig rightEncoder;
-        PidController.Config rotationController;
-        PidController.Config leftController;
-        PidController.Config rightController;
-        double wheelCircumference;
+    public static class Config {
+        public SpeedControllerConfig leftMotor;
+        public SpeedControllerConfig rightMotor;
+        public EncoderConfig leftEncoder;
+        public EncoderConfig rightEncoder;
+        public PidController.Config rotationController;
+        public PidController.Config leftController;
+        public PidController.Config rightController;
+        public double wheelCircumference;
     }
 }
