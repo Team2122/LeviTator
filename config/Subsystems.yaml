@@ -1,0 +1,3 @@
+operatorInterface:
+  driverJoystick: {index: 0, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}
+  gunnerJoystick: {index: 1, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}

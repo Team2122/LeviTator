@@ -90,8 +90,9 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         logger.debug("Creating commands");
         registerCommands();
         ObjectNode commandsConfig = (ObjectNode) configLoader.load("Commands.yaml");
-        getCommandStore().createCommandsFromConfig(commandsConfig);
-        autoCommand = commandStore.getCommand("$AutoChooser");
+        //TODO command config
+        //getCommandStore().createCommandsFromConfig(commandsConfig);
+        //autoCommand = commandStore.getCommand("$AutoChooser");
     }
 
     protected void configureTests() {
@@ -107,7 +108,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         ObjectNode triggersConfig = (ObjectNode) configLoader.load("Triggers.yaml");
         triggerBinder.setDriverJoystick(getDriverJoystick());
         triggerBinder.setGunnerJoystick(getGunnerJoystick());
-        triggerBinder.bindTriggers(triggersConfig);
+        //TODO Triggers
+        //triggerBinder.bindTriggers(triggersConfig);
     }
 
     protected void startThreads() {
@@ -142,6 +144,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
                 subsystem.update(delta);
             }
         }
+        DriverStation.getInstance().isDSAttached();
     }
 
     private void setUpDashboards() {

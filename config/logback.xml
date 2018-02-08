@@ -7,14 +7,14 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-
+<!--
     <appender name="File" class="ch.qos.logback.core.FileAppender">
         <file>/media/sda1/LeviTator Logs/${fileTimestamp}_Limbo.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-
+-->
     <!--
         <appender name="Server" class="ch.qos.logback.classic.net.server.ServerSocketAppender">
             <port>5802</port>
@@ -26,13 +26,13 @@
         <remoteHost>10.21.22.5</remoteHost>
         <reconnectionDelay>1000</reconnectionDelay>
     </appender>
-
+<!--
     <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
         <neverBlock>true</neverBlock>
         <queueSize>240</queueSize>
         <appender-ref ref="File"/>
     </appender>
-
+-->
     <appender name="AsyncServer" class="ch.qos.logback.classic.AsyncAppender">
         <neverBlock>true</neverBlock>
         <queueSize>240</queueSize>
@@ -41,7 +41,7 @@
 
     <root level="debug">
         <appender-ref ref="Console"/>
-        <appender-ref ref="AsyncFile"/>
+        <!--<appender-ref ref="AsyncFile"/>-->
         <appender-ref ref="AsyncServer"/>
     </root>
 
