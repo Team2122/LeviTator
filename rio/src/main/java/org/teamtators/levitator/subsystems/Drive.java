@@ -1,7 +1,11 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedController;
+import org.teamtators.common.config.Configurable;
+import org.teamtators.common.config.EncoderConfig;
+import org.teamtators.common.config.SpeedControllerConfig;
 import org.teamtators.common.control.PidController;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.scheduler.Subsystem;
@@ -10,16 +14,18 @@ import org.teamtators.common.scheduler.Subsystem;
  * Has 2 sets of wheels (on the left and right) which can be independently controlled with motors. Also has 2
  * encoders and a gyroscope to measure the movements of the robot
  */
-public class Drive extends Subsystem {
+public class Drive extends Subsystem implements Configurable<Drive.Config> {
 
     private SpeedController leftMotor;
     private SpeedController rightMotor;
     private Encoder rightEncoder;
     private Encoder leftEncoder;
     private ADXRS453 gyro;
-    private PidController rotationController;
-    private PidController leftController;
-    private PidController rightController;
+    private PidController rotationController = new PidController("RotationController");
+    private PidController leftController = new PidController("LeftController");
+    private PidController rightController = new PidController("RightController");
+
+    private Config config;
 
     private double speed;
 
@@ -75,7 +81,7 @@ public class Drive extends Subsystem {
      * @param rightSpeed the speed (inches/sec) for the right side
      * @param leftSpeed  the speed (in/sec) for the left side
      */
-    public void driveSpeeds(double rightSpeed, double leftSpeed) {
+    public void driveSpeeds(double leftSpeed, double rightSpeed) {
         rotationController.stop();
         leftController.start();
         rightController.start();
@@ -105,7 +111,7 @@ public class Drive extends Subsystem {
     }
 
     public double getLeftDistance() {
-        return leftEncoder.getDistance(); //* wheelCircumference;
+        return leftEncoder.getDistance() * config.wheelCircumference;
     }
 
 
@@ -132,5 +138,31 @@ public class Drive extends Subsystem {
 
     public void resetYawAngle() {
         gyro.resetAngle();
+    }
+
+    @Override
+    public void configure(Config config) {
+        this.config = config;
+        this.leftMotor = config.leftMotor.create();
+        this.rightMotor = config.rightMotor.create();
+        this.leftEncoder = config.leftEncoder.create();
+        this.rightEncoder = config.rightEncoder.create();
+        gyro = new ADXRS453(SPI.Port.kOnboardCS0);
+        this.rotationController.configure(config.rotationController);
+        this.leftController.configure(config.leftController);
+        this.rightController.configure(config.rightController);
+        gyro.start();
+        gyro.startCalibration();
+    }
+
+    public class Config {
+        SpeedControllerConfig leftMotor;
+        SpeedControllerConfig rightMotor;
+        EncoderConfig leftEncoder;
+        EncoderConfig rightEncoder;
+        PidController.Config rotationController;
+        PidController.Config leftController;
+        PidController.Config rightController;
+        double wheelCircumference;
     }
 }
