@@ -39,7 +39,7 @@ class DeployNativeLibsTask extends DefaultTask {
                             dest: unzipped,
                             overwrite: "true")
                     project.fileTree(unzipped)
-                            .include("*.so*", "lib/*.so*", "java/lib/*.so*")
+                            .include("*.so*", "lib/*.so", "java/lib/*.so", "linux/athena/shared/*.so", "**/libopencv*.so.*", "linux/athena/*.so")
                             .visit { FileVisitDetails visit ->
                         if (!visit.directory)
                             putLibFile visit.file

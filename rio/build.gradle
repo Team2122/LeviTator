@@ -5,8 +5,8 @@ apply plugin: org.teamtators.rioplugin.RioPlugin
 
 rio {
     teamNumber = rootProject.teamNumber
-    robotClass = 'org.teamtators.limbo.TatorRobot'
-    deployDir = "/home/lvuser/Limbo"
+    robotClass = 'org.teamtators.levitator.TatorRobot'
+    deployDir = "/home/lvuser/LeviTator"
     runArgs = "${rio.configDir}"
     jvmArgs = ""
 }
@@ -80,6 +80,19 @@ dependencies {
 //    source "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:sources"
     source name: "CTRE_Phoenix-sources"
     source name: "CTRE_Phoenix-javadoc"
+
+    compile "edu.wpi.first.wpilibj:wpilibj-jni:${wpilibVersion}:linuxathena"
+
+
+    compile "edu.wpi.first.ntcore:ntcore-java:${ntcoreVersion}"
+
+    nativeZip "edu.wpi.first.ntcore:ntcore-jni:${ntcoreVersion}:linuxathena"
+    nativeZip "edu.wpi.first.wpiutil:wpiutil-cpp:3.0.0:linuxathena@zip"
+    nativeZip "edu.wpi.first.hal:hal:${wpilibVersion}:linuxathena@zip"
+    compile "edu.wpi.first.wpiutil:wpiutil-java:3.0.0"
+    //nativeZip "edu.wpi.first.wpiutil:wpiutil-cpp:3.0.0:linuxathena@zip"
+
+
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
 }

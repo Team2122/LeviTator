@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <timestamp key="fileTimestamp" datePattern="yyyy-MM-dd HH.mm.ss"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="File" class="ch.qos.logback.core.FileAppender">
+        <file>/media/sda1/LeviTator Logs/${fileTimestamp}_Limbo.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        <appender name="Server" class="ch.qos.logback.classic.net.server.ServerSocketAppender">
+            <port>5802</port>
+        </appender>
+    -->
+
+    <appender name="Server" class="ch.qos.logback.classic.net.SocketAppender">
+        <port>5802</port>
+        <remoteHost>10.21.22.5</remoteHost>
+        <reconnectionDelay>1000</reconnectionDelay>
+    </appender>
+
+    <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <queueSize>240</queueSize>
+        <appender-ref ref="File"/>
+    </appender>
+
+    <appender name="AsyncServer" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <queueSize>240</queueSize>
+        <appender-ref ref="Server"/>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="AsyncFile"/>
+        <appender-ref ref="AsyncServer"/>
+    </root>
+
+    <!--<logger name="org.teamtators.limbo.subsystems.Drive" level="TRACE" />-->
+    <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftLow)" level="TRACE" />-->
+    <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftHigh)" level="TRACE" />-->
+    <!--<logger name="org.teamtators.limbo.commands.DriveTank(Drive.Tank)" level="TRACE" />-->
+    <!--<logger name="org.teamtators.limbo.subsystems.Drive" level="TRACE" />-->
+</configuration>

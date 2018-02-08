@@ -12,20 +12,20 @@ public class Subsystems extends SubsystemsBase {
 
     private List<Subsystem> subsystems;
 
+    private OperatorInterface oi;
     private Drive drive;
     private Picker picker;
     private Lift lift;
-    //private YourSubsytem yourSubsystem;
+    //private YourSubsystem yourSubsystem;
 
     public Subsystems() {
+        oi = new OperatorInterface();
         drive = new Drive();
         picker = new Picker();
         lift = new Lift();
 
         //your subsystems here
-
-
-        subsystems = Arrays.asList(drive, picker, lift /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift /*, yourSubsystem */);
     }
 
 
@@ -41,7 +41,7 @@ public class Subsystems extends SubsystemsBase {
 
     @Override
     public List<Updatable> getControllers() {
-        return null;
+        return Arrays.asList();
     }
 
     public Drive getDrive() {
@@ -50,5 +50,13 @@ public class Subsystems extends SubsystemsBase {
 
     public Picker getPicker() {
         return picker;
+    }
+
+    public Lift getLift() {
+        return lift;
+    }
+
+    public OperatorInterface getOI() {
+        return oi;
     }
 }
