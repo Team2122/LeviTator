@@ -7,6 +7,7 @@ import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.ADXRS453Test;
+import org.teamtators.common.tester.components.ControllerTest;
 import org.teamtators.common.tester.components.EncoderTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
@@ -79,7 +80,7 @@ public class Drive extends Subsystem {
      * @param rightSpeed the speed (inches/sec) for the right side
      * @param leftSpeed  the speed (in/sec) for the left side
      */
-    public void driveSpeeds(double rightSpeed, double leftSpeed) {
+    public void driveSpeeds(double leftSpeed, double rightSpeed) {
         rotationController.stop();
         leftController.start();
         rightController.start();
@@ -147,6 +148,9 @@ public class Drive extends Subsystem {
         tests.addTests(new EncoderTest("RightEncoder", rightEncoder));
         tests.addTests(new EncoderTest("LeftEncoder", leftEncoder));
         tests.addTests(new ADXRS453Test("gyro", gyro));
+        tests.addTests(new ControllerTest(rotationController, 180));
+        tests.addTests(new ControllerTest(leftController, 24));
+        tests.addTests(new ControllerTest(rightController, 24));
 
         return tests;
     }
