@@ -44,7 +44,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return cubeStatusSensor.get();
     }
 
-    public void setState(State desiredState) {
+    public void setDesiredState(State desiredState) {
         state = desiredState;
     }
 
@@ -73,10 +73,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public enum State {
-        IN,
+        RETRACTED_NO_CUBE,
         PICKING,
-        GRIP_IN,
-        GRIP_OUT,
+        RETRACTED_WITH_CUBE,
+        EXTENDED_WITH_CUBE,
         RELEASING
     }
 
