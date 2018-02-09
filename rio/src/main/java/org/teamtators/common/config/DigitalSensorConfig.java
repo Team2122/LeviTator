@@ -2,6 +2,14 @@ package org.teamtators.common.config;
 
 import org.teamtators.common.hw.DigitalSensor;
 
+/**
+ * Example mapping:
+ * exampleSensor: {channel: 0, type: NPN}
+ * OR
+ * exampleSensor: {channel: 0, type: PNP}
+ *
+ * Whichever one works!
+ */
 public class DigitalSensorConfig {
     private int channel;
     private DigitalSensor.Type type;

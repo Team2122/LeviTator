@@ -2,6 +2,10 @@ package org.teamtators.common.config;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
+/**
+ * Example mapping:
+ * exampleSolenoid: {channel: 0}
+ */
 public class SolenoidConfig {
     private int channel;
 

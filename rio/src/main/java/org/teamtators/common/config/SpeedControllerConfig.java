@@ -4,11 +4,21 @@ import edu.wpi.first.wpilibj.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Example Mapping:
+ *
+ * minimum required:
+ * controllerName: {channel: 0, powerChannels: [0, 1, 2]}
+ *
+ * all values:
+ * controllerName: {channel: 0, inverted: true, type: Victor, powerChannels: [0, 1, 2]}
+ */
 public class SpeedControllerConfig {
     private int channel;
     private boolean inverted = false;
     private Type type = Type.VICTORSP;
     private int[] powerChannels;
+    //Not config
     private Logger logger = LoggerFactory.getLogger(SpeedControllerConfig.class);
 
 
