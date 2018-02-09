@@ -354,11 +354,9 @@ public class Robot {
         }
 
         try {
-            /*robot = (TatorRobotBase) Class.forName(robotName)
+            robot = (TatorRobotBase) Class.forName(robotName)
                     .getConstructor(String.class)
-                    .newInstance(this.configDir);*/
-            //TEMP FIX
-            robot = new TatorRobot(this.configDir);
+                    .newInstance(this.configDir);
         } catch (Throwable throwable) {
             DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " "
                     + throwable.toString() + " at " + Arrays.toString(throwable.getStackTrace()), false);

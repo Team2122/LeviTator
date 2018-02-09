@@ -1,9 +1,4 @@
-ext.wpilibVersion = "2018.1.1"
-ext.ntcoreVersion = "4.0.0"
-ext.talonSrxVersion = "5.2.1.1"
-ext.opencvVersion = "320"
-
-ext.teamNumber = "2122"
+ext.teamNumber = 2122
 
 allprojects {
     apply plugin: "idea"
@@ -17,6 +12,6 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
+    gradleVersion = '4.5.1'
     distributionType = 'ALL'
 }

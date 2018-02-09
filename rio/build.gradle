@@ -1,44 +1,48 @@
-apply plugin: "java"
-apply plugin: org.teamtators.rioplugin.RioPlugin
+import jaci.gradle.deploy.artifact.FileArtifact
+import jaci.gradle.deploy.artifact.FileCollectionArtifact
+import jaci.openrio.gradle.frc.FRCJavaArtifact
+import jaci.openrio.gradle.frc.RoboRIO
+import org.gradle.api.java.archives.internal.DefaultManifest
 
-//def common = project(":common")
+plugins {
+    id "java"
+    id "jaci.openrio.gradle.GradleRIO" version "2018.01.22"
+}
 
-rio {
-    teamNumber = rootProject.teamNumber
-    robotClass = 'org.teamtators.levitator.TatorRobot'
-    deployDir = "/home/lvuser/LeviTator"
-    runArgs = "${rio.configDir}"
-    jvmArgs = ""
+def robotDir = '/home/lvuser/LeviTator'
+
+deploy {
+    targets {
+        target("roborio", RoboRIO) {
+            team = teamNumber
+        }
+    }
+    artifacts {
+        artifact('frcJava', FRCJavaArtifact) {
+            targets << 'roborio'
+            filename = 'LeviTator.jar'
+            arguments = [ "$robotDir/config" ]
+        }
+        artifact('config', FileCollectionArtifact) {
+            targets << 'roborio'
+            files = rootProject.files('config')
+//            filename = configDir
+        }
+    }
 }
 
 repositories {
     mavenCentral()
     maven {
-        name = "WPI"
-        url = "http://first.wpi.edu/FRC/roborio/maven/release"
-    }
-    maven {
-        name = "Jaci"
-        url = "http://dev.imjac.in/maven/"
-    }
-    maven {
         name = "Eclipse Paho"
         url = "https://repo.eclipse.org/content/repositories/paho-releases/"
-    }
-    maven {
-        name = "OpenRIO"
-        url = "https://raw.githubusercontent.com/Open-RIO/Maven-Mirror/master/m2"
     }
     flatDir {
         dirs file("lib")
     }
 }
 
-configurations {
-}
-
 dependencies {
-
     compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.5'
     compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.1.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
@@ -50,51 +54,18 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-ext', version: '1.7.25'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.11'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.11'
-//    compile common
-
-    // WPILIB/CTRE jars
-    compile "edu.wpi.first.wpilibj:wpilibj-java:${wpilibVersion}"
-    compile "openrio.mirror.third.ctre:CTRE-phoenix-java:${talonSrxVersion}"
-    compile "edu.wpi.first.ntcore:ntcore-java:${ntcoreVersion}"
-//    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:arm"
-//    compile name: "CTRE_Phoenix"
-//    compile "thirdparty.frc.ctre:Toolsuite-Java:${talonSrxVersion}"
-//    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:desktop"
-//    compile "org.opencv:opencv-java:${opencvVersion}"
-//    compile "edu.wpi.cscore.java:cscore:${wpilibVersion}:arm"
-
-    // WPILIB/CTRE native libraries
-
-
-    //nativeZip "edu.wpi.first.wpilibj:athena-jni:${wpilibVersion}"
-    //nativeZip "edu.wpi.first.wpilib:athena-runtime:${wpilibVersion}@zip
-    nativeZip "openrio.mirror.third.ctre:CTRE-phoenix-java:${talonSrxVersion}"
-
-//    nativeLib name: "libCTRE_PhoenixCCI", ext: "so"
-//    nativeZip "thirdparty.frc.ctre:Toolsuite-Zip:${talonSrxVersion}@zip"
-//    nativeZip "org.opencv:opencv-jni:${opencvVersion}:linux-arm"
-//    nativeZip "edu.wpi.cscore.java:cscore:${wpilibVersion}:athena-uberzip@zip"
-
-    // WPILIB/CTRE sources
-//    source "edu.wpi.first.wpilibj:athena:${wpilibVersion}:sources"
-//    source "edu.wpi.first.wpilib.networktables.java:NetworkTables:${ntcoreVersion}:sources"
-    source name: "CTRE_Phoenix-sources"
-    source name: "CTRE_Phoenix-javadoc"
-
-    compile "edu.wpi.first.wpilibj:wpilibj-jni:${wpilibVersion}:linuxathena"
-
-
-    compile "edu.wpi.first.ntcore:ntcore-java:${ntcoreVersion}"
-
-    nativeZip "edu.wpi.first.ntcore:ntcore-jni:${ntcoreVersion}:linuxathena"
-    nativeZip "edu.wpi.first.wpiutil:wpiutil-cpp:3.0.0:linuxathena@zip"
-    nativeZip "edu.wpi.first.hal:hal:${wpilibVersion}:linuxathena@zip"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:3.0.0"
-    //nativeZip "edu.wpi.first.wpiutil:wpiutil-cpp:3.0.0:linuxathena@zip"
-
-
-
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
+
+    compile wpilib()
+    compile ctre()
+    compile navx()
+    compile openrio.powerup.matchData()
 }
 
-//evaluationDependsOn(":common")
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest { DefaultManifest mf ->
+        mf.attributes 'Main-Class': 'org.teamtators.common.Robot'
+        mf.attributes 'Robot-Class': 'org.teamtators.levitator.TatorRobot'
+    }
+}
