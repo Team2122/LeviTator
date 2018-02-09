@@ -7,6 +7,7 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.EncoderConfig;
 import org.teamtators.common.config.SpeedControllerConfig;
 import org.teamtators.common.control.PidController;
+import org.teamtators.common.control.Updatable;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -14,6 +15,9 @@ import org.teamtators.common.tester.components.ADXRS453Test;
 import org.teamtators.common.tester.components.ControllerTest;
 import org.teamtators.common.tester.components.EncoderTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Has 2 sets of wheels (on the left and right) which can be independently controlled with motors. Also has 2
@@ -26,13 +30,12 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     private Encoder rightEncoder;
     private Encoder leftEncoder;
     private ADXRS453 gyro;
-    private PidController rotationController;
-    private PidController leftController;
-    private PidController rightController;
+    private PidController rotationController = new PidController("RotationController");
+    private PidController leftController = new PidController("LeftController");
+    private PidController rightController = new PidController("rightController");
 
     private Config config;
     private double speed;
-
 
     public Drive() {
         super("Drive");
@@ -48,6 +51,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
             setRightMotorPower(speed + output);
             setLeftMotorPower(speed - output);
         });
+        config.distancePerPulse = .0471238898;
     }
 
     /**
@@ -116,12 +120,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     }
 
     public double getLeftDistance() {
-        return leftEncoder.getDistance() * config.wheelCircumference;
+        return leftEncoder.getDistance() * config.distancePerPulse;
     }
 
-
     public double getRightDistance() {
-        return rightEncoder.getDistance();
+        return rightEncoder.getDistance() * config.distancePerPulse;
     }
 
     public double getAverageDistance() {
@@ -145,6 +148,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         gyro.resetAngle();
     }
 
+    public List<Updatable> getUpdatables() {
+        return Arrays.asList(rotationController, leftController, rightController);
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
@@ -160,7 +167,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
 
         return tests;
     }
-
 
     @Override
     public void configure(Config config) {
@@ -185,6 +191,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         public PidController.Config rotationController;
         public PidController.Config leftController;
         public PidController.Config rightController;
-        public double wheelCircumference;
+        public double distancePerPulse;
     }
 }
