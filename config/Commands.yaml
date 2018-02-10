@@ -1,1 +1,6 @@
-
+PickerPick:
+  pickPowers: { left: 1.0, right: 0.5 }
+  unjamPowers: { left: 0.2, right: -0.2 }
+  jamDetectPeriod: 0.2
+  unjamPeriod: 0.5
+  finishDetectPeriod: 0.2

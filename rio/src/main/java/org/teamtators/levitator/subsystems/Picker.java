@@ -32,8 +32,17 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         rightMotor.set(right);
     }
 
+    public void setRollerPowers(RollerPowers rollerPowers) {
+        leftMotor.set(rollerPowers.left);
+        rightMotor.set(rollerPowers.right);
+    }
+
     public void setRollerPower(double power) {
         setRollerPowers(power, power);
+    }
+
+    public void stopRollers() {
+        setRollerPowers(0.0, 0.0);
     }
 
     public void setDeathGrip(boolean isDeathGrip) {
@@ -91,5 +100,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         public DigitalSensorConfig cubeDetectLeftSensor;
         public DigitalSensorConfig cubeDetectRightSensor;
         public DigitalSensorConfig cubePresenseSensor;
+    }
+
+    public static class RollerPowers {
+        public double left;
+        public double right;
     }
 }

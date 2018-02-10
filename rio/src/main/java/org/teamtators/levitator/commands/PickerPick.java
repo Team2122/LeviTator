@@ -3,78 +3,87 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.util.BooleanSampler;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Subsystems;
 
 public class PickerPick extends Command implements Configurable<PickerPick.Config> {
-    Picker picker;
-    Config config;
-    Timer timer = new Timer();
+    private Picker picker;
+    private Config config;
 
-    boolean jammed = false;
-    boolean unjamLeft = true;
+
+    private boolean cubePresent;
+    private boolean cubeLeft;
+    private boolean cubeRight;
+
+    private BooleanSampler jammed = new BooleanSampler(() ->
+            cubePresent && (!cubeLeft || !cubeRight));
+    private BooleanSampler finished = new BooleanSampler(() ->
+            cubePresent && cubeLeft && cubeRight);
+
+    private boolean unjamming;
+    private Timer unjamTimer = new Timer();
 
     public PickerPick(TatorRobot robot) {
         super("PickerPick");
-        picker = ((Subsystems)robot.getSubsystemsBase()).getPicker();
+        picker = robot.getSubsystems().getPicker();
         requires(picker);
     }
 
     @Override
     protected void initialize() {
-        picker.setPickerExtended(true);
         super.initialize();
-        timer.start();
+        picker.setPickerExtended(true);
+        unjamming = false;
     }
 
     @Override
     protected boolean step() {
-        if(!jammed) {
-            if (!picker.isCubeDetected() && !picker.isCubeDetectedRight() && !picker.isCubeDetectedLeft()) {
-                picker.setRollerPowers(config.leftRollerPower, config.rightRollerPower);
-            } else if (picker.isCubeDetected() && (!picker.isCubeDetectedLeft() || !picker.isCubeDetectedRight())) {
-                if (timer.hasPeriodElapsed(config.waitPeriod)) {
-                    jammed = true;
-                    timer.reset();
-                }
-            }
-        } else {
-            timer.start();
-            if(unjamLeft) {
-                picker.setRollerPowers(config.unjamLeftRollerPower, 0.0);
-            } else {
-                picker.setRollerPowers(0.0, config.unjamRightRollerPower);
-            }
-            if(timer.hasPeriodElapsed(config.unjamPeriod)) {
-                unjamLeft = !unjamLeft;
-                timer.restart();
-            }
+        this.cubePresent = picker.isCubeDetected();
+        this.cubeLeft = picker.isCubeDetectedLeft();
+        this.cubeRight = picker.isCubeDetectedRight();
+
+        boolean jammed = this.jammed.get();
+        boolean finished = this.finished.get();
+
+        if (jammed && !unjamming) {
+            unjamming = true;
+            unjamTimer.start();
         }
-        return picker.isCubeDetected() && picker.isCubeDetectedLeft() && picker.isCubeDetectedRight();
+
+        if (unjamming && unjamTimer.hasPeriodElapsed(config.unjamPeriod)) {
+            unjamming = false;
+        }
+
+        if (unjamming) {
+            picker.setRollerPowers(config.unjamPowers);
+        } else {
+            picker.setRollerPowers(config.pickPowers);
+        }
+
+        return finished;
     }
 
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
-        jammed = true;
-        unjamLeft = true;
-        timer.reset();
-        picker.setRollerPowers(0.0,0.0);
+        picker.stopRollers();
         picker.setPickerExtended(false);
     }
 
     @Override
     public void configure(Config config) {
         this.config = config;
+        this.jammed.setPeriod(config.jamDetectPeriod);
+        this.finished.setPeriod(config.finishDetectPeriod);
     }
 
     public static class Config {
-        public double leftRollerPower;
-        public double rightRollerPower;
-        public double unjamLeftRollerPower;
-        public double unjamRightRollerPower;
-        public double waitPeriod;
+        public Picker.RollerPowers pickPowers;
+        public Picker.RollerPowers unjamPowers;
+        public double jamDetectPeriod;
+        public double finishDetectPeriod;
         public double unjamPeriod;
     }
 }
