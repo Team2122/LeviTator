@@ -11,6 +11,6 @@ public class CommandRegistrar {
     }
 
     public void register(ConfigCommandStore commandStore) {
-        commandStore.putCommand("Drive.Tank", new DriveTank(robot));
+        commandStore.putCommand("DriveTank", new DriveTank(robot));
     }
 }

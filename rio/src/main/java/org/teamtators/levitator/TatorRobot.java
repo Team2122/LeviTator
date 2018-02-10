@@ -21,6 +21,10 @@ public class TatorRobot extends TatorRobotBase {
         subsystems = new Subsystems();
     }
 
+    public Subsystems getSubsystems() {
+        return subsystems;
+    }
+
     @Override
     public SubsystemsBase getSubsystemsBase() {
         return subsystems;

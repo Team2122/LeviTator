@@ -49,7 +49,7 @@ public class Timer {
     /**
      * Set start time to a value such that any timeout will finish
      */
-    public void reset() {
+    public void stop() {
         startTime = Double.NEGATIVE_INFINITY;
     }
 
@@ -78,5 +78,13 @@ public class Timer {
      */
     public boolean isRunning() {
         return startTime != Double.NEGATIVE_INFINITY;
+    }
+
+    public void startOrStop(boolean shouldStart) {
+        if (shouldStart && !isRunning()) {
+            start();
+        } else if (!shouldStart) {
+            stop();
+        }
     }
 }

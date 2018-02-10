@@ -8,14 +8,14 @@ import java.util.function.BooleanSupplier;
 
 public class BooleanSampler implements Configurable<BooleanSampler.Config> {
     private BooleanSupplier source;
-    private double minPeriod;
+    private double period;
     private Timer timer = new Timer();
 
-    public BooleanSampler(BooleanSupplier source, double minPeriod) {
-        Preconditions.checkArgument(minPeriod >= 0, "minPeriod must be positive");
+    public BooleanSampler(BooleanSupplier source, double period) {
+        Preconditions.checkArgument(period >= 0, "period must be positive");
         Preconditions.checkNotNull(source);
         this.source = source;
-        this.minPeriod = minPeriod;
+        this.period = period;
     }
 
     public BooleanSampler(BooleanSupplier source) {
@@ -27,21 +27,29 @@ public class BooleanSampler implements Configurable<BooleanSampler.Config> {
             if (!timer.isRunning()) {
                 timer.start();
             }
-            if (timer.periodically(minPeriod)) {
+            if (timer.hasPeriodElapsed(this.period)) {
                 return true;
             }
         } else {
-            timer.reset();
+            timer.stop();
         }
         return false;
     }
 
+    public double getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(double period) {
+        this.period = period;
+    }
+
     @Override
     public void configure(Config config) {
-        this.minPeriod = config.minPeriod;
+        this.period = config.period;
     }
 
     public static class Config {
-        public double minPeriod;
+        public double period;
     }
 }
