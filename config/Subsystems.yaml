@@ -18,8 +18,8 @@ picker:
   cubePresenseSensor: { channel: 15 }
 lift:
   liftMotor: { channel: 0, inverted: false, powerChannels: [] }
-  liftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: 0.05249 }
-  limitSensorTop: { channel: 0, type: PNP }
+  liftEncoder: { aChannel: 4, bChannel: 5, reverse: true, distancePerPulse: 0.05249 }
+  limitSensorTop: { channel: 1, type: PNP }
   limiSensorBottom: { channel: 0, type: PNP }
   pivotMotor: { channel: 0, inverted: false, powerChannels: [] }
   pivotEncoder: { channel: 0 }

@@ -28,7 +28,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public Lift() {
         super("Lift");
-        //double config.ticksPerInch = 0.05249
     }
 
     /**
@@ -99,6 +98,25 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 break;
         }
         return angleValue;
+    }
+
+    public void setLiftPower(double liftPower) {
+        //limit to max zero if max height is triggered
+        if(limitSensorTop.get() == true) {
+            if(liftPower > 0) {
+                liftPower = 0;
+            }
+        }
+        if(limitSensorBottom.get() == true) {
+            if(liftPower < 0) {
+                liftPower = 0;
+            }
+        }
+        liftMotor.set(liftPower);
+    }
+
+    public void setPivotPower(double pivotPower) {
+        pivotMotor.set(pivotPower);
     }
 
     @Override
