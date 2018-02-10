@@ -66,7 +66,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             case SCALE_LOW: heightValue = config.heightPresetScaleLow;
                 break;
             case SCALE_HIGH: heightValue = config.heightPresetScaleHigh;
-            break;
+                break;
+            case HOME: heightValue = config.heightPresetHome;
         }
         return heightValue;
     }
@@ -114,7 +115,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         PICK,
         SWITCH,
         SCALE_LOW,
-        SCALE_HIGH;
+        SCALE_HIGH,
+        HOME;
     }
 
     public enum AnglePreset {
@@ -152,6 +154,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightPresetSwitch;
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
+        public double heightPresetHome;
 
     }
 }
