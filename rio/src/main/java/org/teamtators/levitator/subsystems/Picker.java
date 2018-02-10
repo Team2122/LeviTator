@@ -21,7 +21,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private DigitalSensor cubeDetectSensor;
     private DigitalSensor cubeDetectLeftSensor;
     private DigitalSensor cubeDetectRightSensor;
-    private DigitalSensor cubePresenseSensor;
+    private DigitalSensor cubePresenceSensor;
 
     public Picker() {
         super("Picker");
@@ -66,7 +66,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         tests.addTest(new DigitalSensorTest("cubeDetectSensor", cubeDetectSensor));
         tests.addTest(new DigitalSensorTest("cubeDetectLeftSensor", cubeDetectLeftSensor));
         tests.addTest(new DigitalSensorTest("cubeDetectRightSensor", cubeDetectRightSensor));
-        tests.addTest(new DigitalSensorTest("cubePresenseSensor", cubePresenseSensor));
+        tests.addTest(new DigitalSensorTest("cubePresenceSensor", cubePresenceSensor));
         return tests;
     }
 
@@ -79,7 +79,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.cubeDetectSensor = config.cubeDetectSensor.create();
         this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
         this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
-        this.cubePresenseSensor = config.cubePresenseSensor.create();
+        this.cubePresenceSensor = config.cubePresenseSensor.create();
     }
 
     public static class Config {
