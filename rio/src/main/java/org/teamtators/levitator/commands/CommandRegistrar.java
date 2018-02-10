@@ -14,5 +14,6 @@ public class CommandRegistrar {
         commandStore.putCommand("DriveTank", new DriveTank(robot));
 
         commandStore.registerCommand("PickerPick", () -> new PickerPick(robot));
+        commandStore.registerCommand("PickerRelease", () -> new PickerRelease(robot));
     }
 }
