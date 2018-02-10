@@ -17,7 +17,7 @@ public class LiftContinuous extends Command{
     public LiftContinuous(TatorRobot robot) {
         super("LiftContinuous");
         this.robot = robot;
-        lift = ((Subsystems) robot.getSubsystemsBase()).getLift();
+        lift = (robot.getSubsystems()).getLift();
         // oi = ((Subsystems) robot.getSubsystemsBase()).getOI();
         requires(lift);
     }
