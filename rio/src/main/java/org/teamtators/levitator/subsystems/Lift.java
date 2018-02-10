@@ -15,30 +15,27 @@ import org.teamtators.common.tester.components.SpeedControllerTest;
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private SpeedController liftMotor;
+    private Encoder liftEncoder;
     private DigitalSensor limitSensorTop;
     private DigitalSensor limitSensorBottom;
     private SpeedController pivotMotor;
     private AnalogPotentiometer pivotEncoder;
-    private Encoder liftEncoder;
 
     private double desiredPivotAngle;
     private double desiredHeight;
-    private HeightPreset desiredPresetHeight;
-    private AnglePreset desiredAngle;
 
     private Config config;
 
     public Lift() {
         super("Lift");
-        config.ticksPerInch = 0.05249;
-        config.angleOffset = 360;
+        //double config.ticksPerInch = 0.05249
     }
 
     /**
      * @return height in inches
      */
     public double getCurrentHeight() {
-        return liftEncoder.getDistance() / config.ticksPerInch;
+        return liftEncoder.getDistance();
     }
 
     /**
@@ -56,11 +53,26 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
-        this.desiredPresetHeight = desiredHeight;
+        setDesiredHeight(getHeightPreset(desiredHeight));
+    }
+
+    public double getHeightPreset(HeightPreset heightPreset) {
+        double heightValue = 0.0;
+        switch(heightPreset) {
+            case PICK: heightValue = config.heightPresetPick;
+                break;
+            case SWITCH: heightValue = config.heightPresetSwitch;
+                break;
+            case SCALE_LOW: heightValue = config.heightPresetScaleLow;
+                break;
+            case SCALE_HIGH: heightValue = config.heightPresetScaleHigh;
+            break;
+        }
+        return heightValue;
     }
 
     public double getCurrentPivotAngle() {
-        return ((pivotEncoder.get() / 5.0) * 360) + config.angleOffset;
+        return pivotEncoder.get();
     }
 
     public double getDesiredPivotAngle() {
@@ -72,19 +84,30 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
-        this.desiredAngle = desiredPivotAngle;
+        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
+    }
+
+    public double getAnglePreset(AnglePreset anglePreset) {
+        double angleValue = 0.0;
+        switch(anglePreset) {
+            case LEFT: angleValue = config.anglePresetLeft;
+                break;
+            case RIGHT: angleValue = config.anglePresetRight;
+                break;
+            case CENTER:  angleValue = config.anglePresetCenter;
+                break;
+        }
+        return angleValue;
     }
 
     @Override
     public void configure(Config config) {
-        this.config = config;
         this.liftMotor = config.liftMotor.create();
         this.liftEncoder = config.liftEncoder.create();
         this.limitSensorTop = config.limitSensorTop.create();
         this.limitSensorBottom = config.limitSensorBottom.create();
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
-        this.liftEncoder = config.liftEncoder.create();
     }
 
     public enum HeightPreset {
@@ -103,24 +126,32 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
-        /*tests.addTest(new SpeedControllerTest("liftMotor", liftMotor));
+        tests.addTest(new SpeedControllerTest("liftMotor", liftMotor));
+        tests.addTest(new EncoderTest("liftEncoder", liftEncoder));
         tests.addTest(new DigitalSensorTest("limitSensorTop", limitSensorTop));
         tests.addTest(new DigitalSensorTest("limitSensorBottom", limitSensorBottom));
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
-        tests.addTest(new EncoderTest("liftEncoder", liftEncoder));
-        */return tests;
+
+        return tests;
     }
 
     public static class Config {
         public SpeedControllerConfig liftMotor;
+        public EncoderConfig liftEncoder;
         public DigitalSensorConfig limitSensorTop;
         public DigitalSensorConfig limitSensorBottom;
         public SpeedControllerConfig pivotMotor;
         public AnalogPoteniometerConfig pivotEncoder;
-        public EncoderConfig liftEncoder;
 
-        public double ticksPerInch;
-        public double angleOffset;
+        public double anglePresetLeft;
+        public double anglePresetCenter;
+        public double anglePresetRight;
+
+        public double heightPresetPick;
+        public double heightPresetSwitch;
+        public double heightPresetScaleLow;
+        public double heightPresetScaleHigh;
+
     }
 }
