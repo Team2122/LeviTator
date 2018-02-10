@@ -14,77 +14,82 @@ import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
-
-    private SpeedController leftPickerMotor;
-    private SpeedController rightPickerMotor;
+    private SpeedController leftMotor;
+    private SpeedController rightMotor;
     private Solenoid deathGripSolenoid;
-    private Solenoid pickerRetractSolenoid;
-    private DigitalSensor cubeStatusSensor;
-
-    private State state;
+    private Solenoid extensionSolenoid;
+    private DigitalSensor cubeDetectSensor;
+    private DigitalSensor cubeDetectLeftSensor;
+    private DigitalSensor cubeDetectRightSensor;
+    private DigitalSensor cubePresenseSensor;
 
     public Picker() {
         super("Picker");
     }
 
-    public void setRollerPower(double rollerPower) {
-        leftPickerMotor.set(rollerPower);
-        rightPickerMotor.set(rollerPower);
+    public void setRollerPowers(double left, double right) {
+        leftMotor.set(left);
+        rightMotor.set(right);
     }
 
-    public void setDeathGrip(boolean isGrip) {
-        deathGripSolenoid.set(isGrip);
+    public void setRollerPower(double power) {
+        setRollerPowers(power, power);
     }
 
-    public void setPickerRetract(boolean isRetract) {
-        pickerRetractSolenoid.set(isRetract);
+    public void setDeathGrip(boolean isDeathGrip) {
+        deathGripSolenoid.set(isDeathGrip);
     }
 
-    public boolean isCubeIn() {
-        return cubeStatusSensor.get();
+    public void setPickerExtended(boolean isExtended) {
+        extensionSolenoid.set(isExtended);
     }
 
-    public void setDesiredState(State desiredState) {
-        state = desiredState;
+    public boolean isCubeDetected() {
+        return cubeDetectSensor.get();
     }
 
-    public State getState(){
-        return state;
+    public boolean isCubeDetectedLeft() {
+        return cubeDetectLeftSensor.get();
+    }
+
+    public boolean isCubeDetectedRight() {
+        return cubeDetectRightSensor.get();
     }
 
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
-        tests.addTest(new SpeedControllerTest("leftPickerMotor", leftPickerMotor));
-        tests.addTest(new SpeedControllerTest("rightPickerMotor", rightPickerMotor));
+        tests.addTest(new SpeedControllerTest("leftMotor", leftMotor));
+        tests.addTest(new SpeedControllerTest("rightMotor", rightMotor));
         tests.addTest(new SolenoidTest("deathGripSolenoid", deathGripSolenoid));
-        tests.addTest(new SolenoidTest("pickerRetractSolenoid", pickerRetractSolenoid));
-        tests.addTest(new DigitalSensorTest("cubeStatusSensor", cubeStatusSensor));
+        tests.addTest(new SolenoidTest("extensionSolenoid", extensionSolenoid));
+        tests.addTest(new DigitalSensorTest("cubeDetectSensor", cubeDetectSensor));
+        tests.addTest(new DigitalSensorTest("cubeDetectLeftSensor", cubeDetectLeftSensor));
+        tests.addTest(new DigitalSensorTest("cubeDetectRightSensor", cubeDetectRightSensor));
+        tests.addTest(new DigitalSensorTest("cubePresenseSensor", cubePresenseSensor));
         return tests;
     }
 
     @Override
     public void configure(Config config) {
-        this.leftPickerMotor = config.leftPickerMotor.create();
-        this.rightPickerMotor = config.rightPickerMotor.create();
+        this.leftMotor = config.leftMotor.create();
+        this.rightMotor = config.rightMotor.create();
         this.deathGripSolenoid = config.deathGripSolenoid.create();
-        this.pickerRetractSolenoid = config.pickerRetractSolenoid.create();
-        this.cubeStatusSensor = config.cubeStatusSensor.create();
-    }
-
-    public enum State {
-        RETRACTED_NO_CUBE,
-        PICKING,
-        RETRACTED_WITH_CUBE,
-        EXTENDED_WITH_CUBE,
-        RELEASING
+        this.extensionSolenoid = config.extensionSolenoid.create();
+        this.cubeDetectSensor = config.cubeDetectSensor.create();
+        this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
+        this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
+        this.cubePresenseSensor = config.cubePresenseSensor.create();
     }
 
     public static class Config {
-        public SpeedControllerConfig leftPickerMotor;
-        public SpeedControllerConfig rightPickerMotor;
+        public SpeedControllerConfig leftMotor;
+        public SpeedControllerConfig rightMotor;
         public SolenoidConfig deathGripSolenoid;
-        public SolenoidConfig pickerRetractSolenoid;
-        public DigitalSensorConfig cubeStatusSensor;
+        public SolenoidConfig extensionSolenoid;
+        public DigitalSensorConfig cubeDetectSensor;
+        public DigitalSensorConfig cubeDetectLeftSensor;
+        public DigitalSensorConfig cubeDetectRightSensor;
+        public DigitalSensorConfig cubePresenseSensor;
     }
 }
