@@ -1,1 +1,1 @@
-include 'buildSrc', 'rio'
+include 'rio'
