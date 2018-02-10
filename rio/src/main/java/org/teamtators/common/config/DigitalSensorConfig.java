@@ -7,7 +7,7 @@ import org.teamtators.common.hw.DigitalSensor;
  * exampleSensor: {channel: 0, type: NPN}
  * OR
  * exampleSensor: {channel: 0, type: PNP}
- *
+ * <p>
  * Whichever one works!
  */
 public class DigitalSensorConfig {

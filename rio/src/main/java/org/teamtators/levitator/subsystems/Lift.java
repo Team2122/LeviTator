@@ -84,12 +84,12 @@ public class Lift extends Subsystem {
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
-        tests.addTest(new SpeedControllerTest("liftMotor", liftMotor));
+        /*tests.addTest(new SpeedControllerTest("liftMotor", liftMotor));
         tests.addTest(new DigitalSensorTest("limitSensorTop", limitSensorTop));
         tests.addTest(new DigitalSensorTest("limitSensorBottom", limitSensorBottom));
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
         tests.addTest(new EncoderTest("liftEncoder", liftEncoder));
-        return tests;
+        */return tests;
     }
 }

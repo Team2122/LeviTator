@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Example Mapping:
- *
+ * <p>
  * minimum required:
  * controllerName: {channel: 0, powerChannels: [0, 1, 2]}
- *
+ * <p>
  * all values:
  * controllerName: {channel: 0, inverted: true, type: Victor, powerChannels: [0, 1, 2]}
  */

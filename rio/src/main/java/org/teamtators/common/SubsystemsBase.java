@@ -1,6 +1,5 @@
 package org.teamtators.common;
 
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.teamtators.common.config.ConfigLoader;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.scheduler.Subsystem;

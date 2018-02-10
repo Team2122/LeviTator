@@ -12,7 +12,6 @@ import org.teamtators.common.control.Updatable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.Provider;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;

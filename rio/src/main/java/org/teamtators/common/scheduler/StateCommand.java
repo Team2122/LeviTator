@@ -10,12 +10,14 @@ public class StateCommand<S> extends Command {
     private Stepper<S> stepper;
     private Finisher<S> finish;
     private S state;
+
     public StateCommand(String name, Initializer<S> initializer, Stepper<S> step, Finisher<S> finish) {
         super(name);
         this.initializer = checkNotNull(initializer);
         this.stepper = checkNotNull(step);
         this.finish = checkNotNull(finish);
     }
+
     public StateCommand(Initializer<S> initializer, Stepper<S> step, Finisher<S> finish) {
         this("StateCommand", initializer, step, finish);
     }

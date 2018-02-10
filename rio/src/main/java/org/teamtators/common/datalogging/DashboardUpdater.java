@@ -43,7 +43,7 @@ public class DashboardUpdater extends ArrayList<DashboardUpdatable> implements U
 
     @Override
     public void update(double delta) {
-        if(current == null) {
+        if (current == null) {
             return;
         }
         this.forEach(updatable -> updatable.updateDashboard(current));

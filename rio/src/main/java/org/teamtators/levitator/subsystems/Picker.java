@@ -42,12 +42,12 @@ public class Picker extends Subsystem {
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
-        tests.addTest(new SpeedControllerTest("leftPickerMotor", leftPickerMotor));
+        /*tests.addTest(new SpeedControllerTest("leftPickerMotor", leftPickerMotor));
         tests.addTest(new SpeedControllerTest("rightPickerMotor", rightPickerMotor));
         tests.addTest(new SolenoidTest("deathGripSolenoid", deathGripSolenoid));
         tests.addTest(new SolenoidTest("pickerRetractSolenoid", pickerRetractSolenoid));
         tests.addTest(new DigitalSensorTest("cubeStatusSensor", cubeStatusSensor));
-        return tests;
+        */return tests;
     }
 
     public enum State {

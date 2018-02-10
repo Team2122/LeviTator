@@ -76,7 +76,7 @@ public class LogitechF310 implements Configurable<LogitechF310.Config>, Updatabl
 
     @Override
     public void update(double delta) {
-        if(timer.hasPeriodElapsed(targetTime)) {
+        if (timer.hasPeriodElapsed(targetTime)) {
             joystick.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0);
             joystick.setRumble(GenericHID.RumbleType.kRightRumble, 0.0);
         }
