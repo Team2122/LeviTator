@@ -31,8 +31,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     private Encoder leftEncoder;
     private ADXRS453 gyro;
     private PidController rotationController = new PidController("RotationController");
-    private PidController leftController = new PidController("LeftController");
-    private PidController rightController = new PidController("rightController");
 
     private Config config;
     private double speed;
@@ -40,18 +38,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     public Drive() {
         super("Drive");
 
-        leftController.setInputProvider(this::getLeftRate);
-        leftController.setOutputConsumer(this::setLeftMotorPower);
-
-        rightController.setInputProvider(this::getRightRate);
-        rightController.setOutputConsumer(this::setRightMotorPower);
-
         rotationController.setInputProvider(this::getYawAngle);
         rotationController.setOutputConsumer((double output) -> {
             setRightMotorPower(speed + output);
             setLeftMotorPower(speed - output);
         });
-        config.distancePerPulse = .0471238898;
     }
 
     /**
@@ -61,8 +52,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
      * @param speed   in inches/second
      */
     public void driveHeading(double heading, double speed) {
-        rightController.stop();
-        leftController.stop();
         rotationController.start();
         this.speed = speed;
 
@@ -76,8 +65,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
      * @param rightPower the power for the right side
      */
     public void drivePowers(double leftPower, double rightPower) {
-        rightController.stop();
-        leftController.stop();
         rotationController.stop();
 
         setRightMotorPower(rightPower);
@@ -92,11 +79,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
      */
     public void driveSpeeds(double leftSpeed, double rightSpeed) {
         rotationController.stop();
-        leftController.start();
-        rightController.start();
-
-        leftController.setSetpoint(leftSpeed);
-        rightController.setSetpoint(rightSpeed);
     }
 
     public void setRightMotorPower(double power) {
@@ -120,11 +102,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     }
 
     public double getLeftDistance() {
-        return leftEncoder.getDistance() * config.distancePerPulse;
+        return leftEncoder.getDistance();
     }
 
     public double getRightDistance() {
-        return rightEncoder.getDistance() * config.distancePerPulse;
+        return rightEncoder.getDistance();
     }
 
     public double getAverageDistance() {
@@ -149,7 +131,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(rotationController, leftController, rightController);
+        return Arrays.asList(rotationController);
     }
 
     @Override
@@ -157,13 +139,12 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         ManualTestGroup tests = super.createManualTests();
 
         tests.addTests(new SpeedControllerTest("LeftMotor", leftMotor));
+        tests.addTests(new EncoderTest("LeftEncoder", leftEncoder));
         tests.addTests(new SpeedControllerTest("RightMotor", rightMotor));
         tests.addTests(new EncoderTest("RightEncoder", rightEncoder));
-        tests.addTests(new EncoderTest("LeftEncoder", leftEncoder));
+
         tests.addTests(new ADXRS453Test("gyro", gyro));
         tests.addTests(new ControllerTest(rotationController, 180));
-        tests.addTests(new ControllerTest(leftController, 24));
-        tests.addTests(new ControllerTest(rightController, 24));
 
         return tests;
     }
@@ -177,8 +158,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         this.rightEncoder = config.rightEncoder.create();
         gyro = new ADXRS453(SPI.Port.kOnboardCS0);
         this.rotationController.configure(config.rotationController);
-        this.leftController.configure(config.leftController);
-        this.rightController.configure(config.rightController);
         gyro.start();
         gyro.startCalibration();
     }
@@ -189,8 +168,5 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         public EncoderConfig leftEncoder;
         public EncoderConfig rightEncoder;
         public PidController.Config rotationController;
-        public PidController.Config leftController;
-        public PidController.Config rightController;
-        public double distancePerPulse;
     }
 }

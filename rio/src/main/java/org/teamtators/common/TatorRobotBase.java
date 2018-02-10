@@ -108,8 +108,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         ObjectNode triggersConfig = (ObjectNode) configLoader.load("Triggers.yaml");
         triggerBinder.setDriverJoystick(getDriverJoystick());
         triggerBinder.setGunnerJoystick(getGunnerJoystick());
-        //TODO Triggers
-        //triggerBinder.bindTriggers(triggersConfig);
+        triggerBinder.bindTriggers(triggersConfig);
     }
 
     protected void startThreads() {
@@ -144,7 +143,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
                 subsystem.update(delta);
             }
         }
-        DriverStation.getInstance().isDSAttached();
+        //DriverStation.getInstance().isDSAttached();
     }
 
     private void setUpDashboards() {

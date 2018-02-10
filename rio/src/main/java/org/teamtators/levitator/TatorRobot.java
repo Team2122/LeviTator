@@ -3,9 +3,11 @@ package org.teamtators.levitator;
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.levitator.commands.CommandRegistrar;
 import org.teamtators.levitator.subsystems.Subsystems;
 
 public class TatorRobot extends TatorRobotBase {
+    private final CommandRegistrar registrar = new CommandRegistrar(this);
 
     private Subsystems subsystems;
 
@@ -26,7 +28,7 @@ public class TatorRobot extends TatorRobotBase {
 
     @Override
     protected void registerCommands() {
-
+        registrar.register(getCommandStore());
     }
 
     @Override
