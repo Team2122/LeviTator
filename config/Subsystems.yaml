@@ -1,6 +1,6 @@
 operatorInterface:
-  driverJoystick: {index: 0, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}
-  gunnerJoystick: {index: 1, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}
+  driverJoystick: { index: 0, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1 }
+  gunnerJoystick: { index: 1, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
@@ -10,19 +10,29 @@ drive:
 picker:
   leftMotor: { type: TALON_SRX, channel: 1 }
   rightMotor: { type: TALON_SRX, channel: 2, inverted: true }
-  deathGripSolenoid: { channel: 7 }
   extensionSolenoid: { channel: 6 }
-  cubeDetectSensor: { channel: 14 }
+  cubeDetectSensor: { channel: 14, type: PNP }
   cubeDetectLeftSensor: { channel: 13, type: NPN }
   cubeDetectRightSensor: { channel: 12, type: NPN }
-  cubePresenseSensor: { channel: 15 }
 lift:
-  liftMotor: { channel: 0, inverted: false, powerChannels: [] }
+  liftMotor: { type: VICTOR_SPX, channel: 3, inverted: false, powerChannels: [] }
+#  liftMotor: { type: VICTOR_SPX, channel: 4, inverted: false, powerChannels: [] }
   liftEncoder: { aChannel: 4, bChannel: 5, reverse: true, distancePerPulse: 0.05249 }
-  limitSensorTop: { channel: 1, type: PNP }
-  limiSensorBottom: { channel: 0, type: PNP }
-  pivotMotor: { channel: 0, inverted: false, powerChannels: [] }
-  pivotEncoder: { channel: 0 }
+  limitSensorTop: { channel: 11, type: PNP }
+  limitSensorBottom: { channel: 10, type: PNP }
+  pivotMotor: { type: VICTOR_SPX, channel: 5, inverted: false, powerChannels: [] }
+  pivotEncoder: { channel: 3, fullRange: 360.0, offset: -208.0 }
+
+  pivotController:
+    P: 0.08
+    I: 0.08
+    D: 0.0
+    maxIError: 0.5
+    maxAbsoluteSetpoint: 90.0
+    maxAbsoluteOutput: 0.2
+#    target: { within: 1.0 }
+#    holdPower: 0.0
+
   anglePresetLeft: 0
   anglePresetCenter: 0
   anglePresetRight: 0
@@ -31,3 +41,4 @@ lift:
   heightPresetScaleLow: 0
   heightPresetScaleHigh: 0
   heightPresetHome: 0
+

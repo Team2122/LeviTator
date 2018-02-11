@@ -6,7 +6,7 @@ public class AnalogPoteniometerConfig {
     public int channel;
     public double fullRange = 360;
     public double offset = 0;
-    public boolean continuous = true;
+    public boolean continuous = false;
 
     public AnalogPotentiometer create() {
         return new AnalogPotentiometer(channel, fullRange, offset, continuous);

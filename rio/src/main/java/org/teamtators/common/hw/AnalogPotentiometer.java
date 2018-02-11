@@ -19,7 +19,7 @@ public class AnalogPotentiometer implements Potentiometer {
     }
 
     public AnalogPotentiometer(int channel, double fullRange, double offset) {
-        this(channel, fullRange, offset, true);
+        this(channel, fullRange, offset, false);
     }
 
     public double getRawVoltage() {
@@ -34,11 +34,13 @@ public class AnalogPotentiometer implements Potentiometer {
     public double get() {
         double p = analogInput.getVoltage() / ControllerPower.getVoltage5V();
         double value = p * fullRange + offset;
-        if (value < 0) {
-            value += fullRange;
-        }
-        if (value > fullRange) {
-            value -= fullRange;
+        if (continuous) {
+            if (value < 0) {
+                value += fullRange;
+            }
+            if (value > fullRange) {
+                value -= fullRange;
+            }
         }
         return value;
     }

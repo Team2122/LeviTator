@@ -44,8 +44,8 @@ public class ControllerTest extends ManualTest {
                 printTestInfo("Enabled controller");
                 break;
             case X:
-                printTestInfo("Input = {}, Setpoint = {}, Output = {}, On Target = {}", controller.getInput(),
-                        controller.getSetpoint(), controller.getOutput(), controller.isOnTarget());
+                printTestInfo(String.format("Input = %.3f, Setpoint = %.3f, Output = %.3f, On Target = %b", controller.getInput(),
+                        controller.getSetpoint(), controller.getOutput(), controller.isOnTarget()));
                 break;
         }
     }

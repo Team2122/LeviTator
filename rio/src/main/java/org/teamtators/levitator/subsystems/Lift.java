@@ -2,15 +2,13 @@ package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.*;
+import org.teamtators.common.control.PidController;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.common.tester.components.AnalogPotentiometerTest;
-import org.teamtators.common.tester.components.DigitalSensorTest;
-import org.teamtators.common.tester.components.EncoderTest;
-import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.common.tester.components.*;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
@@ -24,10 +22,16 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double desiredPivotAngle;
     private double desiredHeight;
 
+    private PidController pivotController;
+
     private Config config;
 
     public Lift() {
         super("Lift");
+
+        pivotController = new PidController("pivotController");
+        pivotController.setInputProvider(this::getCurrentPivotAngle);
+        pivotController.setOutputConsumer(this::setPivotPower);
     }
 
     /**
@@ -57,16 +61,21 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public double getHeightPreset(HeightPreset heightPreset) {
         double heightValue = 0.0;
-        switch(heightPreset) {
-            case PICK: heightValue = config.heightPresetPick;
+        switch (heightPreset) {
+            case PICK:
+                heightValue = config.heightPresetPick;
                 break;
-            case SWITCH: heightValue = config.heightPresetSwitch;
+            case SWITCH:
+                heightValue = config.heightPresetSwitch;
                 break;
-            case SCALE_LOW: heightValue = config.heightPresetScaleLow;
+            case SCALE_LOW:
+                heightValue = config.heightPresetScaleLow;
                 break;
-            case SCALE_HIGH: heightValue = config.heightPresetScaleHigh;
+            case SCALE_HIGH:
+                heightValue = config.heightPresetScaleHigh;
                 break;
-            case HOME: heightValue = config.heightPresetHome;
+            case HOME:
+                heightValue = config.heightPresetHome;
         }
         return heightValue;
     }
@@ -89,12 +98,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public double getAnglePreset(AnglePreset anglePreset) {
         double angleValue = 0.0;
-        switch(anglePreset) {
-            case LEFT: angleValue = config.anglePresetLeft;
+        switch (anglePreset) {
+            case LEFT:
+                angleValue = config.anglePresetLeft;
                 break;
-            case RIGHT: angleValue = config.anglePresetRight;
+            case RIGHT:
+                angleValue = config.anglePresetRight;
                 break;
-            case CENTER:  angleValue = config.anglePresetCenter;
+            case CENTER:
+                angleValue = config.anglePresetCenter;
                 break;
         }
         return angleValue;
@@ -102,15 +114,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setLiftPower(double liftPower) {
         //limit to max zero if max height is triggered
-        if(limitSensorTop.get() == true) {
-            if(liftPower > 0) {
-                liftPower = 0;
-            }
+        if (limitSensorTop.get() && liftPower > 0.0) {
+            liftPower = 0.0;
         }
-        if(limitSensorBottom.get() == true) {
-            if(liftPower < 0) {
-                liftPower = 0;
-            }
+        if (limitSensorBottom.get() && liftPower < 0.0) {
+            liftPower = 0.0;
         }
         liftMotor.set(liftPower);
     }
@@ -119,14 +127,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotMotor.set(pivotPower);
     }
 
-    @Override
-    public void configure(Config config) {
-        this.liftMotor = config.liftMotor.create();
-        this.liftEncoder = config.liftEncoder.create();
-        this.limitSensorTop = config.limitSensorTop.create();
-        this.limitSensorBottom = config.limitSensorBottom.create();
-        this.pivotMotor = config.pivotMotor.create();
-        this.pivotEncoder = config.pivotEncoder.create();
+    public PidController getPivotController() {
+        return pivotController;
     }
 
     public enum HeightPreset {
@@ -153,7 +155,21 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
 
+        tests.addTest(new ControllerTest(pivotController));
+
         return tests;
+    }
+
+    @Override
+    public void configure(Config config) {
+        this.liftMotor = config.liftMotor.create();
+        this.liftEncoder = config.liftEncoder.create();
+        this.limitSensorTop = config.limitSensorTop.create();
+        this.limitSensorBottom = config.limitSensorBottom.create();
+        this.pivotMotor = config.pivotMotor.create();
+        this.pivotEncoder = config.pivotEncoder.create();
+
+        this.pivotController.configure(config.pivotController);
     }
 
     public static class Config {
@@ -163,6 +179,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig limitSensorBottom;
         public SpeedControllerConfig pivotMotor;
         public AnalogPoteniometerConfig pivotEncoder;
+
+        public PidController.Config pivotController;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
