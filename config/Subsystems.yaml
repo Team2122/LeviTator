@@ -15,23 +15,24 @@ picker:
   cubeDetectLeftSensor: { channel: 13, type: NPN }
   cubeDetectRightSensor: { channel: 12, type: NPN }
 lift:
-  liftMotor: { type: VICTOR_SPX, channel: 3, inverted: false, powerChannels: [] }
-#  liftMotor: { type: VICTOR_SPX, channel: 4, inverted: false, powerChannels: [] }
+  liftMotor:
+    - { type: VICTOR_SPX, channel: 3, inverted: false, powerChannels: [] }
+    - { type: VICTOR_SPX, channel: 4, inverted: false, powerChannels: [] }
   liftEncoder: { aChannel: 4, bChannel: 5, reverse: true, distancePerPulse: 0.05249 }
-  limitSensorTop: { channel: 11, type: PNP }
-  limitSensorBottom: { channel: 10, type: PNP }
+  limitSensorTop: { channel: 11, type: NPN }
+  limitSensorBottom: { channel: 10, type: NPN }
   pivotMotor: { type: VICTOR_SPX, channel: 5, inverted: false, powerChannels: [] }
-  pivotEncoder: { channel: 3, fullRange: 360.0, offset: -208.0 }
+  pivotEncoder: { channel: 3, fullRange: 360.0, offset: -211.4 }
 
   pivotController:
-    P: 0.08
-    I: 0.08
+    P: 0.02
+    I: 0.04
     D: 0.0
     maxIError: 0.5
     maxAbsoluteSetpoint: 90.0
     maxAbsoluteOutput: 0.2
-#    target: { within: 1.0 }
-#    holdPower: 0.0
+    target: { within: 1.0 }
+    holdPower: 0.0
 
   anglePresetLeft: 0
   anglePresetCenter: 0

@@ -24,7 +24,8 @@ public class EncoderTest extends ManualTest {
             encoder.reset();
             printTestInfo("Encoder reset");
         } else if (button == LogitechF310.Button.A) {
-            printTestInfo("Distance: {} (ticks: {}), Rate: {}", encoder.getDistance(), encoder.get(), encoder.getRate());
+            printTestInfo(String.format("Distance: %.3f (ticks: %d), Rate: %.3f",
+                    encoder.getDistance(), encoder.get(), encoder.getRate()));
         }
     }
 }

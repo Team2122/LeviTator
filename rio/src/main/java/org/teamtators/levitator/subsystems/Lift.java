@@ -6,13 +6,15 @@ import org.teamtators.common.control.PidController;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import org.teamtators.common.hw.DigitalSensor;
+import org.teamtators.common.hw.SpeedControllerGroup;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
-    private SpeedController liftMotor;
+    private SpeedControllerGroup liftMotor;
     private Encoder liftEncoder;
     private DigitalSensor limitSensorTop;
     private DigitalSensor limitSensorBottom;
@@ -112,12 +114,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return angleValue;
     }
 
+    public boolean isAtBottomLimit() {
+        return limitSensorBottom.get();
+    }
+
+    public boolean isAtTopLimit() {
+        return !limitSensorTop.get();
+    }
+
     public void setLiftPower(double liftPower) {
         //limit to max zero if max height is triggered
-        if (limitSensorTop.get() && liftPower > 0.0) {
+        if (isAtTopLimit() && liftPower > 0.0) {
             liftPower = 0.0;
         }
-        if (limitSensorBottom.get() && liftPower < 0.0) {
+        if (isAtBottomLimit() && liftPower < 0.0) {
             liftPower = 0.0;
         }
         liftMotor.set(liftPower);
@@ -129,6 +139,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public PidController getPivotController() {
         return pivotController;
+    }
+
+    @Override
+    public void onEnterRobotState(RobotState state) {
+        switch (state) {
+            case AUTONOMOUS:
+            case TELEOP:
+                pivotController.start();
+                pivotController.setSetpoint(0.0);
+                break;
+            case DISABLED:
+                pivotController.stop();
+                break;
+        }
     }
 
     public enum HeightPreset {
@@ -173,7 +197,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public static class Config {
-        public SpeedControllerConfig liftMotor;
+        public SpeedControllerGroupConfig liftMotor;
         public EncoderConfig liftEncoder;
         public DigitalSensorConfig limitSensorTop;
         public DigitalSensorConfig limitSensorBottom;

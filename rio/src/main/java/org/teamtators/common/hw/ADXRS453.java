@@ -82,7 +82,7 @@ public class ADXRS453 implements PIDSource, Gyro {
         spi.setClockActiveHigh();
         spi.setChipSelectActiveLow();
         setCalibrationPeriod(5.0);
-        startup = new Thread(this::startup);
+        startup = new Thread(this::startup, "ADXRS453.Startup");
         fullReset();
     }
 
@@ -466,7 +466,6 @@ public class ADXRS453 implements PIDSource, Gyro {
     @Override
     public void update(double delta) {
         if (!hasStarted.get()) {
-            logger.trace("ADXRS453 gyro not started yet");
             return;
         }
         double elapsed = delta;
