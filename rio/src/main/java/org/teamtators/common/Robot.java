@@ -11,11 +11,13 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -62,28 +64,33 @@ public class Robot {
         // TODO: StartCAPI();
         // TODO: See if the next line is necessary
         // Resource.RestartProgram();
+        this.configDir = configDir;
         networkTables = NetworkTableInstance.getDefault();
         networkTables.setNetworkIdentity("Robot");
         networkTables.startServer("/home/lvuser/networktables.ini");// must be before b
         m_ds = DriverStation.getInstance();
         networkTables.getTable(""); // forces network tables to initialize
         networkTables.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
-        this.configDir = configDir;
-        LiveWindow.setEnabled(true);
+
+        LiveWindow.setEnabled(false);
     }
 
     /**
+     * Get if the robot is a simulation.
+     *
      * @return If the robot is running in simulation.
      */
     public static boolean isSimulation() {
-        return false;
+        return !isReal();
     }
 
     /**
+     * Get if the robot is real.
+     *
      * @return If the robot is running in the real world.
      */
     public static boolean isReal() {
-        return true;
+        return HALUtil.getHALRuntimeType() == 0;
     }
 
     @SuppressWarnings("JavadocMethod")
@@ -105,24 +112,19 @@ public class Robot {
      * Common initialization for all robot programs.
      */
     public static void initializeHardwareConfiguration() {
-        boolean rv = HAL.initialize(0, 0);
-        assert rv;
+        if (!HAL.initialize(500, 0)) {
+            throw new IllegalStateException("HAL.initialize failed. Terminating");
+        }
 
         // Set some implementations so that the static methods work properly
         Timer.SetImplementation(new HardwareTimer());
         HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
         RobotState.SetImplementation(DriverStation.getInstance());
 
-        // Load opencv
-        /*
-        try {
-            System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        } catch (UnsatisfiedLinkError ex) {
-            System.out.println("OpenCV Native Libraries could not be loaded.");
-            System.out.println("Please try redeploying, or reimage your roboRIO and try again.");
-            ex.printStackTrace();
-        }
-        */
+        // Call a CameraServer JNI function to force OpenCV native library loading
+        // Needed because all the OpenCV JNI functions don't have built in loading
+        // TODO: Have a way to enable this if/when we use CameraServer
+//        CameraServerJNI.enumerateSinks();
     }
 
     /**
@@ -130,6 +132,7 @@ public class Robot {
      */
     @SuppressWarnings("PMD.UnusedFormalParameter")
     public static void main(String... args) {
+        System.out.println("********** Initializing HAL **********");
         initializeHardwareConfiguration();
 
         HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
@@ -139,29 +142,12 @@ public class Robot {
             System.exit(1);
         }
 
-        Robot robot = new Robot(args[0]);
-
-        try {
-            final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
-
-            if (file.exists()) {
-                file.delete();
-            }
-
-            file.createNewFile();
-
-            try (FileOutputStream output = new FileOutputStream(file)) {
-                output.write("Java ".getBytes());
-                output.write(WPILibVersion.Version.getBytes());
-            }
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        writeVersionsFile();
 
         boolean errorOnExit = false;
         try {
             System.out.println("********** Robot program starting **********");
+            Robot robot = new Robot(args[0]);
             robot.startCompetition();
         } catch (Throwable throwable) {
             DriverStation.reportError(
@@ -180,6 +166,26 @@ public class Robot {
             }
         }
         System.exit(1);
+    }
+
+    public static void writeVersionsFile() {
+        try {
+            final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
+
+            if (file.exists()) {
+                file.delete();
+            }
+
+            file.createNewFile();
+
+            try (FileOutputStream output = new FileOutputStream(file)) {
+                output.write("Java ".getBytes());
+                output.write(WPILibVersion.Version.getBytes());
+            }
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -252,7 +258,7 @@ public class Robot {
             doStartCompetition();
         } catch (Throwable t) {
             logger.error("Unhandled exception thrown!", t);
-            System.exit(1);
+            throw t;
         }
     }
 
@@ -332,8 +338,10 @@ public class Robot {
                 SmartDashboard.updateValues();
             }
             // Enable LiveWindow if in test mode
-//            LiveWindow.setEnabled(robotState == RobotState.TEST);
+            LiveWindow.setEnabled(robotState == org.teamtators.common.scheduler.RobotState.TEST);
             // Wait for new data from the driver station. Should be at a ~20ms period
+            SmartDashboard.updateValues();
+            LiveWindow.updateValues();
             m_ds.waitForData();
         }
     }
