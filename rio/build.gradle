@@ -22,12 +22,17 @@ deploy {
         artifact('frcJava', FRCJavaArtifact) {
             targets << 'roborio'
             filename = "LeviTator.jar"
-            arguments = [ "$robotDir/config" ]
+            arguments = ["$robotDir/config"]
         }
         artifact('config', FileCollectionArtifact) {
             targets << 'roborio'
             files = rootProject.fileTree('config/')
             directory = 'config'
+        }
+        artifact('dependencies', FileCollectionArtifact) {
+            targets << 'roborio'
+            files = project.configurations.compile
+            directory = 'libs'
         }
     }
 }
@@ -64,11 +69,12 @@ dependencies {
 }
 
 jar {
-    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it)  }
-    exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
-    exclude 'META-INF/ECLIPSE_.RSA', 'META-INF/ECLIPSE_.SF'
+    from configurations.compile.findAll { it.isDirectory() }
     manifest { DefaultManifest mf ->
-        mf.attributes 'Main-Class': 'org.teamtators.common.Robot'
-        mf.attributes 'Robot-Class': 'org.teamtators.levitator.TatorRobot'
+        mf.attributes 'Main-Class': 'org.teamtators.common.Robot',
+                'Robot-Class': 'org.teamtators.levitator.TatorRobot',
+                'Class-Path': project.configurations.compile.collect {
+                    "$robotDir/libs/${it.getName()}"
+                }.join(' ')
     }
 }
