@@ -90,8 +90,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         logger.debug("Creating commands");
         registerCommands();
         ObjectNode commandsConfig = (ObjectNode) configLoader.load("Commands.yaml");
-        //TODO command config
-        //getCommandStore().createCommandsFromConfig(commandsConfig);
+        getCommandStore().createCommandsFromConfig(commandsConfig);
         //autoCommand = commandStore.getCommand("$AutoChooser");
     }
 

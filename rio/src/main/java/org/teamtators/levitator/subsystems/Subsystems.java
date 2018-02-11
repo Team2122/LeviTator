@@ -52,6 +52,7 @@ public class Subsystems extends SubsystemsBase {
         TatorRobot.logger.trace("Configuring subsystems...");
         oi.configure(config.operatorInterface);
         drive.configure(config.drive);
+        picker.configure(config.picker);
     }
 
     @Override
@@ -78,5 +79,6 @@ public class Subsystems extends SubsystemsBase {
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;
+        public Picker.Config picker;
     }
 }

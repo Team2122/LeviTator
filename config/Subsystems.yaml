@@ -8,11 +8,11 @@ drive:
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
   rotationController: {}
 picker:
-  leftMotor: { type: VICTOR_SPX, channel: 1 }
-  rightMotor: { type: VICTOR_SPX, channel: 2 }
+  leftMotor: { type: TALON_SRX, channel: 1 }
+  rightMotor: { type: TALON_SRX, channel: 2, inverted: true }
   deathGripSolenoid: { channel: 7 }
   extensionSolenoid: { channel: 6 }
-  cubeDetectSensor: { channel: 12 }
-  cubeDetectLeftSensor: { channel: 13 }
-  cubeDetectRightSensor: { channel: 14 }
+  cubeDetectSensor: { channel: 14 }
+  cubeDetectLeftSensor: { channel: 13, type: NPN }
+  cubeDetectRightSensor: { channel: 12, type: NPN }
   cubePresenseSensor: { channel: 15 }

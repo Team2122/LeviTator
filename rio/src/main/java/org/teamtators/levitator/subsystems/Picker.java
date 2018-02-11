@@ -28,13 +28,13 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public void setRollerPowers(double left, double right) {
+        logger.trace("Setting roller powers to {}, {}", left, right);
         leftMotor.set(left);
         rightMotor.set(right);
     }
 
     public void setRollerPowers(RollerPowers rollerPowers) {
-        leftMotor.set(rollerPowers.left);
-        rightMotor.set(rollerPowers.right);
+        setRollerPowers(rollerPowers.left, rollerPowers.right);
     }
 
     public void setRollerPower(double power) {

@@ -12,7 +12,7 @@ import org.teamtators.common.hw.DigitalSensor;
  */
 public class DigitalSensorConfig {
     private int channel;
-    private DigitalSensor.Type type;
+    private DigitalSensor.Type type = DigitalSensor.Type.PNP;
 
     public int getChannel() {
         return channel;

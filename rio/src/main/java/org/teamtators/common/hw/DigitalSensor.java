@@ -1,5 +1,6 @@
 package org.teamtators.common.hw;
 
+import com.google.common.base.Preconditions;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
@@ -7,11 +8,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public class DigitalSensor {
     private DigitalInput digitalSensor;
-    private Type type;
+    private Type type = Type.PNP;
 
     public DigitalSensor(int channel, Type type) {
+        Preconditions.checkNotNull(type, "type can not be null");
         digitalSensor = new DigitalInput(channel);
         this.type = type;
+    }
+
+    public DigitalSensor(int channel) {
+        this(channel, Type.PNP);
     }
 
     /**
@@ -22,6 +28,7 @@ public class DigitalSensor {
         switch (type) {
             case NPN:
                 return !value;
+            case PNP:
             default:
                 return value;
         }

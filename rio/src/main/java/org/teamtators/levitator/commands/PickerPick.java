@@ -47,7 +47,8 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         boolean jammed = this.jammed.get();
         boolean finished = this.finished.get();
 
-        if (jammed && !unjamming) {
+        if (jammed && !unjamming && (!unjamTimer.isRunning() || unjamTimer.hasPeriodElapsed(config.afterUnjamWait))) {
+            logger.info("Jam detected, unjamming");
             unjamming = true;
             unjamTimer.start();
         }
@@ -68,7 +69,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
-        picker.stopRollers();
+        picker.setRollerPowers(config.holdPowers);
         picker.setPickerExtended(false);
     }
 
@@ -82,8 +83,10 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     public static class Config {
         public Picker.RollerPowers pickPowers;
         public Picker.RollerPowers unjamPowers;
+        public Picker.RollerPowers holdPowers;
         public double jamDetectPeriod;
         public double finishDetectPeriod;
         public double unjamPeriod;
+        public double afterUnjamWait;
     }
 }

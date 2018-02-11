@@ -11,10 +11,6 @@ public class TatorRobot extends TatorRobotBase {
 
     private Subsystems subsystems;
 
-    private LogitechF310 driver;
-
-    private LogitechF310 gunner;
-
     public TatorRobot(String configDir) {
         super(configDir);
 
@@ -37,23 +33,16 @@ public class TatorRobot extends TatorRobotBase {
 
     @Override
     protected LogitechF310 getGunnerJoystick() {
-        return driver;
+        return getSubsystems().getOI().getGunnerJoystick();
     }
 
     @Override
     protected LogitechF310 getDriverJoystick() {
-        return gunner;
+        return getSubsystems().getOI().getDriverJoystick();
     }
 
     @Override
     public String getName() {
         return "LeviTator";
-    }
-
-    @Override
-    protected void configureSubsystems() {
-        super.configureSubsystems();
-        this.driver = subsystems.getOI().getDriverJoystick();
-        this.gunner = subsystems.getOI().getGunnerJoystick();
     }
 }
