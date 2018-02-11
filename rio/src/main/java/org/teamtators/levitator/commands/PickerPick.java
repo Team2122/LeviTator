@@ -23,6 +23,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
             cubePresent && cubeLeft && cubeRight);
 
     private boolean unjamming;
+    private boolean unjamRight;
     private Timer unjamTimer = new Timer();
 
     public PickerPick(TatorRobot robot) {
@@ -36,6 +37,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         super.initialize();
         picker.setPickerExtended(true);
         unjamming = false;
+        unjamRight = false;
     }
 
     @Override
@@ -55,10 +57,12 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
 
         if (unjamming && unjamTimer.hasPeriodElapsed(config.unjamPeriod)) {
             unjamming = false;
+            unjamRight = !unjamRight;
         }
 
         if (unjamming) {
-            picker.setRollerPowers(config.unjamPowers);
+            picker.setRollerPowers(unjamRight ? config.unjamPowers.right : config.unjamPowers.left,
+                    unjamRight ? config.unjamPowers.left : config.unjamPowers.right);
         } else {
             picker.setRollerPowers(config.pickPowers);
         }

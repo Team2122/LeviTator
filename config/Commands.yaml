@@ -1,10 +1,10 @@
 PickerPick:
   pickPowers: { left: 1.0, right: 0.5 }
-  unjamPowers: { left: 0.2, right: -0.2 }
-  holdPowers: { left: 0.05, right: 0.05 }
+  unjamPowers: { left: 0.4, right: -0.4 }
+  holdPowers: { left: 0.1, right: 0.1 }
   jamDetectPeriod: 0.0
   unjamPeriod: 0.2
-  afterUnjamWait: 1.0
+  afterUnjamWait: 0.5
   finishDetectPeriod: 0.0
 
 PickerRelease:

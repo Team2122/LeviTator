@@ -2,9 +2,9 @@ operatorInterface:
   driverJoystick: {index: 0, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}
   gunnerJoystick: {index: 1, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1}
 drive:
-  leftMotor: { channel: 0, inverted: false, powerChannels: [] }
+  leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
-  rightMotor: { channel: 1, inverted: true, powerChannels: [] }
+  rightMotor: { type: VICTOR_SP, channel: 1, inverted: true, powerChannels: [] }
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
   rotationController: {}
 picker:
