@@ -16,12 +16,10 @@ import org.teamtators.common.tester.components.SpeedControllerTest;
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
     private SpeedController rightMotor;
-    private Solenoid deathGripSolenoid;
     private Solenoid extensionSolenoid;
     private DigitalSensor cubeDetectSensor;
     private DigitalSensor cubeDetectLeftSensor;
     private DigitalSensor cubeDetectRightSensor;
-    private DigitalSensor cubePresenceSensor;
 
     public Picker() {
         super("Picker");
@@ -45,10 +43,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setRollerPowers(0.0, 0.0);
     }
 
-    public void setDeathGrip(boolean isDeathGrip) {
-        deathGripSolenoid.set(isDeathGrip);
-    }
-
     public void setPickerExtended(boolean isExtended) {
         extensionSolenoid.set(isExtended);
     }
@@ -65,17 +59,19 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return cubeDetectRightSensor.get();
     }
 
+    public boolean isCubeInPicker() {
+        return cubeDetectRightSensor.get();
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
         tests.addTest(new SpeedControllerTest("leftMotor", leftMotor));
         tests.addTest(new SpeedControllerTest("rightMotor", rightMotor));
-        tests.addTest(new SolenoidTest("deathGripSolenoid", deathGripSolenoid));
         tests.addTest(new SolenoidTest("extensionSolenoid", extensionSolenoid));
         tests.addTest(new DigitalSensorTest("cubeDetectSensor", cubeDetectSensor));
         tests.addTest(new DigitalSensorTest("cubeDetectLeftSensor", cubeDetectLeftSensor));
         tests.addTest(new DigitalSensorTest("cubeDetectRightSensor", cubeDetectRightSensor));
-        tests.addTest(new DigitalSensorTest("cubePresenceSensor", cubePresenceSensor));
         return tests;
     }
 
@@ -83,23 +79,19 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     public void configure(Config config) {
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
-        this.deathGripSolenoid = config.deathGripSolenoid.create();
         this.extensionSolenoid = config.extensionSolenoid.create();
         this.cubeDetectSensor = config.cubeDetectSensor.create();
         this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
         this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
-        this.cubePresenceSensor = config.cubePresenseSensor.create();
     }
 
     public static class Config {
         public SpeedControllerConfig leftMotor;
         public SpeedControllerConfig rightMotor;
-        public SolenoidConfig deathGripSolenoid;
         public SolenoidConfig extensionSolenoid;
         public DigitalSensorConfig cubeDetectSensor;
         public DigitalSensorConfig cubeDetectLeftSensor;
         public DigitalSensorConfig cubeDetectRightSensor;
-        public DigitalSensorConfig cubePresenseSensor;
     }
 
     public static class RollerPowers {
