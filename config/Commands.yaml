@@ -6,3 +6,6 @@ PickerPick:
   unjamPeriod: 0.2
   afterUnjamWait: 1.0
   finishDetectPeriod: 0.0
+
+PickerRelease:
+  powers: { left: -1.0, right: -1.0 }
