@@ -29,6 +29,10 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
     private Config config = new Config();
     private TrapezoidalProfile baseProfile;
 
+    private volatile double maxOutput = Double.POSITIVE_INFINITY;
+    private volatile double minOutput = Double.NEGATIVE_INFINITY;
+    private volatile double holdPower = 0.0;
+
     // Variable data
     private volatile TrapezoidalProfileCalculator calculator;
     private volatile double initialPosition;
@@ -127,6 +131,30 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         this.onTargetPredicate = onTargetPredicate;
     }
 
+    public synchronized double getMinOutput() {
+        return minOutput;
+    }
+
+    public synchronized void setMinOutput(double minOutput) {
+        this.minOutput = minOutput;
+    }
+
+    public synchronized double getMaxOutput() {
+        return maxOutput;
+    }
+
+    public synchronized void setMaxOutput(double maxOutput) {
+        this.maxOutput = maxOutput;
+    }
+
+    public synchronized double getHoldPower() {
+        return holdPower;
+    }
+
+    public synchronized void setHoldPower(double holdPower) {
+        this.holdPower = holdPower;
+    }
+
     @Override
     protected synchronized final void doUpdate(double delta) {
         checkNotNull(velocityProvider, "currentPosition must be set on a TrapezoidalProfileFollower before using");
@@ -143,7 +171,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         }
 
         double computedOutput = computeOutput(delta);
-        computedOutput = applyLimits(computedOutput, -config.maxOutput, config.maxOutput);
+        computedOutput = applyLimits(computedOutput, this.minOutput, this.maxOutput);
 
         output = computedOutput;
         if (outputConsumer != null)
@@ -155,7 +183,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         velocityError = calculator.getVelocity() - getCurrentVelocity();
 
         double output = positionError * config.kpP + velocityError * config.kpV +
-                calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA;
+                calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA + holdPower;
 
         if (calculator.getVelocity() >= EPSILON) {
             output += config.kMinOutput;
@@ -252,7 +280,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
     @Override
     public synchronized String toString() {
-        return "AbstractController{" +
+        return "TrapezoidalProfileFollower{" +
                 "name='" + getName() + '\'' +
                 ", calculator=" + calculator +
                 ", currentPosition=" + currentPosition +
@@ -265,7 +293,19 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
     @Override
     public void configure(Config config) {
-        this.config = config;
+        synchronized (this) {
+            this.config = config;
+
+            if (!Double.isNaN(config.maxAbsoluteOutput)) {
+                setMaxOutput(config.maxAbsoluteOutput);
+                setMinOutput(-config.maxAbsoluteOutput);
+            } else {
+                setMinOutput(config.minOutput);
+                setMaxOutput(config.maxOutput);
+            }
+
+            setHoldPower(config.kHoldPower);
+        }
     }
 
     public Config getConfig() {
@@ -279,9 +319,12 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         public double kfV = 0.0; // velocity feed forward
         public double kMinOutput = 0.0; // intercept for velocity feed forward (aka minimum velocity)
         public double kfA = 0.0; // acceleration feed forward
+        public double kHoldPower = 0.0; // always added to output power
 
         public double maxIError = Double.POSITIVE_INFINITY; // maximum absolute error for which it will apply kiP
-        public double maxOutput = Double.POSITIVE_INFINITY; // maximum absolute output power
+        public double maxAbsoluteOutput = Double.NaN; // maximum absolute output power
+        public double maxOutput = Double.POSITIVE_INFINITY; // maximum output power
+        public double minOutput = Double.NEGATIVE_INFINITY; // minumum output power
 
         public boolean logData = false; // whether datalog is enabled or not
     }
