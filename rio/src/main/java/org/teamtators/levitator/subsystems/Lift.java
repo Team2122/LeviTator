@@ -2,6 +2,7 @@ package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.*;
+import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.PidController;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;

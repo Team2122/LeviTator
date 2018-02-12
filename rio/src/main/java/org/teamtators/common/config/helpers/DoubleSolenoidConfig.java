@@ -1,8 +1,8 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class DoubleSolenoidConfig {
+public class DoubleSolenoidConfig implements ConfigHelper<DoubleSolenoid> {
     private int forwardChannel;
     private int reverseChannel;
 

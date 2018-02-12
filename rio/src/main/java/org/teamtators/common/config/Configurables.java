@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.TatorRobotBase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -16,7 +17,7 @@ import java.lang.reflect.Type;
 public class Configurables {
     private static final Logger logger = LoggerFactory.getLogger(Configurables.class);
 
-    public static boolean configureObject(Object toConfigure, JsonNode config, ObjectMapper mapper) throws ConfigException {
+    public static boolean configureObject(Object toConfigure, JsonNode config) throws ConfigException {
         Preconditions.checkNotNull(toConfigure, "Cannot config null object");
         Preconditions.checkNotNull(config, "config for object must not be null");
 
@@ -29,7 +30,7 @@ public class Configurables {
             if (type.getRawType() == Configurable.class) {
                 Class configClass = (Class) type.getActualTypeArguments()[0];
                 try {
-                    Object configObj = mapper.treeToValue(config, configClass);
+                    Object configObj = TatorRobotBase.configMapper.treeToValue(config, configClass);
                     Method configure = clazz.getMethod("configure", configClass);
                     configure.invoke(toConfigure, configObj);
                     return true;

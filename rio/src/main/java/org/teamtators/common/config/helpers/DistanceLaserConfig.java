@@ -1,8 +1,8 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import org.teamtators.common.hw.DistanceLaser;
 
-public class DistanceLaserConfig {
+public class DistanceLaserConfig implements ConfigHelper<DistanceLaser> {
     private int channel;
     private double distance0V;
     private double distance5V;

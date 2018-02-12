@@ -1,4 +1,4 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Encoder;

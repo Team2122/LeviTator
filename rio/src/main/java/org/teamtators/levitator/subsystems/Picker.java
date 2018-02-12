@@ -1,11 +1,14 @@
 package org.teamtators.levitator.subsystems;
 
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.DigitalSensorConfig;
-import org.teamtators.common.config.SolenoidConfig;
-import org.teamtators.common.config.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.SolenoidConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -83,6 +86,16 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.cubeDetectSensor = config.cubeDetectSensor.create();
         this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
         this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
+
+        PowerDistributionPanel pdp = new PowerDistributionPanel();
+        LiveWindow.add(pdp);
+
+        ((Sendable) leftMotor).setName("Picker", "leftMotor");
+        ((Sendable) rightMotor).setName("Picker", "rightMotor");
+        extensionSolenoid.setName("Picker", "leftMotor");
+        cubeDetectSensor.setName("Picker", "cubeDetectSensor");
+        cubeDetectLeftSensor.setName("Picker", "cubeDetectLeftSensor");
+        cubeDetectRightSensor.setName("Picker", "cubeDetectRightSensor");
     }
 
     public static class Config {

@@ -28,7 +28,7 @@ import java.util.List;
 
 public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     public static final Logger logger = LoggerFactory.getLogger(TatorRobotBase.class);
-    protected final ObjectMapper configMapper = new ObjectMapper(new YAMLFactory());
+    public static final ObjectMapper configMapper = new ObjectMapper(new YAMLFactory());
     protected final ConfigLoader configLoader;
     protected final Scheduler scheduler = new Scheduler();
     protected final ConfigCommandStore commandStore = new ConfigCommandStore();

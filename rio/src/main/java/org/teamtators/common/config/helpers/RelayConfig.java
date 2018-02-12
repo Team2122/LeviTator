@@ -1,8 +1,8 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import edu.wpi.first.wpilibj.Relay;
 
-public class RelayConfig {
+public class RelayConfig implements ConfigHelper<Relay> {
     public Integer channel = null;
     public Relay.Direction direction = null;
 

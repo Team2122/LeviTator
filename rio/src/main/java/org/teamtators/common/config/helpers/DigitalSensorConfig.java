@@ -1,4 +1,4 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import org.teamtators.common.hw.DigitalSensor;
 
@@ -10,7 +10,7 @@ import org.teamtators.common.hw.DigitalSensor;
  * <p>
  * Whichever one works!
  */
-public class DigitalSensorConfig {
+public class DigitalSensorConfig implements ConfigHelper<DigitalSensor> {
     private int channel;
     private DigitalSensor.Type type = DigitalSensor.Type.PNP;
 

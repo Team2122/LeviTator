@@ -1,10 +1,12 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.wpilibj.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.TatorRobotBase;
+import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.hw.NoSpeedController;
 
 /**
@@ -16,11 +18,13 @@ import org.teamtators.common.hw.NoSpeedController;
  * all values:
  * controllerName: {channel: 0, inverted: true, type: Victor, powerChannels: [0, 1, 2]}
  */
-public class SpeedControllerConfig {
+public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
+    public static final ObjectMapper CONFIG_MAPPER = TatorRobotBase.configMapper;
     private int channel;
     private boolean inverted = false;
     private Type type = Type.NONE;
     private int[] powerChannels;
+    private JsonNode config;
     //Not config
     private Logger logger = LoggerFactory.getLogger(SpeedControllerConfig.class);
 
@@ -85,6 +89,7 @@ public class SpeedControllerConfig {
         this.type = type;
     }
 
+    @Override
     public SpeedController create() {
         SpeedController speedController;
         switch (type) {
@@ -109,21 +114,44 @@ public class SpeedControllerConfig {
             case VICTOR_SP:
                 speedController = new VictorSP(channel);
                 break;
-            case TALON_SRX:
-                speedController = new WPI_TalonSRX(channel);
-                break;
-            case VICTOR_SPX:
-                speedController = new WPI_VictorSPX(channel);
-                break;
             default:
-                throw new RuntimeException("Invalid speed controller type " + type + ".");
+                return configureController();
         }
         speedController.setInverted(inverted);
         return speedController;
     }
 
+    private SpeedController configureController() {
+        if (this.config == null) {
+            throw new ConfigException("Must specify config for GROUP, TALON_SRX and VICTOR_SPX SpeedControllerConfig");
+        }
+        ConfigHelper<? extends SpeedController> configHelper;
+        Class<? extends ConfigHelper<? extends SpeedController>> configHelperClass;
+        switch (this.type) {
+            case GROUP:
+                configHelperClass = SpeedControllerGroupConfig.class;
+                break;
+            case TALON_SRX:
+                configHelperClass = TalonSRXConfig.class;
+                break;
+            case VICTOR_SPX:
+                configHelperClass = VictorSPXConfig.class;
+                break;
+            default:
+                throw new ConfigException("Invalid SpeedControllerConfig type " + type + ".");
+        }
+        try {
+            configHelper = CONFIG_MAPPER.treeToValue(this.config, configHelperClass);
+        } catch (Exception e) {
+            throw new ConfigException(String.format("Error creating %s from SpeedControllerConfig",
+                    configHelperClass.getSimpleName()), e);
+        }
+        return configHelper.create();
+    }
+
     public enum Type {
         NONE,
+        GROUP,
         JAGUAR,
         SD540,
         SPARK,

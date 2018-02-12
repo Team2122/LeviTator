@@ -2,22 +2,23 @@ package org.teamtators.common.hw;
 
 import com.google.common.base.Preconditions;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Sendable;
 
 /**
- * Reads digital inputs and returns the current value on the channel
+ * An abstraction for either PNP or NPN digital sensors
+ *
+ * Essentially allows for inverting the sensor reading
  */
-public class DigitalSensor {
-    private DigitalInput digitalSensor;
+public class DigitalSensor extends DigitalInput {
     private Type type = Type.PNP;
 
     public DigitalSensor(int channel, Type type) {
-        Preconditions.checkNotNull(type, "type can not be null");
-        digitalSensor = new DigitalInput(channel);
-        this.type = type;
+        this(channel);
+        setType(type);
     }
 
     public DigitalSensor(int channel) {
-        this(channel, Type.PNP);
+        super(channel);
     }
 
     /**
@@ -35,21 +36,25 @@ public class DigitalSensor {
     }
 
     /**
-     * @return the value from a digital input channel
+     * @return The raw signal from the DigitalInput
      */
     public boolean getRaw() {
-        return digitalSensor.get();
+        return super.get();
     }
 
     /**
-     * @return type of the digital sensor
+     * @return type of the digital sensor, PNP or NPN
      */
     public Type getType() {
         return type;
     }
 
+    public void setType(Type type) {
+        Preconditions.checkNotNull(type, "type can not be null");
+        this.type = type;
+    }
+
     public enum Type {
-        NPN,
-        PNP
+        PNP, NPN
     }
 }

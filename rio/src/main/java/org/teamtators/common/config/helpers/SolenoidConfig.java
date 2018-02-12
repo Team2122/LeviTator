@@ -1,4 +1,4 @@
-package org.teamtators.common.config;
+package org.teamtators.common.config.helpers;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Solenoid;
  * Example mapping:
  * exampleSolenoid: {channel: 0}
  */
-public class SolenoidConfig {
+public class SolenoidConfig implements ConfigHelper<Solenoid> {
     private int channel;
 
     public int getChannel() {

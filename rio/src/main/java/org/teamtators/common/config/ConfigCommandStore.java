@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class ConfigCommandStore extends CommandStore {
-    protected ObjectMapper objectMapper = new YAMLMapper();
     private Map<String, Supplier<Command>> commandSuppliers = new HashMap<String, Supplier<Command>>();
     private Map<String, JsonNode> defaultConfigs = new HashMap<>();
 
@@ -114,7 +113,7 @@ public class ConfigCommandStore extends CommandStore {
                 config = applyDefaults(objectConfig, (ObjectNode) defaultConfig);
             }
         }
-        Configurables.configureObject(command, config, objectMapper);
+        Configurables.configureObject(command, config);
     }
 
     public Command createCommandFromConfig(String commandName, JsonNode config) throws ConfigException {
