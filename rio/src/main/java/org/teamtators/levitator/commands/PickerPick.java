@@ -3,10 +3,9 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
-import org.teamtators.common.util.BooleanSampler;
+import org.teamtators.common.control.BooleanSampler;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Picker;
-import org.teamtators.levitator.subsystems.Subsystems;
 
 public class PickerPick extends Command implements Configurable<PickerPick.Config> {
     private Picker picker;

@@ -1,8 +1,7 @@
-package org.teamtators.common.util;
+package org.teamtators.common.control;
 
 import com.google.common.base.Preconditions;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.Timer;
 
 import java.util.function.BooleanSupplier;
 

@@ -1,7 +1,6 @@
-package org.teamtators.common.util;
+package org.teamtators.common.control;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.Updatable;
 
 public class Ramper implements Updatable, Configurable<Ramper.Config> {
     private double maxAcceleration;
