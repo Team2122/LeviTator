@@ -143,7 +143,7 @@ public class TrapezoidalProfileCalculator {
 
         // if the sign of distance and the sign on travel_d_s do not match, that means that d is so small that it can
         // not get up to travel speed
-        if (distance * travel_d_s < 0) {
+        if (distance * travel_d_s <= 0) {
             max_a = Math.copySign(max_a, start_d_v);
             end_d_t = (Math.sqrt(2) * Math.sqrt(2 * Math.pow(max_a, 3) * distance
                     + Math.pow(max_a * end_v, 2) + Math.pow(max_a * start_v, 2)) - 2 * max_a * end_v)
