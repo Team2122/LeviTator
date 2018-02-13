@@ -87,9 +87,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
         this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
 
-        PowerDistributionPanel pdp = new PowerDistributionPanel();
-        LiveWindow.add(pdp);
-
         ((Sendable) leftMotor).setName("Picker", "leftMotor");
         ((Sendable) rightMotor).setName("Picker", "rightMotor");
         extensionSolenoid.setName("Picker", "leftMotor");

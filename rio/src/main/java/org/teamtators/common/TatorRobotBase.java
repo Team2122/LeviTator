@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teamtators.common.commands.CancelCommand;
@@ -77,6 +78,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     protected void configureSubsystems() {
         pdp = new PowerDistributionPanel();
         driverStation = DriverStation.getInstance();
+
+        LiveWindow.add(pdp);
 
         SubsystemsBase subsystems = getSubsystemsBase();
         logger.debug("Configuring subsystems");

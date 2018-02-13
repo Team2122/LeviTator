@@ -2,7 +2,7 @@ package org.teamtators.common.config.helpers;
 
 import org.teamtators.common.hw.AnalogPotentiometer;
 
-public class AnalogPoteniometerConfig implements ConfigHelper<AnalogPotentiometer> {
+public class AnalogPotentiometerConfig implements ConfigHelper<AnalogPotentiometer> {
     public int channel;
     public double fullRange = 360;
     public double offset = 0;

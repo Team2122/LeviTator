@@ -4,6 +4,8 @@ import com.google.common.collect.EvictingQueue;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SensorBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * A sensor class for using an ADXRS453 gyroscope.
  * Measures angle change on the yaw axis.
  */
-public class ADXRS453 implements PIDSource, Gyro {
+public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     public static final double UPDATE_PERIOD = 1.0 / 120.0;
     public static final int STARTUP_DELAY_MS = 50;
     protected static final Logger logger = LoggerFactory.getLogger(ADXRS453.class);
@@ -75,6 +77,8 @@ public class ADXRS453 implements PIDSource, Gyro {
      * @param spi The spi to use
      */
     public ADXRS453(SPI spi) {
+        super();
+        setName("ADXRS453");
         this.spi = spi;
         spi.setClockRate(kSPIClockRate);
         spi.setMSBFirst();
@@ -496,8 +500,10 @@ public class ADXRS453 implements PIDSource, Gyro {
     }
 
     @Override
-    public String getName() {
-        return "ADXRS453";
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Gyro");
+        builder.addDoubleProperty("Value", this::getAngle, this::setAngle);
+        builder.addDoubleProperty("Rate", this::getRate, null);
     }
 
     public enum Register {

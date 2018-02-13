@@ -4,20 +4,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.config.ConfigLoader;
-import org.teamtators.common.control.PidController;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.controllers.Controller;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.levitator.TatorRobot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Subsystems extends SubsystemsBase {
     private static final String SUBSYSTEMS_CONFIG_FILE = "Subsystems.yaml";
     private final List<Subsystem> subsystems;
-    private final List<Updatable> controllers;
+    private final List<Updatable> updatables;
 
     private OperatorInterface oi;
     private Drive drive;
@@ -33,9 +33,10 @@ public class Subsystems extends SubsystemsBase {
 
         //your subsystems here
         subsystems = Arrays.asList(oi, drive, picker, lift /*, yourSubsystem */);
-        controllers = Arrays.asList(
-                lift.getPivotController()
-        );
+
+        updatables = new ArrayList<>();
+        updatables.addAll(drive.getUpdatables());
+        updatables.add(lift.getPivotController());
     }
 
     @Override
@@ -45,7 +46,7 @@ public class Subsystems extends SubsystemsBase {
 
     @Override
     public List<Updatable> getUpdatables() {
-        return controllers;
+        return updatables;
     }
 
     @Override

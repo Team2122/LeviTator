@@ -2,6 +2,7 @@ package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
@@ -131,7 +132,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(rotationController);
+        return Arrays.asList(gyro, rotationController);
     }
 
     @Override
@@ -156,10 +157,17 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>{
         this.rightMotor = config.rightMotor.create();
         this.leftEncoder = config.leftEncoder.create();
         this.rightEncoder = config.rightEncoder.create();
+
         gyro = new ADXRS453(SPI.Port.kOnboardCS0);
         this.rotationController.configure(config.rotationController);
         gyro.start();
         gyro.startCalibration();
+
+        ((Sendable) leftMotor).setName("Drive", "leftMotor");
+        ((Sendable) rightMotor).setName("Drive", "rightMotor");
+        leftEncoder.setName("Drive", "leftEncoder");
+        rightEncoder.setName("Drive", "rightEncoder");
+        gyro.setName("Drive", "gyro");
     }
 
     public static class Config {

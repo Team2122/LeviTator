@@ -1,11 +1,13 @@
 package org.teamtators.common.hw;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.ControllerPower;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public class AnalogPotentiometer implements Potentiometer {
+public class AnalogPotentiometer extends SensorBase implements Potentiometer, Sendable {
+    public static final double DEFAULT_FULL_RANGE = 360.0;
+    public static final double DEFAULT_OFFSET = 0.0;
+    public static final boolean DEFAULT_CONTINUOUS = false;
     private AnalogInput analogInput;
     private double fullRange;
     private double offset;
@@ -16,10 +18,20 @@ public class AnalogPotentiometer implements Potentiometer {
         this.fullRange = fullRange;
         this.offset = offset;
         this.continuous = continuous;
+
+        addChild(analogInput);
     }
 
     public AnalogPotentiometer(int channel, double fullRange, double offset) {
-        this(channel, fullRange, offset, false);
+        this(channel, fullRange, offset, DEFAULT_CONTINUOUS);
+    }
+
+    public AnalogPotentiometer(int channel, boolean continuous) {
+        this(channel, DEFAULT_FULL_RANGE, DEFAULT_OFFSET, continuous);
+    }
+
+    public AnalogPotentiometer(int channel) {
+        this(channel, DEFAULT_CONTINUOUS);
     }
 
     public double getRawVoltage() {
@@ -27,6 +39,7 @@ public class AnalogPotentiometer implements Potentiometer {
     }
 
     public void free() {
+        super.free();
         analogInput.free();
     }
 
@@ -84,5 +97,16 @@ public class AnalogPotentiometer implements Potentiometer {
     @Override
     public double pidGet() {
         return this.get();
+    }
+
+    public AnalogInput getAnalogInput() {
+        return analogInput;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Analog Input");
+        builder.addDoubleProperty("Value", this::get, null);
+        builder.addDoubleProperty("Offset", this::getOffset, this::setOffset);
     }
 }

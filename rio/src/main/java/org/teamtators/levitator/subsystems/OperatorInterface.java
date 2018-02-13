@@ -13,7 +13,6 @@ import java.util.List;
 public class OperatorInterface extends Subsystem implements Configurable<OperatorInterface.Config> {
     private LogitechF310 driverJoystick = new LogitechF310("driver");
     private LogitechF310 gunnerJoystick = new LogitechF310("gunner");
-    private Config config;
     private List<Controller<?, ?>> controllers;
 
     public OperatorInterface() {
@@ -31,7 +30,6 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
 
     @Override
     public void configure(Config config) {
-        this.config = config;
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
 

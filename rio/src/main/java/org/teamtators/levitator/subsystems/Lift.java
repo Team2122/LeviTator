@@ -1,5 +1,6 @@
 package org.teamtators.levitator.subsystems;
 
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.*;
 import org.teamtators.common.config.helpers.*;
@@ -195,6 +196,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotEncoder = config.pivotEncoder.create();
 
         this.pivotController.configure(config.pivotController);
+
+        liftMotor.setName("Lift", "liftMotor");
+        liftEncoder.setName("Lift", "liftMotor");
+        liftMotor.setName("Lift", "liftEncoder");
+        limitSensorTop.setName("Lift", "limitSensorTop");
+        limitSensorBottom.setName("Lift", "limitSensorBottom");
+        ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
+        pivotEncoder.setName("Lift", "pivotEncoder");
     }
 
     public static class Config {
@@ -203,9 +212,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig limitSensorTop;
         public DigitalSensorConfig limitSensorBottom;
         public SpeedControllerConfig pivotMotor;
-        public AnalogPoteniometerConfig pivotEncoder;
+        public AnalogPotentiometerConfig pivotEncoder;
 
-//        public
         public PidController.Config pivotController;
 
         public double anglePresetLeft;
@@ -217,5 +225,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
+
     }
 }
