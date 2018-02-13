@@ -1,15 +1,20 @@
 package org.teamtators.levitator.subsystems;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.Controller;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class OperatorInterface extends Subsystem implements Configurable<OperatorInterface.Config> {
-    private LogitechF310 driverJoystick = new LogitechF310();
-    private LogitechF310 gunnerJoystick = new LogitechF310();
+    private LogitechF310 driverJoystick = new LogitechF310("driver");
+    private LogitechF310 gunnerJoystick = new LogitechF310("gunner");
     private Config config;
+    private List<Controller<?, ?>> controllers;
 
     public OperatorInterface() {
         super("Operator Interface");
@@ -29,6 +34,11 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         this.config = config;
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
+
+        controllers = Arrays.asList(
+                getDriverJoystick(),
+                getGunnerJoystick()
+        );
     }
 
     public LogitechF310 getDriverJoystick() {
@@ -37,6 +47,10 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
 
     public LogitechF310 getGunnerJoystick() {
         return gunnerJoystick;
+    }
+
+    public List<Controller<?, ?>> getAllControllers() {
+        return controllers;
     }
 
     @Override

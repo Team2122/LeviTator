@@ -8,9 +8,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.commands.CancelCommand;
+import org.teamtators.common.commands.WaitCommand;
+import org.teamtators.common.commands.WaitForCommand;
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.ConfigLoader;
-import org.teamtators.common.config.TriggerBinder;
+import org.teamtators.common.controllers.TriggerBinder;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.UpdatableCollection;
@@ -19,11 +22,11 @@ import org.teamtators.common.datalogging.Dashboard;
 import org.teamtators.common.datalogging.DashboardUpdatable;
 import org.teamtators.common.datalogging.DashboardUpdater;
 import org.teamtators.common.datalogging.DataCollector;
-import org.teamtators.common.hw.LogitechF310;
 import org.teamtators.common.scheduler.*;
 import org.teamtators.common.tester.AutomatedTester;
 import org.teamtators.common.tester.ManualTester;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class TatorRobotBase implements RobotStateListener, Updatable {
@@ -32,7 +35,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     protected final ConfigLoader configLoader;
     protected final Scheduler scheduler = new Scheduler();
     protected final ConfigCommandStore commandStore = new ConfigCommandStore();
-    protected final TriggerBinder triggerBinder = new TriggerBinder(getScheduler(), getCommandStore(), configMapper);
+    protected final TriggerBinder triggerBinder = new TriggerBinder(getScheduler(), getCommandStore());
     protected final ManualTester tester = new ManualTester();
     protected final AutomatedTester automatedTester = new AutomatedTester(getScheduler());
 
@@ -46,8 +49,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     protected final Timer stateTimer = new Timer();
     protected double lastDelta = 0.0;
 
-    private PowerDistributionPanel pdp = new PowerDistributionPanel();
-    private DriverStation driverStation = DriverStation.getInstance();
+    private PowerDistributionPanel pdp;
+    private DriverStation driverStation;
     private Command autoCommand;
     private List<Subsystem> subsystemList;
 
@@ -72,11 +75,14 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
 
 
     protected void configureSubsystems() {
+        pdp = new PowerDistributionPanel();
+        driverStation = DriverStation.getInstance();
+
         SubsystemsBase subsystems = getSubsystemsBase();
         logger.debug("Configuring subsystems");
 
         subsystems.configure(configLoader);
-        this.controllers.addAll(subsystems.getControllers());
+        this.controllers.addAll(subsystems.getUpdatables());
 
         subsystemList = subsystems.getSubsystemList();
         for (Subsystem subsystem : subsystemList) {
@@ -88,15 +94,15 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
 
     protected void configureCommands() {
         logger.debug("Creating commands");
-        registerCommands();
+        registerCommands(getCommandStore());
         ObjectNode commandsConfig = (ObjectNode) configLoader.load("Commands.yaml");
         getCommandStore().createCommandsFromConfig(commandsConfig);
-        //autoCommand = commandStore.getCommand("$AutoChooser");
+        this.autoCommand = this.getAutoCommand();
     }
 
     protected void configureTests() {
         logger.debug("Configuring tests");
-        getTester().setJoystick(getDriverJoystick());
+        getTester().setJoystick(getSubsystemsBase().getTestModeController());
         automatedTester.registerWith(getTester());
         getScheduler().registerDefaultCommand(getTester());
         //getAutomatedTester().initialize(configLoader);
@@ -104,9 +110,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
 
     protected void configureTriggers() {
         logger.debug("Configuring triggers");
+        getTriggerBinder().putControllers(getSubsystemsBase().getControllers());
         ObjectNode triggersConfig = (ObjectNode) configLoader.load("Triggers.yaml");
-        triggerBinder.setDriverJoystick(getDriverJoystick());
-        triggerBinder.setGunnerJoystick(getGunnerJoystick());
         triggerBinder.bindTriggers(triggersConfig);
     }
 
@@ -125,7 +130,11 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         this.getScheduler().onEnterRobotState(state);
 
         if (state == RobotState.AUTONOMOUS) {
-            this.getScheduler().startCommand(autoCommand);
+            if (autoCommand == null) {
+                logger.warn("No auto command was specified");
+            } else {
+                this.getScheduler().startCommand(autoCommand);
+            }
         }
     }
 
@@ -142,7 +151,6 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
                 subsystem.update(delta);
             }
         }
-        //DriverStation.getInstance().isDSAttached();
     }
 
     private void setUpDashboards() {
@@ -185,22 +193,30 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         return pdp;
     }
 
+    public DriverStation getDriverStation() {
+        return driverStation;
+    }
+
     protected void onDriverStationData() {
+    }
+
+    public String getRobotName() {
+        return "TatorRobot";
     }
 
     public abstract SubsystemsBase getSubsystemsBase();
 
-    protected abstract void registerCommands();
-
-    protected abstract LogitechF310 getGunnerJoystick();
-
-    protected abstract LogitechF310 getDriverJoystick();
-
-    protected void postInitialize() {
-        logger.info("==> Initialized TatorRobot");
+    protected void registerCommands(ConfigCommandStore commandStore) {
+        commandStore.registerCommand("Cancel", () -> new CancelCommand(this));
+        commandStore.registerCommand("Wait", () -> new WaitCommand(this));
+        commandStore.registerCommand("WaitFor", () -> new WaitForCommand(this));
     }
 
-    public DriverStation getDriverStation() {
-        return driverStation;
+    protected Command getAutoCommand() {
+        return null;
+    }
+
+    protected void postInitialize() {
+        logger.info("==> Initialized " + getRobotName());
     }
 }

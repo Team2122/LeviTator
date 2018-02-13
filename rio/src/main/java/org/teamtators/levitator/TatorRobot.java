@@ -2,9 +2,13 @@ package org.teamtators.levitator;
 
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.TatorRobotBase;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.config.ConfigCommandStore;
+import org.teamtators.common.controllers.LogitechF310;
+import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.commands.CommandRegistrar;
 import org.teamtators.levitator.subsystems.Subsystems;
+
+import java.util.Arrays;
 
 public class TatorRobot extends TatorRobotBase {
     private final CommandRegistrar registrar = new CommandRegistrar(this);
@@ -17,6 +21,11 @@ public class TatorRobot extends TatorRobotBase {
         subsystems = new Subsystems();
     }
 
+    @Override
+    public String getRobotName() {
+        return "LeviTator";
+    }
+
     public Subsystems getSubsystems() {
         return subsystems;
     }
@@ -27,18 +36,14 @@ public class TatorRobot extends TatorRobotBase {
     }
 
     @Override
-    protected void registerCommands() {
-        registrar.register(getCommandStore());
+    protected void registerCommands(ConfigCommandStore commandStore) {
+        super.registerCommands(commandStore);
+        registrar.register(commandStore);
     }
 
     @Override
-    protected LogitechF310 getGunnerJoystick() {
-        return getSubsystems().getOI().getGunnerJoystick();
-    }
-
-    @Override
-    protected LogitechF310 getDriverJoystick() {
-        return getSubsystems().getOI().getDriverJoystick();
+    protected Command getAutoCommand() {
+        return null;
     }
 
     @Override

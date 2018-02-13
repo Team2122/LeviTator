@@ -1,4 +1,4 @@
-package org.teamtators.common.config;
+package org.teamtators.common.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,41 +6,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.wpilibj.Joystick;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.TatorRobotBase;
+import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.scheduler.*;
 
+import javax.naming.ldap.Control;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class TriggerBinder {
     private static final Logger logger = LoggerFactory.getLogger(TriggerBinder.class);
-    private Scheduler scheduler;
-    private CommandStore commandStore;
-    private ObjectMapper objectMapper;
-    private LogitechF310 driverJoystick;
-    private LogitechF310 gunnerJoystick;
+    private static final ObjectMapper objectMapper = TatorRobotBase.configMapper;
 
-    public TriggerBinder(Scheduler scheduler, CommandStore commandStore,
-                         ObjectMapper objectMapper) {
+    private final Scheduler scheduler;
+    private final CommandStore commandStore;
+    private final Map<String, Controller<?, ?>> controllers = new HashMap<>();
+
+    public TriggerBinder(Scheduler scheduler, CommandStore commandStore) {
         this.scheduler = scheduler;
         this.commandStore = commandStore;
-        this.objectMapper = objectMapper;
     }
 
-    public LogitechF310 getDriverJoystick() {
-        return driverJoystick;
+    public void putController(Controller<?, ?> controller) {
+        controllers.put(controller.getName(), controller);
     }
 
-    public void setDriverJoystick(LogitechF310 driverJoystick) {
-        this.driverJoystick = driverJoystick;
+    public void putControllers(Collection<Controller<?, ?>> controllers) {
+        controllers.forEach(this::putController);
     }
 
-    public LogitechF310 getGunnerJoystick() {
-        return gunnerJoystick;
+    public Map<String, Controller<?, ?>> getControllers() {
+        return this.controllers;
     }
 
-    public void setGunnerJoystick(LogitechF310 gunnerJoystick) {
-        this.gunnerJoystick = gunnerJoystick;
+    public void clearControllers() {
+        controllers.clear();
     }
 
     /**
@@ -49,8 +51,10 @@ public class TriggerBinder {
      * @param triggersConfig Triggers configuration object
      */
     public void bindTriggers(TriggersConfig triggersConfig) {
-        bindButtonsToLogitechF310(triggersConfig.driver, driverJoystick);
-        bindButtonsToLogitechF310(triggersConfig.gunner, gunnerJoystick);
+        for (Map.Entry<String, Controller<?, ?>> entry : controllers.entrySet()) {
+            Controller<?, ?> controller = entry.getValue();
+            bindButtonsToController(controller, triggersConfig.getBinding(controller.getName()));
+        }
         registerDefaults(triggersConfig.defaults);
     }
 
@@ -67,27 +71,28 @@ public class TriggerBinder {
      * @param config Root config node of triggers
      */
     public void bindTriggers(JsonNode config) {
-        TriggersConfig triggersConfig;
         try {
-            triggersConfig = objectMapper.treeToValue(config, TriggersConfig.class);
+            TriggersConfig triggersConfig = objectMapper.treeToValue(config, TriggersConfig.class);
+            bindTriggers(triggersConfig);
         } catch (JsonProcessingException e) {
             throw new ConfigException("Failed to load triggers config", e);
         }
-        bindTriggers(triggersConfig);
     }
 
-    /**
-     * Bind buttons to a joystick using a TriggersConfig
-     *
-     * @param buttonsMap Map of buttons and their bindings
-     * @param joystick   Joystick to bind buttons to
-     */
-    public void bindButtonsToLogitechF310(Map<LogitechF310.Button, JsonNode> buttonsMap, LogitechF310 joystick) {
-        if (buttonsMap == null) return;
-        for (Map.Entry<LogitechF310.Button, JsonNode> entry : buttonsMap.entrySet()) {
-            TriggerSource triggerSource = joystick.getTriggerSource(entry.getKey());
+    private <TButton> void bindButtonsToController(Controller<TButton, ?> controller, Map<JsonNode, JsonNode> bindings) {
+        if (bindings == null) return;
+        Class<TButton> buttonClass = controller.getButtonClass();
+        for (Map.Entry<JsonNode, JsonNode> binding : bindings.entrySet()) {
+            TButton button;
+            try {
+                button = objectMapper.treeToValue(binding.getKey(), buttonClass);
+            } catch (Exception e) {
+                throw new ConfigException("Invalid button name " + binding.getKey() +
+                        " for controller " + controller.getName());
+            }
+            TriggerSource triggerSource = controller.getTriggerSource(button);
             TriggerAdder triggerAdder = scheduler.onTrigger(triggerSource);
-            JsonNode specifier = entry.getValue();
+            JsonNode specifier = binding.getValue();
             if (specifier.isTextual()) {
                 bindTriggerWithSpecifier(triggerAdder, specifier.asText());
             } else if (specifier.isArray()) {
@@ -149,9 +154,5 @@ public class TriggerBinder {
             throw new ConfigException("Command " + commandName + " in binding does not exist");
         }
         return command;
-    }
-
-    public void bindButtonsToJoystick(Joystick joystick) {
-
     }
 }

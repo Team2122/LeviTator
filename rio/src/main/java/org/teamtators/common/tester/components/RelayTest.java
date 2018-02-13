@@ -1,7 +1,7 @@
 package org.teamtators.common.tester.components;
 
 import edu.wpi.first.wpilibj.Relay;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
 public class RelayTest extends ManualTest {

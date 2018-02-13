@@ -2,6 +2,8 @@ package org.teamtators.common;
 
 import org.teamtators.common.config.ConfigLoader;
 import org.teamtators.common.control.Updatable;
+import org.teamtators.common.controllers.Controller;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Subsystem;
 
 import java.util.List;
@@ -14,5 +16,9 @@ public abstract class SubsystemsBase {
 
     public abstract void configure(ConfigLoader configLoader);
 
-    public abstract List<Updatable> getControllers();
+    public abstract List<Updatable> getUpdatables();
+
+    public abstract List<Controller<?, ?>> getControllers();
+
+    public abstract LogitechF310 getTestModeController();
 }

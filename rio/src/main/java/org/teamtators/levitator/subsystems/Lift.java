@@ -205,6 +205,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public SpeedControllerConfig pivotMotor;
         public AnalogPoteniometerConfig pivotEncoder;
 
+//        public
         public PidController.Config pivotController;
 
         public double anglePresetLeft;
@@ -216,6 +217,5 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
-
     }
 }

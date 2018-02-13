@@ -5,7 +5,7 @@ import org.teamtators.common.control.ControllerOutput;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.LogDataProvider;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
 import java.util.Arrays;

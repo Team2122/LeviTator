@@ -1,6 +1,6 @@
 package org.teamtators.common.tester.automated;
 
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.AutomatedTestMessage;
 

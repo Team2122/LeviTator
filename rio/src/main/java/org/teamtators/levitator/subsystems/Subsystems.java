@@ -6,6 +6,8 @@ import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.config.ConfigLoader;
 import org.teamtators.common.control.PidController;
 import org.teamtators.common.control.Updatable;
+import org.teamtators.common.controllers.Controller;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.levitator.TatorRobot;
 
@@ -42,7 +44,7 @@ public class Subsystems extends SubsystemsBase {
     }
 
     @Override
-    public List<Updatable> getControllers() {
+    public List<Updatable> getUpdatables() {
         return controllers;
     }
 
@@ -79,6 +81,16 @@ public class Subsystems extends SubsystemsBase {
 
     public OperatorInterface getOI() {
         return oi;
+    }
+
+    @Override
+    public List<Controller<?, ?>> getControllers() {
+        return oi.getAllControllers();
+    }
+
+    @Override
+    public LogitechF310 getTestModeController() {
+        return oi.getDriverJoystick();
     }
 
     public static class Config {

@@ -3,7 +3,7 @@ package org.teamtators.common.tester.components;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
 public class SpeedControllerTest extends ManualTest {

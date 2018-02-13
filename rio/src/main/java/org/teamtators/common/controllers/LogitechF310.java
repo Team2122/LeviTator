@@ -1,24 +1,34 @@
-package org.teamtators.common.hw;
+package org.teamtators.common.controllers;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.Timer;
-import org.teamtators.common.control.Updatable;
 import org.teamtators.common.scheduler.TriggerSource;
 
-public class LogitechF310 implements Configurable<LogitechF310.Config>, Updatable {
-    private Joystick joystick;
+public class LogitechF310
+        extends ControllerBase<LogitechF310.Button, LogitechF310.Axis, LogitechF310.Config>
+        implements Configurable<LogitechF310.Config> {
     private double rightTriggerDeadzone;
     private double leftTriggerDeadzone;
-    private double targetTime;
 
-    private Timer timer = new Timer();
-
-    public double getAxisValue(Axis axis) {
-        return joystick.getRawAxis(axis.getAxisID());
+    public LogitechF310(String name) {
+        super(name);
     }
 
+    @Override
+    public Class<Button> getButtonClass() {
+        return Button.class;
+    }
+
+    @Override
+    public Class<Axis> getAxisClass() {
+        return Axis.class;
+    }
+
+    @Override
+    public double getAxisValue(Axis axis) {
+        return getRawAxisValue(axis.getAxisID());
+    }
+
+    @Override
     public boolean isButtonDown(Button button) {
         switch (button) {
             case TRIGGER_LEFT:
@@ -34,52 +44,30 @@ public class LogitechF310 implements Configurable<LogitechF310.Config>, Updatabl
             case POV_LEFT:
                 return getPov() == 270;
             default:
-                return joystick.getRawButton(button.getButtonID());
+                return super.isRawButtonDown(button.getButtonID());
         }
     }
 
-    /**
-     * Gets a trigger source for the specified button on the joystick
-     *
-     * @param button Button to get the trigger source for
-     * @return A TriggerSource
-     */
+    @Override
+    public boolean isButtonPressed(Button button) {
+        return isRawButtonPressed(button.getButtonID());
+    }
+
+    @Override
+    public boolean isButtonReleased(Button button) {
+        return isRawButtonDown(button.getButtonID());
+    }
+
+    @Override
     public TriggerSource getTriggerSource(Button button) {
-        return new LogitechTrigger(this, button);
-    }
-
-    private int getPov() {
-        return joystick.getPOV();
-    }
-
-    public void setRumble(RumbleType rumbleType, double value, double time) {
-        targetTime = time;
-        timer.restart();
-//        setRumbleValue(rumbleType, value);
-    }
-
-    private void setRumbleValue(RumbleType rumbleType, double value) {
-        if (rumbleType == RumbleType.LEFT || rumbleType == RumbleType.BOTH) {
-            joystick.setRumble(GenericHID.RumbleType.kLeftRumble, value);
-        }
-        if (rumbleType == RumbleType.RIGHT || rumbleType == RumbleType.BOTH) {
-            joystick.setRumble(GenericHID.RumbleType.kRightRumble, value);
-        }
+        return getRawTriggerSource(button.getButtonID());
     }
 
     @Override
     public void configure(Config config) {
-        joystick = new Joystick(config.index);
+        super.configure(config);
         this.leftTriggerDeadzone = config.leftTriggerDeadzone;
         this.rightTriggerDeadzone = config.rightTriggerDeadzone;
-    }
-
-    @Override
-    public void update(double delta) {
-        if (timer.hasPeriodElapsed(targetTime)) {
-            joystick.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0);
-            joystick.setRumble(GenericHID.RumbleType.kRightRumble, 0.0);
-        }
     }
 
     /**
@@ -132,7 +120,7 @@ public class LogitechF310 implements Configurable<LogitechF310.Config>, Updatabl
     /**
      * Enum to reference axis
      */
-    public static enum Axis {
+    public enum Axis {
         LEFT_STICK_X(0),
         LEFT_STICK_Y(1),
         LEFT_TRIGGER(2),
@@ -156,35 +144,7 @@ public class LogitechF310 implements Configurable<LogitechF310.Config>, Updatabl
         }
     }
 
-    /**
-     * An enum to rumble the left, right or both sides of a controller
-     */
-    public enum RumbleType {
-        LEFT,
-        RIGHT,
-        BOTH
-    }
-
-    /**
-     * A class representing a button on a WPILibLogitechF310 gamepad, used for binding commands to buttons
-     */
-    public static class LogitechTrigger implements TriggerSource {
-        private LogitechF310 joystick;
-        private Button button;
-
-        public LogitechTrigger(LogitechF310 joystick, Button button) {
-            this.joystick = joystick;
-            this.button = button;
-        }
-
-        @Override
-        public boolean getActive() {
-            return joystick.isButtonDown(button);
-        }
-    }
-
-    public static class Config {
-        public int index;
+    public static class Config extends ControllerBase.Config {
         public double leftTriggerDeadzone;
         public double rightTriggerDeadzone;
     }

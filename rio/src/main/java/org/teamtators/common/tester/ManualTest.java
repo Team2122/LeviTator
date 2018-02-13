@@ -3,7 +3,7 @@ package org.teamtators.common.tester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teamtators.common.control.Updatable;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 
 /**
  * Class to represent a component test

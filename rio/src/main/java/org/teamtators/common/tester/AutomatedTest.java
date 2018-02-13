@@ -1,6 +1,6 @@
 package org.teamtators.common.tester;
 
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
 

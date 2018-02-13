@@ -11,11 +11,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.FRCNetComm;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
@@ -25,11 +23,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.teamtators.levitator.TatorRobot;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -135,7 +133,7 @@ public class Robot {
         System.out.println("********** Initializing HAL **********");
         initializeHardwareConfiguration();
 
-        HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+        HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Java);
 
         if (args.length < 1) {
             System.err.println("Config directory must be specified as first argument");
@@ -258,7 +256,6 @@ public class Robot {
             doStartCompetition();
         } catch (Throwable t) {
             logger.error("Unhandled exception thrown!", t);
-            throw t;
         }
     }
 
@@ -280,10 +277,10 @@ public class Robot {
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     }
 
-    private void doStartCompetition() {
+    private void doStartCompetition() throws Throwable {
         // Report that we are using java just to match what IterativeRobot does
-        HAL.report(tResourceType.kResourceType_Framework,
-                tInstances.kFramework_Iterative);
+        HAL.report(FRCNetComm.tResourceType.kResourceType_Framework,
+                FRCNetComm.tInstances.kFramework_Iterative);
 
         // Actually initialize user robot code
         robotInit();
@@ -346,7 +343,7 @@ public class Robot {
         }
     }
 
-    private void initialize() throws IOException {
+    private void initialize() throws Exception {
         logger.info("Robot initializing with config directory " + this.configDir);
 
         String robotName = "";
@@ -365,25 +362,24 @@ public class Robot {
             robot = (TatorRobotBase) Class.forName(robotName)
                     .getConstructor(String.class)
                     .newInstance(this.configDir);
-        } catch (Throwable throwable) {
+        } catch (Exception e) {
             DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " "
-                    + throwable.toString() + " at " + Arrays.toString(throwable.getStackTrace()), false);
-            System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
-            System.err.println("Does the class exist, and does it have a public constructor which takes the name of the" +
-                    "config directory?");
-            System.exit(1);
-            return;
+                    + e.toString() + " at " + Arrays.toString(e.getStackTrace()), false);
+            logger.error("Could not instantiate robot " + robotName + "!\n" +
+                    "Does the class exist, and does it have a public constructor which takes the name of the " +
+                    "config directory?", e);
+            throw e;
         }
 
         robot.initialize();
     }
 
-    public void robotInit() {
+    public void robotInit() throws Throwable {
         try {
             initialize();
         } catch (Throwable t) {
             logger.error("Exception during robot init", t);
-            System.exit(1);
+            throw t;
         }
     }
 }

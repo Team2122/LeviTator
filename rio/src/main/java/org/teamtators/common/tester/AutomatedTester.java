@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.teamtators.common.config.ConfigLoader;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.Configurables;
-import org.teamtators.common.hw.LogitechF310;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.Scheduler;
 import org.teamtators.common.scheduler.SequentialCommand;
@@ -148,7 +148,7 @@ public class AutomatedTester extends ManualTest {
         for (AutomatedTest test : testList) {
             if (test instanceof Configurable) {
                 try {
-                    Configurables.configureObject(test, configNode.get(test.getName()), configLoader.getObjectMapper());
+                    Configurables.configureObject(test, configNode.get(test.getName()));
                 } catch (Exception e) {
                     logger.error("Configuration of automated test {} failed", test.getName());
                     throw e;
