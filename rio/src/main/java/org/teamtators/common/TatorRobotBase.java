@@ -26,6 +26,7 @@ import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.scheduler.*;
 import org.teamtators.common.tester.AutomatedTester;
 import org.teamtators.common.tester.ManualTester;
+import org.teamtators.common.util.FMSData;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +55,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     private DriverStation driverStation;
     private Command autoCommand;
     private List<Subsystem> subsystemList;
+
+    private FMSData fmsData = new FMSData();
 
     public TatorRobotBase(String configDir) {
         configMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
@@ -148,6 +151,13 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
     public void update(double delta) {
         lastDelta = delta;
         getScheduler().execute();
+
+        FMSData fmsDataCurrent = FMSData.fromDriverStation(driverStation);
+        if (!fmsDataCurrent.equals(fmsData)) {
+            logger.info("FMS Data updated: " + fmsDataCurrent);
+            fmsData = fmsDataCurrent;
+            // TODO: some sort of callback/notification system for this
+        }
 
         if (getState() != RobotState.TEST) {
             for (Subsystem subsystem : subsystemList) {
