@@ -21,13 +21,10 @@
         </appender>
     -->
 
-    <appender name="Server" class="me.moocar.logback.net.SocketEncoderAppender">
+    <appender name="Server" class="ch.qos.logback.classic.net.SocketAppender">
         <port>50505</port>
         <remoteHost>localhost</remoteHost>
-        <!--<reconnectionDelay>1000</reconnectionDelay>-->
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
+        <reconnectionDelay>1000</reconnectionDelay>
     </appender>
 
     <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">

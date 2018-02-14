@@ -59,7 +59,6 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-ext', version: '1.7.25'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile group: 'me.moocar', name: 'socket-encoder-appender', version: '0.1beta1'
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
 
     compile wpilib()
