@@ -9,7 +9,7 @@
     </appender>
 
     <appender name="File" class="ch.qos.logback.core.FileAppender">
-        <file>/media/sda1/LeviTatorLogs/${fileTimestamp}_LeviTator.log</file>
+        <file>${tator.logdir}/logs/${fileTimestamp}_LeviTator.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>

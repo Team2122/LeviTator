@@ -251,12 +251,24 @@ public class Robot {
 
     public void startCompetition() {
         try {
+            findLogDirectory();
             configureLogging();
 
             doStartCompetition();
         } catch (Throwable t) {
             logger.error("Unhandled exception thrown!", t);
         }
+    }
+
+    private void findLogDirectory() {
+        File logDir = new File("/media/sda1");
+        if (logDir.exists() && logDir.canWrite()) {
+            System.out.println("Using USB drive for logs");
+        } else {
+            System.out.println("USB drive not present, or permissions are incorrect. Logging to /home/lvuser");
+            logDir = new File(configDir).getParentFile();
+        }
+        System.setProperty("tator.logdir", logDir.getAbsolutePath());
     }
 
     private void configureLogging() {

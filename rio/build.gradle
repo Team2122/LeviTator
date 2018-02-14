@@ -1,3 +1,4 @@
+import jaci.gradle.deploy.DeployContext
 import jaci.gradle.deploy.artifact.FileCollectionArtifact
 import jaci.openrio.gradle.frc.FRCJavaArtifact
 import jaci.openrio.gradle.frc.RoboRIO
@@ -27,11 +28,19 @@ deploy {
             targets << 'roborio'
             files = rootProject.fileTree('config/')
             directory = 'config'
+            postdeploy << { DeployContext ctx ->
+                ctx.execute("chmod 755 .; chown lvuser .")
+                ctx.execute("sync")
+            }
         }
         artifact('dependencies', FileCollectionArtifact) {
             targets << 'roborio'
             files = project.configurations.compile
             directory = 'libs'
+        }
+        artifact('permissions', jaci.gradle.deploy.artifact.CommandArtifact) {
+            targets << 'roborio'
+            command = "chmod 755 .; chown lvuser ."
         }
     }
 }
