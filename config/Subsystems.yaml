@@ -1,6 +1,6 @@
 operatorInterface:
-  driverJoystick: { index: 0, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1 }
-  gunnerJoystick: { index: 1, leftTriggerDeadzone: 0.1, rightTriggerDeadzone: 0.1 }
+  driverJoystick: { port: 0 }
+  gunnerJoystick: { port: 1 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}

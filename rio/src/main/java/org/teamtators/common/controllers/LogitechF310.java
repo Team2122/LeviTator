@@ -145,7 +145,7 @@ public class LogitechF310
     }
 
     public static class Config extends ControllerBase.Config {
-        public double leftTriggerDeadzone;
-        public double rightTriggerDeadzone;
+        public double leftTriggerDeadzone = 0.1;
+        public double rightTriggerDeadzone = 0.1;
     }
 }
