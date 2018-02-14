@@ -30,6 +30,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private double desiredPivotAngle;
     private double desiredHeight;
+    private double targetHeight;
 
     private TrapezoidalProfileFollower liftController;
     private PidController pivotController;
@@ -105,6 +106,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setTargetHeight(double height) {
+        if (targetHeight == height) {
+            return;
+        }
         if (height < config.heightBottomLimit) {
             logger.warn("Lift target height exceeded bottom height limit ({} < {})", height, config.heightBottomLimit);
             height = config.heightBottomLimit;
@@ -112,6 +116,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.warn("Lift target height exceeded top height limit ({} > {})", height, config.heightTopLimit);
             height = config.heightTopLimit;
         }
+        this.targetHeight = height;
         double distance = height - getCurrentHeight();
         logger.debug(String.format("Setting lift target height to %.3f (distance to move: %.3f)",
                 height, distance));
@@ -120,6 +125,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftProfile.setTravelVelocity(Math.copySign(liftProfile.getTravelVelocity(), distance));
         logger.trace("Profile: " + liftProfile);
         liftController.updateProfile();
+    }
+
+    public double getTargetHeight() {
+        return this.targetHeight;
     }
 
     private void enableLiftController() {
@@ -164,6 +173,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return angleValue;
     }
 
+    public void setTargetAngle(double angle) {
+        pivotController.setSetpoint(angle);
+    }
+
+    public double getTargetAngle() {
+        return pivotController.getSetpoint();
+    }
+
     public boolean isAtBottomLimit() {
         return limitSensorBottom.get();
     }
@@ -200,11 +217,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         switch (state) {
             case AUTONOMOUS:
             case TELEOP:
+                setDesiredHeight(getCurrentHeight());
+                setDesiredPivotAngle(getCurrentPivotAngle());
+                setTargetAngle(getCurrentPivotAngle());
                 pivotController.start();
-                pivotController.setSetpoint(0.0);
+                enableLiftController();
                 break;
             case DISABLED:
                 pivotController.stop();
+                disableLiftController();
                 break;
         }
     }

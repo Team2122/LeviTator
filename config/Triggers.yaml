@@ -1,5 +1,12 @@
-defaults: [ DriveTank ]
+defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   A: toggle whenPressed PickerPick
   B: whilePressed PickerRelease
+  POV_UP: start whenPressed PivotCenter
+  POV_LEFT: start whenPressed PivotLeft
+  POV_RIGHT: start whenPressed PivotRight
+  X: start whenPressed LiftHome
+  Y: start whenPressed LiftSwitch
+  BUMPER_RIGHT: start whenPressed LiftScaleLow
+  BUMPER_LEFT: start whenPressed LiftScaleHigh

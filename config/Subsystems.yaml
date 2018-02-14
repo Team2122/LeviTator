@@ -32,21 +32,21 @@ lift:
     kMinOutput: 0.0823
     kfA: 0.00089
     kHoldPower: 0.129
-    maxOutput: 0.6
-    minOutput: -0.3
+    maxOutput: 1.0
+    minOutput: -0.5
 
   baseHeightProfile:
-    maxAcceleration: 25.0
-    travelVelocity: 25.0
+    maxAcceleration: 80.0
+    travelVelocity: 60.0
     endVelocity: 0.0
 
   pivotController:
-    P: 0.4
+    P: 0.02 #0.2
     I: 0.04
-    D: -0.16
+    D: 0 #-0.08
     maxIError: 0.5
     maxAbsoluteSetpoint: 90.0
-    maxAbsoluteOutput: 0.5
+    maxAbsoluteOutput: 0.3
     target: { within: 0.5 }
     holdPower: 0.0
 
@@ -55,8 +55,8 @@ lift:
   anglePresetRight: 90
   heightBottomLimit: 0.0
   heightTopLimit: 85.0
-  heightPresetPick: 0
-  heightPresetSwitch: 40
+  heightPresetPick: 2
+  heightPresetSwitch: 45
   heightPresetScaleLow: 70
   heightPresetScaleHigh: 80
   heightPresetHome: 0

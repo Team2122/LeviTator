@@ -12,3 +12,13 @@ PickerPick:
 
 PickerRelease:
   powers: { left: -1.0, right: -1.0 }
+
+PivotLeft: { class: PivotAnglePreset, preset: LEFT }
+PivotCenter: { class: PivotAnglePreset, preset: CENTER }
+PivotRight: { class: PivotAnglePreset, preset: RIGHT }
+
+LiftHome: { class: LiftHeightPreset, preset: HOME }
+LiftPick: { class: LiftHeightPreset, preset: PICK }
+LiftSwitch: { class: LiftHeightPreset, preset: SWITCH }
+LiftScaleLow: { class: LiftHeightPreset, preset: SCALE_LOW }
+LiftScaleHigh: { class: LiftHeightPreset, preset: SCALE_HIGH }

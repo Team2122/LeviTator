@@ -9,9 +9,7 @@ public class LiftContinuous extends Command{
 
     private TatorRobot robot;
     private Lift lift;
-    private double currentHeight;
     private double desiredHeight;
-    private double currentPivotAngle;
     private double desiredPivotAngle;
 
     public LiftContinuous(TatorRobot robot) {
@@ -23,17 +21,11 @@ public class LiftContinuous extends Command{
 
     @Override
     protected boolean step() {
-        currentHeight = lift.getCurrentHeight();
         desiredHeight = lift.getDesiredHeight();
-        currentPivotAngle = lift.getCurrentPivotAngle();
         desiredPivotAngle = lift.getDesiredPivotAngle();
 
-        if(currentHeight != desiredHeight) {
-            //set the target height here
-        }
-        if(currentPivotAngle != desiredPivotAngle) {
-            //set the target angle here
-        }
+        lift.setTargetHeight(desiredHeight);
+        lift.setTargetAngle(desiredPivotAngle);
 
         return false;
     }

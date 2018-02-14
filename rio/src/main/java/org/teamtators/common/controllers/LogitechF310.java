@@ -60,7 +60,7 @@ public class LogitechF310
 
     @Override
     public TriggerSource getTriggerSource(Button button) {
-        return getRawTriggerSource(button.getButtonID());
+        return () -> isButtonDown(button);
     }
 
     @Override
