@@ -18,7 +18,6 @@ public class LiftContinuous extends Command{
         super("LiftContinuous");
         this.robot = robot;
         lift = (robot.getSubsystems()).getLift();
-        // oi = ((Subsystems) robot.getSubsystemsBase()).getOI();
         requires(lift);
     }
 
