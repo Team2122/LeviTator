@@ -1,5 +1,5 @@
 defaults: [ DriveTank ]
 
-Driver:
+driver:
   A: toggle whenPressed PickerPick
   B: whilePressed PickerRelease

@@ -22,7 +22,7 @@ lift:
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: { channel: 0, fullRange: 360.0, offset: -211.4 }
+  pivotEncoder: { channel: 0, fullRange: 360.0, offset: -207.0 }
 
   heightController:
     kpP: 0.0
@@ -36,13 +36,13 @@ lift:
     minOutput: -0.1
 
   pivotController:
-    P: 0.02
+    P: 0.4
     I: 0.04
-    D: 0.0
+    D: -0.16
     maxIError: 0.5
     maxAbsoluteSetpoint: 90.0
-    maxAbsoluteOutput: 0.2
-    target: { within: 1.0 }
+    maxAbsoluteOutput: 0.5
+    target: { within: 0.5 }
     holdPower: 0.0
 
   anglePresetLeft: 0

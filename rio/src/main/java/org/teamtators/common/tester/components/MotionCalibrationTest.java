@@ -72,8 +72,9 @@ public class MotionCalibrationTest extends ManualTest {
         velocity = velocityProvider.getControllerInput();
         acceleration = (velocity - lastVelocity) / delta;
         lastVelocity = velocity;
-        velocityPower = follower.getConfig().kfV * velocity;
-        acclerationPower = follower.getConfig().kfA * acceleration;
+        TrapezoidalProfileFollower.Config config = follower.getConfig();
+        velocityPower = config.kfV * velocity + Math.copySign(config.kMinOutput, velocity) + config.kHoldPower;
+        acclerationPower = config.kfA * acceleration;
         if (applyStick) {
             power = stickInput;
         }

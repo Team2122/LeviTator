@@ -19,6 +19,8 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
         this.offset = offset;
         this.continuous = continuous;
 
+        analogInput.setAverageBits(20);
+
         addChild(analogInput);
     }
 
@@ -45,7 +47,7 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
 
     @Override
     public double get() {
-        double p = analogInput.getVoltage() / ControllerPower.getVoltage5V();
+        double p = analogInput.getAverageVoltage() / ControllerPower.getVoltage5V();
         double value = p * fullRange + offset;
         if (continuous) {
             if (value < 0) {

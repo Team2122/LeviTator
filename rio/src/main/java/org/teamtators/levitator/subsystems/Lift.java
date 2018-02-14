@@ -38,6 +38,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         heightController = new TrapezoidalProfileFollower("heightController");
         heightController.setPositionProvider(this::getCurrentHeight);
         heightController.setVelocityProvider(this::getLiftVelocity);
+        heightController.setOutputConsumer(this::setLiftPower);
 
         pivotController = new PidController("pivotController");
         pivotController.setInputProvider(this::getCurrentPivotAngle);
