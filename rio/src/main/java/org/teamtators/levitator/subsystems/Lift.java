@@ -4,14 +4,18 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.*;
 import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.control.ControllerPredicates;
 import org.teamtators.common.control.PidController;
+import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
 
@@ -27,18 +31,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double desiredPivotAngle;
     private double desiredHeight;
 
-    private TrapezoidalProfileFollower heightController;
+    private TrapezoidalProfileFollower liftController;
     private PidController pivotController;
 
     private Config config;
+    private TrapezoidalProfile liftProfile;
 
     public Lift() {
         super("Lift");
 
-        heightController = new TrapezoidalProfileFollower("heightController");
-        heightController.setPositionProvider(this::getCurrentHeight);
-        heightController.setVelocityProvider(this::getLiftVelocity);
-        heightController.setOutputConsumer(this::setLiftPower);
+        liftController = new TrapezoidalProfileFollower("liftController");
+        liftController.setPositionProvider(this::getCurrentHeight);
+        liftController.setVelocityProvider(this::getLiftVelocity);
+        liftController.setOutputConsumer(this::setLiftPower);
+        liftController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
         pivotController = new PidController("pivotController");
         pivotController.setInputProvider(this::getCurrentPivotAngle);
@@ -98,6 +104,34 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return heightValue;
     }
 
+    public void setTargetHeight(double height) {
+        if (height < config.heightBottomLimit) {
+            logger.warn("Lift target height exceeded bottom height limit ({} < {})", height, config.heightBottomLimit);
+            height = config.heightBottomLimit;
+        } else if (height > config.heightTopLimit) {
+            logger.warn("Lift target height exceeded top height limit ({} > {})", height, config.heightTopLimit);
+            height = config.heightTopLimit;
+        }
+        double distance = height - getCurrentHeight();
+        logger.debug(String.format("Setting lift target height to %.3f (distance to move: %.3f)",
+                height, distance));
+        liftProfile.setDistance(distance);
+        liftProfile.setStartVelocity(getLiftVelocity());
+        liftProfile.setTravelVelocity(Math.copySign(liftProfile.getTravelVelocity(), distance));
+        logger.trace("Profile: " + liftProfile);
+        liftController.updateProfile();
+    }
+
+    private void enableLiftController() {
+        setTargetHeight(getCurrentHeight());
+        liftController.start();
+    }
+
+    private void disableLiftController() {
+        setTargetHeight(getCurrentHeight());
+        liftController.stop();
+    }
+
     public double getCurrentPivotAngle() {
         return pivotEncoder.get();
     }
@@ -153,8 +187,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotMotor.set(pivotPower);
     }
 
-    public TrapezoidalProfileFollower getHeightController() {
-        return heightController;
+    public TrapezoidalProfileFollower getLiftController() {
+        return liftController;
     }
 
     public PidController getPivotController() {
@@ -199,14 +233,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
 
-        tests.addTest(new MotionCalibrationTest(heightController));
+        tests.addTest(new MotionCalibrationTest(liftController));
         tests.addTest(new ControllerTest(pivotController));
+
+        tests.addTest(new LiftTest());
 
         return tests;
     }
 
     @Override
     public void configure(Config config) {
+        this.config = config;
+
         this.liftMotor = config.liftMotor.create();
         this.liftEncoder = config.liftEncoder.create();
         this.limitSensorTop = config.limitSensorTop.create();
@@ -214,7 +252,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
 
-        this.heightController.configure(config.heightController);
+        this.liftController.configure(config.heightController);
+        this.liftProfile = config.baseHeightProfile;
+        liftController.setBaseProfile(liftProfile);
         this.pivotController.configure(config.pivotController);
 
         liftMotor.setName("Lift", "liftMotor");
@@ -234,16 +274,65 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public AnalogPotentiometerConfig pivotEncoder;
 
         public TrapezoidalProfileFollower.Config heightController;
+        public TrapezoidalProfile baseHeightProfile;
         public PidController.Config pivotController;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
         public double anglePresetRight;
 
+        public double heightBottomLimit;
+        public double heightTopLimit;
         public double heightPresetPick;
         public double heightPresetSwitch;
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
+    }
+
+    private class LiftTest extends ManualTest {
+        private double axisValue;
+
+        public LiftTest() {
+            super("LiftTest");
+        }
+
+        @Override
+        public void start() {
+            logger.info("Press A to set lift target to joystick value. Hold Y to enable lift profiler");
+            disableLiftController();
+        }
+        @Override
+        public void onButtonDown(LogitechF310.Button button) {
+            switch (button) {
+                case A:
+                    double height = (config.heightTopLimit - config.heightBottomLimit)
+                            * ((axisValue + 1) / 2) + config.heightBottomLimit;
+                    setTargetHeight(height);
+                    break;
+                case Y:
+                    enableLiftController();
+                    break;
+            }
+        }
+
+        @Override
+        public void onButtonUp(LogitechF310.Button button) {
+            switch (button) {
+                case Y:
+                    disableLiftController();
+                    break;
+            }
+        }
+
+        @Override
+        public void updateAxis(double value) {
+            this.axisValue = value;
+        }
+
+        @Override
+        public void stop() {
+            disableLiftController();
+        }
     }
 }

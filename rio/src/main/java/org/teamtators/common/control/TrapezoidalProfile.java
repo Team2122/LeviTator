@@ -79,4 +79,15 @@ public class TrapezoidalProfile {
     public TrapezoidalProfile copy() {
         return new TrapezoidalProfile(this);
     }
+
+    @Override
+    public String toString() {
+        return "TrapezoidalProfile{" +
+                "distance=" + distance +
+                ", startVelocity=" + startVelocity +
+                ", travelVelocity=" + travelVelocity +
+                ", endVelocity=" + endVelocity +
+                ", maxAcceleration=" + maxAcceleration +
+                '}';
+    }
 }

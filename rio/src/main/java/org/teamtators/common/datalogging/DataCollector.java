@@ -24,13 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataCollector implements Updatable {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
     private static final Logger logger = LoggerFactory.getLogger(DataCollector.class);
-    private static final String OUTPUT_DIR = "/media/sda1/datalogs";
+    private String outputDir;
     private static DataCollector collector = null;
     private Set<ProviderUsage> providers = ConcurrentHashMap.newKeySet();
 
     private DataCollector() {
         try {
-            File outputDirFile = new File(OUTPUT_DIR);
+            outputDir = System.getProperty("tator.logdir") + "/datalogs";
+            File outputDirFile = new File(outputDir);
             if (outputDirFile.mkdirs()) {
                 logger.debug("Created data log directory {}", outputDirFile);
             }
@@ -45,7 +46,7 @@ public class DataCollector implements Updatable {
     }
 
     public String getOutputDir() {
-        return OUTPUT_DIR;
+        return outputDir;
     }
 
     /**
@@ -59,7 +60,7 @@ public class DataCollector implements Updatable {
             return;
         ProviderUsage usage = new ProviderUsage(provider, null, null);
         String timestamp = DATE_FORMAT.format(new Date());
-        String fileName = String.format("%s/%s %s.csv", OUTPUT_DIR, timestamp, provider.getName());
+        String fileName = String.format("%s/%s %s.csv", outputDir, timestamp, provider.getName());
         providers.add(usage);
         logger.debug("Starting data logging for {} to {}", provider.getName(), fileName);
         new Thread(() -> {

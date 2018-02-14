@@ -66,7 +66,7 @@ public class Subsystems extends SubsystemsBase {
         lift.configure(config.lift);
 
         updatables.addAll(drive.getUpdatables());
-        updatables.add(lift.getHeightController());
+        updatables.add(lift.getLiftController());
         updatables.add(lift.getPivotController());
     }
 

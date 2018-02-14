@@ -25,15 +25,20 @@ lift:
   pivotEncoder: { channel: 0, fullRange: 360.0, offset: -207.0 }
 
   heightController:
-    kpP: 0.0
+    kpP: 0.2
     kiP: 0.0
-    kpV: 0.0
-    kfV: 0.0
-    kMinOutput: 0.0
-    kfA: 0.0
-    kHoldPower: 0.0
-    maxOutput: 0.2
-    minOutput: -0.1
+    kpV: 0.005
+    kfV: 0.00963
+    kMinOutput: 0.0823
+    kfA: 0.00089
+    kHoldPower: 0.129
+    maxOutput: 0.6
+    minOutput: -0.3
+
+  baseHeightProfile:
+    maxAcceleration: 25.0
+    travelVelocity: 25.0
+    endVelocity: 0.0
 
   pivotController:
     P: 0.4
@@ -45,9 +50,11 @@ lift:
     target: { within: 0.5 }
     holdPower: 0.0
 
-  anglePresetLeft: 0
+  anglePresetLeft: -90
   anglePresetCenter: 0
-  anglePresetRight: 0
+  anglePresetRight: 90
+  heightBottomLimit: 0.0
+  heightTopLimit: 85.0
   heightPresetPick: 0
   heightPresetSwitch: 40
   heightPresetScaleLow: 70

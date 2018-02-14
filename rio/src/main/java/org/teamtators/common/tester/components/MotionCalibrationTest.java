@@ -64,6 +64,7 @@ public class MotionCalibrationTest extends ManualTest {
     public void start() {
         run = false;
         applyStick = false;
+        logger.info("A to get info, B to set power from stick, hold X to run at set power, hold Y to run at joystick power");
     }
 
     @Override
