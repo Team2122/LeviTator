@@ -263,9 +263,9 @@ public class Robot {
     private void findLogDirectory() {
         File logDir = new File("/media/sda1");
         if (logDir.exists() && logDir.canWrite()) {
-            System.out.println("Using USB drive for logs");
+            System.out.println("****** Using USB drive for logs at /media/sda1 ******");
         } else {
-            System.out.println("USB drive not present, or permissions are incorrect. Logging to /home/lvuser");
+            System.out.println("ERROR: USB drive not present, or permissions are incorrect. Logging to /home/lvuser");
             logDir = new File(configDir).getParentFile();
         }
         System.setProperty("tator.logdir", logDir.getAbsolutePath());

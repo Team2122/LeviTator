@@ -22,7 +22,7 @@ lift:
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: { channel: 3, fullRange: 360.0, offset: -211.4 }
+  pivotEncoder: { channel: 0, fullRange: 360.0, offset: -211.4 }
 
   pivotController:
     P: 0.02
@@ -38,8 +38,8 @@ lift:
   anglePresetCenter: 0
   anglePresetRight: 0
   heightPresetPick: 0
-  heightPresetSwitch: 0
-  heightPresetScaleLow: 0
-  heightPresetScaleHigh: 0
+  heightPresetSwitch: 40
+  heightPresetScaleLow: 70
+  heightPresetScaleHigh: 80
   heightPresetHome: 0
 

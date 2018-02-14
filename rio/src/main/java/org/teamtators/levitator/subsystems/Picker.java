@@ -89,7 +89,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
         ((Sendable) leftMotor).setName("Picker", "leftMotor");
         ((Sendable) rightMotor).setName("Picker", "rightMotor");
-        extensionSolenoid.setName("Picker", "leftMotor");
+        extensionSolenoid.setName("Picker", "extensionSolenoid");
         cubeDetectSensor.setName("Picker", "cubeDetectSensor");
         cubeDetectLeftSensor.setName("Picker", "cubeDetectLeftSensor");
         cubeDetectRightSensor.setName("Picker", "cubeDetectRightSensor");

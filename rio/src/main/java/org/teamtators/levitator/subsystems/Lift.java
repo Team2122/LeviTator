@@ -198,8 +198,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotController.configure(config.pivotController);
 
         liftMotor.setName("Lift", "liftMotor");
-        liftEncoder.setName("Lift", "liftMotor");
-        liftMotor.setName("Lift", "liftEncoder");
+        liftEncoder.setName("Lift", "liftEncoder");
         limitSensorTop.setName("Lift", "limitSensorTop");
         limitSensorBottom.setName("Lift", "limitSensorBottom");
         ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
