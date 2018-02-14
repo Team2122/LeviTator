@@ -66,6 +66,14 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return cubeDetectRightSensor.get();
     }
 
+    public void extend(){
+        setPickerExtended(true);
+    }
+
+    public void retract(){
+        setPickerExtended(false);
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
