@@ -8,20 +8,20 @@ drive:
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
   rotationController: {}
 picker:
-  leftMotor: { type: TALON_SRX, channel: 1 }
-  rightMotor: { type: TALON_SRX, channel: 2, inverted: true }
+  leftMotor: { type: TALON_SRX, config: { id: 1 } }
+  rightMotor: { type: TALON_SRX, config: { id: 2, inverted: true } }
   extensionSolenoid: { channel: 6 }
   cubeDetectSensor: { channel: 14, type: PNP }
   cubeDetectLeftSensor: { channel: 13, type: NPN }
   cubeDetectRightSensor: { channel: 12, type: NPN }
 lift:
   liftMotor:
-    - { type: VICTOR_SPX, channel: 3, inverted: false, powerChannels: [] }
-    - { type: VICTOR_SPX, channel: 4, inverted: false, powerChannels: [] }
-  liftEncoder: { aChannel: 4, bChannel: 5, reverse: true, distancePerPulse: 0.05249 }
+    - { type: VICTOR_SPX, config: { id: 3, inverted: false } }
+    - { type: VICTOR_SPX, config: { id: 4, inverted: false } }
+  liftEncoder: { aChannel: 4, bChannel: 5, reverse: false, distancePerPulse: 0.05249 }
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
-  pivotMotor: { type: VICTOR_SPX, channel: 5, inverted: false, powerChannels: [] }
+  pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: { channel: 3, fullRange: 360.0, offset: -211.4 }
 
   pivotController:

@@ -89,6 +89,14 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
         this.type = type;
     }
 
+    public JsonNode getConfig() {
+        return config;
+    }
+
+    public void setConfig(JsonNode config) {
+        this.config = config;
+    }
+
     @Override
     public SpeedController create() {
         SpeedController speedController;

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.wpilibj.Joystick;
+import jdk.nashorn.internal.ir.ObjectNode;
+import jdk.nashorn.internal.ir.PropertyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teamtators.common.TatorRobotBase;
@@ -51,9 +53,11 @@ public class TriggerBinder {
      * @param triggersConfig Triggers configuration object
      */
     public void bindTriggers(TriggersConfig triggersConfig) {
+        Map<String, Map<String, JsonNode>> bindings = triggersConfig.getBindings();
         for (Map.Entry<String, Controller<?, ?>> entry : controllers.entrySet()) {
             Controller<?, ?> controller = entry.getValue();
-            bindButtonsToController(controller, triggersConfig.getBinding(controller.getName()));
+            Map<String, JsonNode> binding = bindings.get(controller.getName());
+            bindButtonsToController(controller, binding);
         }
         registerDefaults(triggersConfig.defaults);
     }
@@ -79,13 +83,15 @@ public class TriggerBinder {
         }
     }
 
-    private <TButton> void bindButtonsToController(Controller<TButton, ?> controller, Map<JsonNode, JsonNode> bindings) {
+    private <TButton> void bindButtonsToController(Controller<TButton, ?> controller,
+                                                   Map<String, JsonNode> bindings) {
         if (bindings == null) return;
         Class<TButton> buttonClass = controller.getButtonClass();
-        for (Map.Entry<JsonNode, JsonNode> binding : bindings.entrySet()) {
+        for (Map.Entry<String, JsonNode> binding : bindings.entrySet()) {
             TButton button;
             try {
-                button = objectMapper.treeToValue(binding.getKey(), buttonClass);
+                JsonNode buttonTree = objectMapper.readTree(binding.getKey());
+                button = objectMapper.treeToValue(buttonTree, buttonClass);
             } catch (Exception e) {
                 throw new ConfigException("Invalid button name " + binding.getKey() +
                         " for controller " + controller.getName());

@@ -35,8 +35,6 @@ public class Subsystems extends SubsystemsBase {
         subsystems = Arrays.asList(oi, drive, picker, lift /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
-        updatables.addAll(drive.getUpdatables());
-        updatables.add(lift.getPivotController());
     }
 
     @Override
@@ -66,6 +64,9 @@ public class Subsystems extends SubsystemsBase {
         drive.configure(config.drive);
         picker.configure(config.picker);
         lift.configure(config.lift);
+
+        updatables.addAll(drive.getUpdatables());
+        updatables.add(lift.getPivotController());
     }
 
     public Drive getDrive() {

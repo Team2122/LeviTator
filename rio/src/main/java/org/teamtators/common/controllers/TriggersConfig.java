@@ -13,17 +13,17 @@ import java.util.Set;
 
 public class TriggersConfig {
     @JsonIgnore
-    public Map<String, Map<JsonNode, JsonNode>> bindings = new HashMap<>();
+    public Map<String, Map<String, JsonNode>> bindings = new HashMap<>();
 
     public Set<String> defaults;
 
     @JsonAnyGetter
-    public Map<JsonNode, JsonNode> getBinding(String name) {
-        return bindings.get(name);
+    public Map<String, Map<String, JsonNode>> getBindings() {
+        return bindings;
     }
 
     @JsonAnySetter
-    public void setBinding(String name, Map<JsonNode, JsonNode> binding) {
+    public void setBinding(String name, Map<String, JsonNode> binding) {
         bindings.put(name, binding);
     }
 }
