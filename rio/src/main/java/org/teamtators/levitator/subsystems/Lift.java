@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.*;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.PidController;
+import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import org.teamtators.common.hw.DigitalSensor;
@@ -26,12 +27,17 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double desiredPivotAngle;
     private double desiredHeight;
 
+    private TrapezoidalProfileFollower heightController;
     private PidController pivotController;
 
     private Config config;
 
     public Lift() {
         super("Lift");
+
+        heightController = new TrapezoidalProfileFollower("heightController");
+        heightController.setPositionProvider(this::getCurrentHeight);
+        heightController.setVelocityProvider(this::getLiftVelocity);
 
         pivotController = new PidController("pivotController");
         pivotController.setInputProvider(this::getCurrentPivotAngle);
@@ -43,6 +49,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
      */
     public double getCurrentHeight() {
         return liftEncoder.getDistance();
+    }
+
+    /**
+     * @return velocity in inches per second
+     */
+    public double getLiftVelocity() {
+        return liftEncoder.getRate();
     }
 
     /**
@@ -139,6 +152,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotMotor.set(pivotPower);
     }
 
+    public TrapezoidalProfileFollower getHeightController() {
+        return heightController;
+    }
+
     public PidController getPivotController() {
         return pivotController;
     }
@@ -181,6 +198,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
 
+        tests.addTest(new MotionCalibrationTest(heightController));
         tests.addTest(new ControllerTest(pivotController));
 
         return tests;
@@ -195,6 +213,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
 
+        this.heightController.configure(config.heightController);
         this.pivotController.configure(config.pivotController);
 
         liftMotor.setName("Lift", "liftMotor");
@@ -213,6 +232,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public SpeedControllerConfig pivotMotor;
         public AnalogPotentiometerConfig pivotEncoder;
 
+        public TrapezoidalProfileFollower.Config heightController;
         public PidController.Config pivotController;
 
         public double anglePresetLeft;
@@ -224,6 +244,5 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
-
     }
 }

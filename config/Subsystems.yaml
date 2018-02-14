@@ -24,6 +24,17 @@ lift:
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: { channel: 0, fullRange: 360.0, offset: -211.4 }
 
+  heightController:
+    kpP: 0.0
+    kiP: 0.0
+    kpV: 0.0
+    kfV: 0.0
+    kMinOutput: 0.0
+    kfA: 0.0
+    kHoldPower: 0.0
+    maxOutput: 0.2
+    minOutput: -0.1
+
   pivotController:
     P: 0.02
     I: 0.04
