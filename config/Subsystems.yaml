@@ -63,3 +63,6 @@ lift:
 
   bumpHeightValue: 1
   bumpPivotValue: 5
+
+  heightTolerance: .25
+  angleTolerance: 3.0

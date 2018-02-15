@@ -1,8 +1,8 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
-import org.teamtators.common.config.*;
+import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.ControllerPredicates;
 import org.teamtators.common.control.PidController;
@@ -10,7 +10,6 @@ import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Encoder;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.scheduler.RobotState;
@@ -77,15 +76,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
      * @param desiredHeight height in inches
      */
     public void setDesiredHeight(double desiredHeight) {
-        if (isSafeToMoveHeight() == true) {
+        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
             this.desiredHeight = desiredHeight;
+        } else {
+            logger.warn("Cannot move lift to height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
         }
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
-        if(isSafeToMoveHeight() == true) {
-            setDesiredHeight(getHeightPreset(desiredHeight));
-        }
+        setDesiredHeight(getHeightPreset(desiredHeight));
     }
 
     public double getHeightPreset(HeightPreset heightPreset) {
@@ -107,6 +106,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 heightValue = config.heightPresetHome;
         }
         return heightValue;
+    }
+
+    public double getTargetHeight() {
+        return this.targetHeight;
     }
 
     public void setTargetHeight(double height) {
@@ -131,10 +134,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.updateProfile();
     }
 
-    public double getTargetHeight() {
-        return this.targetHeight;
-    }
-
     private void enableLiftController() {
         setTargetHeight(getCurrentHeight());
         liftController.start();
@@ -154,15 +153,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredPivotAngle(double desiredAngle) {
-        if(isSafeToPivot() == true) {
+        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
             this.desiredPivotAngle = desiredAngle;
+        } else {
+            logger.warn("Rotation to {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
         }
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
-        if(isSafeToPivot() == true) {
-            setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
-        }
+        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
     }
 
     public double getAnglePreset(AnglePreset anglePreset) {
@@ -181,12 +180,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return angleValue;
     }
 
-    public void setTargetAngle(double angle) {
-        pivotController.setSetpoint(angle);
-    }
-
     public double getTargetAngle() {
         return pivotController.getSetpoint();
+    }
+
+    public void setTargetAngle(double angle) {
+        pivotController.setSetpoint(angle);
     }
 
     public boolean isAtBottomLimit() {
@@ -254,20 +253,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         }
     }
 
-    public enum HeightPreset {
-        PICK,
-        SWITCH,
-        SCALE_LOW,
-        SCALE_HIGH,
-        HOME;
-    }
-
-    public enum AnglePreset {
-        LEFT,
-        CENTER,
-        RIGHT;
-    }
-
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
@@ -306,8 +291,44 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftEncoder.setName("Lift", "liftEncoder");
         limitSensorTop.setName("Lift", "limitSensorTop");
         limitSensorBottom.setName("Lift", "limitSensorBottom");
-        ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
+        //((Sendable) pivotMotor).setName("Lift", "pivotMotor");
         pivotEncoder.setName("Lift", "pivotEncoder");
+    }
+
+    private double getSafePivotAngle(double desiredAngle) {
+        if (getCurrentHeight() < config.heightPresetSwitch - config.heightTolerance) {
+            return config.anglePresetCenter;
+        }
+        return desiredAngle;
+    }
+
+    public double getSafeLiftHeight(double desiredHeight) {
+        double currentPivotAngle = getCurrentPivotAngle();
+        double currentLiftHeight = getCurrentHeight();
+        if (currentPivotAngle < (config.anglePresetCenter - config.angleTolerance) ||
+                currentPivotAngle > (config.anglePresetCenter + config.angleTolerance)) { // if the picker is out far enough that we can't go below level of elevators
+            if (currentLiftHeight < config.heightPresetSwitch) { // if we are not above the elevators
+                return config.heightPresetSwitch; // don't move
+            }
+            if (desiredHeight < config.heightPresetSwitch) { // if we want to descend to below the elevators
+                return config.heightPresetSwitch; // then descend to the minimum height at which we can rotate
+            }
+        }
+        return desiredHeight; // if picker is all good, go wherever we need to
+    }
+
+    public enum HeightPreset {
+        PICK,
+        SWITCH,
+        SCALE_LOW,
+        SCALE_HIGH,
+        HOME;
+    }
+
+    public enum AnglePreset {
+        LEFT,
+        CENTER,
+        RIGHT;
     }
 
     public static class Config {
@@ -336,6 +357,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         public double bumpHeightValue;
         public double bumpPivotValue;
+
+        public double heightTolerance;
+        public double angleTolerance;
     }
 
     private class LiftTest extends ManualTest {
@@ -349,14 +373,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public void start() {
             logger.info("Press A to set lift target to joystick value. Hold Y to enable lift profiler");
             disableLiftController();
+            //temp
+            pivotController.start();
+            pivotController.setSetpoint(0);
         }
+
         @Override
         public void onButtonDown(LogitechF310.Button button) {
             switch (button) {
                 case A:
                     double height = (config.heightTopLimit - config.heightBottomLimit)
                             * ((axisValue + 1) / 2) + config.heightBottomLimit;
-                    setTargetHeight(height);
+                    setDesiredHeight(height);
                     break;
                 case Y:
                     enableLiftController();
@@ -381,24 +409,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void stop() {
             disableLiftController();
-        }
-    }
-
-    private boolean isSafeToMoveHeight() {
-        if((getCurrentPivotAngle() == config.anglePresetCenter) && (pivotController.isOnTarget() == true)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    private boolean isSafeToPivot() {
-        if((getCurrentHeight() >= config.heightPresetSwitch) && (liftController.isOnTarget() == true)) {
-            return true;
-        }
-        else {
-            return false;
         }
     }
 
