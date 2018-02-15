@@ -61,3 +61,5 @@ lift:
   heightPresetScaleHigh: 80
   heightPresetHome: 0
 
+  bumpHeightValue: 1
+  bumpPivotValue: 5

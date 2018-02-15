@@ -77,11 +77,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
      * @param desiredHeight height in inches
      */
     public void setDesiredHeight(double desiredHeight) {
-        this.desiredHeight = desiredHeight;
+        if (isSafeToMoveHeight() == true) {
+            this.desiredHeight = desiredHeight;
+        }
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
-        setDesiredHeight(getHeightPreset(desiredHeight));
+        if(isSafeToMoveHeight() == true) {
+            setDesiredHeight(getHeightPreset(desiredHeight));
+        }
     }
 
     public double getHeightPreset(HeightPreset heightPreset) {
@@ -150,11 +154,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredPivotAngle(double desiredAngle) {
-        this.desiredPivotAngle = desiredAngle;
+        if(isSafeToPivot() == true) {
+            this.desiredPivotAngle = desiredAngle;
+        }
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
-        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
+        if(isSafeToPivot() == true) {
+            setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
+        }
     }
 
     public double getAnglePreset(AnglePreset anglePreset) {
@@ -198,6 +206,22 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             liftPower = 0.0;
         }
         liftMotor.set(liftPower);
+    }
+
+    public void bumpLiftUp() {
+        setDesiredHeight(getCurrentHeight() + config.bumpHeightValue);
+    }
+
+    public void bumpLiftDown() {
+        setDesiredHeight(getCurrentHeight() - config.bumpHeightValue);
+    }
+
+    public void bumpPivotRight() {
+        setDesiredPivotAngle(getCurrentPivotAngle() + config.bumpPivotValue);
+    }
+
+    public void bumpPivotLeft() {
+        setDesiredPivotAngle(getCurrentPivotAngle() - config.bumpPivotValue);
     }
 
     public void setPivotPower(double pivotPower) {
@@ -309,6 +333,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
+
+        public double bumpHeightValue;
+        public double bumpPivotValue;
     }
 
     private class LiftTest extends ManualTest {
@@ -356,4 +383,23 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             disableLiftController();
         }
     }
+
+    private boolean isSafeToMoveHeight() {
+        if((getCurrentPivotAngle() == config.anglePresetCenter) && (pivotController.isOnTarget() == true)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private boolean isSafeToPivot() {
+        if((getCurrentHeight() >= config.heightPresetSwitch) && (liftController.isOnTarget() == true)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
