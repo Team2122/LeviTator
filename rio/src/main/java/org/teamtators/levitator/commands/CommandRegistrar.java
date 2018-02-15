@@ -19,5 +19,8 @@ public class CommandRegistrar {
         commandStore.putCommand("LiftContinuous", new LiftContinuous(robot));
         commandStore.registerCommand("LiftHeightPreset", () -> new LiftHeightPreset(robot));
         commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
+
+        //misc. commands
+        commandStore.registerCommand("Chooser", () -> new ChooserCommand(robot));
     }
 }

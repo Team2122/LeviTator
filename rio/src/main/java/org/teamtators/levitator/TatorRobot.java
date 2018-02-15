@@ -43,7 +43,7 @@ public class TatorRobot extends TatorRobotBase {
 
     @Override
     protected Command getAutoCommand() {
-        return null;
+        return getCommandStore().getCommand("$AutoChooser");
     }
 
     @Override

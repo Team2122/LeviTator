@@ -22,3 +22,14 @@ LiftPick: { class: LiftHeightPreset, preset: PICK }
 LiftSwitch: { class: LiftHeightPreset, preset: SWITCH }
 LiftScaleLow: { class: LiftHeightPreset, preset: SCALE_LOW }
 LiftScaleHigh: { class: LiftHeightPreset, preset: SCALE_HIGH }
+
+$NoAuto:
+  -
+$AutoChooser:
+  needSwitch:
+    noYield: $NoAuto
+    yield: $NoAuto
+  noSwitch:
+    noYield: $NoAuto
+    yield: $NoAuto
+  defaultAuto: $NoAuto
