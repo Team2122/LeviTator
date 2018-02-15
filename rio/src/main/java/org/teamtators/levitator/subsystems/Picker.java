@@ -9,10 +9,16 @@ import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.levitator.TatorRobot;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
@@ -22,14 +28,34 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private DigitalSensor upperCubeSensor;
     private DigitalSensor lowerCubeSensor;
 
-    public Picker() {
+    private TatorRobot robot;
+    private Config config;
+
+    public Picker(TatorRobot robot) {
         super("Picker");
+        this.robot = robot;
+    }
+
+    public double getLeftCurrent() {
+        return robot.getPDP().getCurrent(config.leftMotor.getPowerChannel());
+    }
+
+    public double getRightCurrent() {
+        return robot.getPDP().getCurrent(config.rightMotor.getPowerChannel());
     }
 
     public void setRollerPowers(double left, double right) {
 //        logger.trace("Setting roller powers to {}, {}", left, right);
         leftMotor.set(left);
         rightMotor.set(right);
+    }
+
+    public void setLeftMotorPower(double power) {
+        setRollerPowers(power, 0.0);
+    }
+
+    public void setRightMotorPower(double power) {
+        setRollerPowers(0.0, power);
     }
 
     public void setRollerPowers(RollerPowers rollerPowers) {
@@ -89,8 +115,19 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("PickerLeftMotorCurrentTest", this::setLeftMotorPower, this::getLeftCurrent),
+                new MotorCurrentTest("PickerRightMotorCurrentTest", this::setRightMotorPower, this::getRightCurrent)
+                //TODO: Hybrid tests
+        );
+    }
+
+    @Override
     public void configure(Config config) {
         super.configure();
+        this.config = config;
+
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
         this.extensionSolenoid = config.extensionSolenoid.create();

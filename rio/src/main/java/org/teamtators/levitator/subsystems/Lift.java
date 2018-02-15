@@ -13,9 +13,17 @@ import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
+import org.teamtators.common.tester.AutomatedTestMessage;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
+import org.teamtators.common.tester.automated.MotorEncoderTest;
 import org.teamtators.common.tester.components.*;
+import org.teamtators.levitator.TatorRobot;
+
+import java.util.Arrays;
+import java.util.List;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,10 +52,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private InputDerivative pivotVelocity;
     private Updatable holdPowerApplier;
 
+    private TatorRobot robot;
     private Config config;
 
-    public Lift() {
+    public Lift(TatorRobot robot) {
         super("Lift");
+
+        this.robot = robot;
 
         liftController = new TrapezoidalProfileFollower("liftController");
         liftController.setPositionProvider(this::getCurrentHeight);
@@ -271,6 +282,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         setDesiredPivotAngle(getCurrentPivotAngle() - config.bumpPivotValue);
     }
 
+    public double getLiftCurrent() {
+        return config.liftMotor.get(0).getTotalCurrent(robot.getPDP()) + config.liftMotor.get(1).getTotalCurrent(robot.getPDP());
+    }
+
     public void setPivotPower(double pivotPower) {
         if(!isPivotLocked()) {
             pivotMotor.set(pivotPower);
@@ -279,6 +294,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         }
     }
 
+    public double getPivotCurrent() {
+        return config.pivotMotor.getTotalCurrent(robot.getPDP());
+    }
 
     public TrapezoidalProfileFollower getLiftController() {
         return liftController;
@@ -336,6 +354,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new LiftTest());
 
         return tests;
+    }
+
+    @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("LiftMotorCurrentTest", this::setTargetHeight, this::getLiftCurrent),
+                new MotorEncoderTest("LiftMotorEncoderTest", this::setTargetHeight, this::getLiftVelocity),
+                new MotorCurrentTest("LiftPivotMotorTest", this::setPivotPower, this::getPivotCurrent),
+                new MotorEncoderTest("LiftPivotMotorEncoderTest", this::setPivotPower, this::getCurrentPivotAngle),
+                new LiftLimitTest("LiftLowerLimitTest", true, -config.liftLimitTestPower, config.liftLimitTestTimeout),
+                new LiftLimitTest("LiftUpperLimitTest", false, config.liftLimitTestPower, config.liftLimitTestTimeout)
+        );
     }
 
     @Override
@@ -453,6 +483,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         public double heightTolerance;
         public double angleTolerance;
+
+        public double liftLimitTestTimeout;
+        public double liftLimitTestPower;
     }
 
     private class LiftTest extends ManualTest {
@@ -515,6 +548,44 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             disableLiftController();
             disablePivotController();
         }
+    }
+
+    private class LiftLimitTest extends AutomatedTest {
+        private boolean lowerLimit;
+        private double liftPower;
+        private double timeOut;
+        private Timer timer = new Timer();
+
+        public LiftLimitTest(String name, boolean lowerLimit, double liftPower, double timeOut) {
+            super(name, true);
+            this.lowerLimit = lowerLimit;
+            this.liftPower = liftPower;
+            this.timeOut = timeOut;
+        }
+
+        @Override
+        protected void initialize() {
+            timer.start();
+            sendMessage((lowerLimit ? "Lowering " : "Raising ") + "the lift", AutomatedTestMessage.Level.INFO);
+        }
+
+        @Override
+        protected boolean step() {
+            setLiftPower(liftPower);
+            return timer.hasPeriodElapsed(timeOut);
+        }
+
+        @Override
+        protected void finish(boolean interrupted) {
+            super.finish(interrupted);
+            if ((lowerLimit ? isAtBottomLimit() : isAtTopLimit())) {
+                sendMessage("Lift has successfully reached limit", AutomatedTestMessage.Level.INFO);
+            } else {
+                sendMessage("Lift has failed to reached limit", AutomatedTestMessage.Level.ERROR);
+            }
+            setDesiredHeightPreset(HeightPreset.HOME);
+        }
+
     }
 
 }
