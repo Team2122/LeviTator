@@ -77,6 +77,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
      */
     public void setDesiredHeight(double desiredHeight) {
         if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
+            logger.info("Setting desired lift height to {}", desiredHeight);
             this.desiredHeight = desiredHeight;
         } else {
             logger.warn("Cannot move lift to height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
@@ -154,6 +155,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setDesiredPivotAngle(double desiredAngle) {
         if (getSafePivotAngle(desiredAngle) == desiredAngle) {
+            logger.info("Setting desired pivot angle {}", desiredAngle);
             this.desiredPivotAngle = desiredAngle;
         } else {
             logger.warn("Rotation to {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());

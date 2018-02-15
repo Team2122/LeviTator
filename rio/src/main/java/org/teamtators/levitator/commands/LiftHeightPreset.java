@@ -16,9 +16,7 @@ public class LiftHeightPreset extends Command implements Configurable<LiftHeight
 
     @Override
     protected void initialize() {
-        double height = lift.getHeightPreset(config.preset);
-        logger.info("Setting desired lift height to preset {} ({})", config.preset, height);
-        lift.setDesiredHeight(height);
+        lift.setDesiredHeightPreset(config.preset);
     }
 
     @Override

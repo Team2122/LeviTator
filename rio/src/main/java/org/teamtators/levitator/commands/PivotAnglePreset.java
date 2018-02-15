@@ -16,9 +16,7 @@ public class PivotAnglePreset extends Command implements Configurable<PivotAngle
 
     @Override
     protected void initialize() {
-        double angle = lift.getAnglePreset(config.preset);
-        logger.info("Setting desired pivot angle to preset {} ({})", config.preset, angle);
-        lift.setDesiredPivotAngle(angle);
+        lift.setDesiredAnglePreset(config.preset);
     }
 
     @Override
