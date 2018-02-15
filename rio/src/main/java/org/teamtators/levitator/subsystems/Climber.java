@@ -10,14 +10,19 @@ import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.MotorPowerUpdater;
+import org.teamtators.common.control.Timer;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
+import org.teamtators.common.tester.AutomatedTestMessage;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
+import org.teamtators.common.tester.automated.MotorEncoderTest;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
@@ -63,6 +68,14 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
             }
         }
         climberMotor.set(pow);
+    }
+
+    public void setPower(double power) {
+        setPower(power, true);
+    }
+
+    public double getClimberCurrent() {
+        return config.climberMotor.getTotalCurrent(robot.getPDP());
     }
 
     public double getPosition() {
@@ -148,6 +161,13 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         return group;
     }
 
+    @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("ClimberMotorCurrentTest", this::setPower, this::getClimberCurrent),
+                new MotorEncoderTest("DriveLeftMotorCurrentTest", this::setLeftPower, this::getLeftCurrent),
+        );
+    }
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerGroupConfig climberMotor;
@@ -202,6 +222,40 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         @Override
         public void stop() {
             setPower(0.0, false);
+        }
+    }
+
+    private class ClimberBottomLimitTest extends AutomatedTest {
+        private double climbPower;
+        private double timeOut;
+        private Timer timer = new Timer();
+
+        public ClimberBottomLimitTest(String name, double liftPower, double timeOut) {
+            super(name, true);
+            this.climbPower = liftPower;
+            this.timeOut = timeOut;
+        }
+
+        @Override
+        protected void initialize() {
+            timer.start();
+            sendMessage("Lowering the lift", AutomatedTestMessage.Level.INFO);
+        }
+
+        @Override
+        public boolean step() {
+            setPower(climbPower, true);
+            return timer.hasPeriodElapsed(timeOut) || isAtBottomLimit();
+        }
+
+        @Override
+        protected void finish(boolean interrupted) {
+            super.finish(interrupted);
+            if (isAtBottomLimit()) {
+                sendMessage("Lift has successfully reached limit", AutomatedTestMessage.Level.INFO);
+            } else {
+                sendMessage("Lift has failed to reached limit", AutomatedTestMessage.Level.ERROR);
+            }
         }
     }
 }

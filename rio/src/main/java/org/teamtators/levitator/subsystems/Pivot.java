@@ -13,9 +13,13 @@ import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
+import org.teamtators.common.tester.automated.MotorEncoderTest;
 import org.teamtators.common.tester.components.*;
+import org.teamtators.levitator.TatorRobot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +39,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
     private boolean homed = false;
+    private TatorRobot robot;
     private double desiredPivotAngle;
     private double targetAngle;
     private double lastAttemptedAngle;
@@ -46,7 +51,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private Config config;
     private boolean manualOverride;
 
-    public Pivot() {
+    public Pivot(TatorRobot robot) {
         super("Pivot");
 
         pivotController = new TrapezoidalProfileFollower("pivotController");
@@ -56,6 +61,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
         pivotUpdatable = new PivotUpdatable();
+
+        this.robot = robot;
     }
 
     public Lift getLift() {
@@ -168,6 +175,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         }
     }
 
+    public double getPivotCurrent() {
+        return config.pivotMotor.getTotalCurrent(robot.getPDP());
+    }
 
     public Updatable getPivotController() {
         return pivotController;
@@ -263,6 +273,13 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         tests.addTest(new PivotTest());
         return tests;
+    }
+
+    @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("PivotMotorCurrentTest", this::setPivotPower, this::getPivotCurrent)
+                );
     }
 
     @Override

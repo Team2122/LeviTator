@@ -3,7 +3,10 @@ package org.teamtators.levitator.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.EncoderConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
@@ -11,9 +14,17 @@ import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
+import org.teamtators.common.tester.AutomatedTestMessage;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.common.tester.components.*;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
+import org.teamtators.common.tester.automated.MotorEncoderTest;
+import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.EncoderTest;
+import org.teamtators.common.tester.components.MotionCalibrationTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.levitator.TatorRobot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +47,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private PreUpdatable preUpdatable;
     private NetworkTablesUpdater networkTablesUpdater;
 
+    private TatorRobot robot;
     private Config config;
 
     private boolean heightForced = false;
@@ -44,9 +56,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double savedHeight;
 
     private boolean manualOverride = false;
-
-    public Lift() {
+    public Lift(TatorRobot robot) {
         super("Lift");
+
+        this.robot = robot;
 
         liftController = new TrapezoidalProfileFollower("liftController");
         liftController.setPositionProvider(this::getCurrentHeight);
@@ -223,6 +236,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return heightForced;
     }
 
+    public double getLiftCurrent() {
+        return config.liftMotor.getTotalCurrent(robot.getPDP());
+    }
+
     public boolean isHomed() {
         return homed;
     }
@@ -329,6 +346,17 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("LiftMotorCurrentTest", this::setTargetHeight, this::getLiftCurrent),
+                new MotorEncoderTest("LiftMotorEncoderTest", this::setTargetHeight, this::getLiftVelocity),
+                new LiftLimitTest("LiftLowerLimitTest", true, -config.liftLimitTestPower, config.liftLimitTestTimeout),
+                new LiftLimitTest("LiftUpperLimitTest", false, config.liftLimitTestPower, config.liftLimitTestTimeout),
+                new PivotLockTest(0.0, 0.0)
+        );
+    }
+
+    @Override
     public void configure(Config config) {
         super.configure();
         this.config = config;
@@ -407,6 +435,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double homeTolerance;
         public double homingPower;
         public double homingTimeout;
+        public double liftLimitTestPower;
+        public double liftLimitTestTimeout;
     }
 
     private void updateHeight() {
@@ -457,7 +487,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
             disable();
         }
-
 
         @Override
         public void onButtonDown(LogitechF310.Button button) {
@@ -520,6 +549,77 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public void update(double delta) {
             SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
             SmartDashboard.putBoolean("move", Lift.this.isHeightForced());
+        }
+    }
+
+    private class LiftLimitTest extends AutomatedTest {
+        private boolean lowerLimit;
+        private double liftPower;
+        private double timeOut;
+        private Timer timer = new Timer();
+
+        public LiftLimitTest(String name, boolean lowerLimit, double liftPower, double timeOut) {
+            super(name, true);
+            this.lowerLimit = lowerLimit;
+            this.liftPower = liftPower;
+            this.timeOut = timeOut;
+        }
+
+        @Override
+        protected void initialize() {
+            timer.start();
+            sendMessage((lowerLimit ? "Lowering " : "Raising ") + "the lift", AutomatedTestMessage.Level.INFO);
+        }
+
+        @Override
+        public boolean step() {
+            setLiftPower(liftPower);
+            return timer.hasPeriodElapsed(timeOut) || (lowerLimit ? isAtBottomLimit() : isAtTopLimit());
+        }
+
+        @Override
+        protected void finish(boolean interrupted) {
+            super.finish(interrupted);
+            if ((lowerLimit ? isAtBottomLimit() : isAtTopLimit())) {
+                sendMessage("Lift has successfully reached limit", AutomatedTestMessage.Level.INFO);
+            } else {
+                sendMessage("Lift has failed to reached limit", AutomatedTestMessage.Level.ERROR);
+            }
+            setDesiredHeightPreset(HeightPreset.HOME);
+        }
+    }
+
+    private class PivotLockTest extends AutomatedTest {
+        private Timer timer = new Timer();
+        private double timeOut;
+        private double acceptableRange;
+
+        public PivotLockTest(double timeOut, double acceptableRange) {
+            super("PivotLockTest");
+            this.timeOut = timeOut;
+            this.acceptableRange = acceptableRange;
+        }
+
+        @Override
+        protected void initialize() {
+            timer.start();
+            sendMessage("Moving the pivot to center", AutomatedTestMessage.Level.INFO);
+        }
+
+        @Override
+        public boolean step() {
+            pivot.setTargetAngle(0.0);
+            return timer.hasPeriodElapsed(timeOut) || pivot.isPivotLocked();
+        }
+
+        @Override
+        protected void finish(boolean interrupted) {
+            super.finish(interrupted);
+            if (pivot.isPivotLocked() && (Math.abs(pivot.getCurrentPivotAngle()) - acceptableRange) <= 0) {
+                sendMessage("Test successful", AutomatedTestMessage.Level.INFO);
+            } else {
+                sendMessage("Test failed because " + (pivot.isPivotLocked() ? "encoder outside of range" : "did not lock in time"), AutomatedTestMessage.Level.ERROR);
+            }
         }
     }
 }
