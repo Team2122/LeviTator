@@ -8,8 +8,8 @@ drive:
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
   rotationController: {}
 picker:
-  leftMotor: { type: TALON_SRX, config: { id: 1 } }
-  rightMotor: { type: TALON_SRX, config: { id: 2, inverted: true } }
+  leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
+  rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
   extensionSolenoid: { channel: 6 }
   cubeDetectSensor: { channel: 14, type: PNP }
   cubeDetectLeftSensor: { channel: 13, type: NPN }
