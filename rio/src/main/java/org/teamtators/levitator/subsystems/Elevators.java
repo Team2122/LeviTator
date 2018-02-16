@@ -1,16 +1,19 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.SolenoidConfig;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.SolenoidTest;
 
-public class Elevators extends Subsystem {
+public class Elevators extends Subsystem implements Configurable<Elevators.Config> {
 
     private Solenoid rightElevatorSolenoid;
     private Solenoid leftElevatorSolenoid;
     private Solenoid releaser;
+
+    private boolean isDeployed;
 
     private Config config;
 
@@ -21,22 +24,34 @@ public class Elevators extends Subsystem {
     public void reset() {
         rightElevatorSolenoid.set(false);
         leftElevatorSolenoid.set(false);
+        releaser.set(false);
+        isDeployed = false;
     }
 
     public void liftRightElevator() {
-        rightElevatorSolenoid.set(true);
+        if(isSafeToLiftElevators() == true) {
+            rightElevatorSolenoid.set(true);
+        }
     }
 
     public void liftLeftElevator() {
-        leftElevatorSolenoid.set(true);
+        if(isSafeToLiftElevators() == true) {
+            leftElevatorSolenoid.set(true);
+        }
     }
 
     public void deployElevators() {
         releaser.set(true);
+        isDeployed = true;
     }
 
-    public void lockElevators() {
-        releaser.set(false);
+    public boolean isSafeToLiftElevators() {
+        if(isDeployed == true) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override
@@ -53,6 +68,7 @@ public class Elevators extends Subsystem {
         this.rightElevatorSolenoid = config.rightElevatorSolenoid.create();
         this.leftElevatorSolenoid = config.leftElevatorSolenoid.create();
         this.releaser = config.releaser.create();
+        reset();
     }
 
     public static class Config{
