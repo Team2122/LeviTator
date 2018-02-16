@@ -34,6 +34,11 @@ public class Subsystems extends SubsystemsBase {
         elevators = new Elevators();
 
         //your subsystems here
+<<<<<<< HEAD
+=======
+        subsystems = Arrays.asList(oi, drive, picker, lift, elevators /*, yourSubsystem */);
+    }
+>>>>>>> 4c9baa6a5d161caa8b2f7beb11496112489cd7cd
 
         subsystems = Arrays.asList(oi, drive, picker, lift, elevators /*, yourSubsystem */);
 
