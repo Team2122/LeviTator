@@ -209,22 +209,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftMotor.set(liftPower);
     }
 
-    public void bumpLiftUp() {
-        setDesiredHeight(getCurrentHeight() + config.bumpHeightValue);
-    }
-
-    public void bumpLiftDown() {
-        setDesiredHeight(getCurrentHeight() - config.bumpHeightValue);
-    }
-
-    public void bumpPivotRight() {
-        setDesiredPivotAngle(getCurrentPivotAngle() + config.bumpPivotValue);
-    }
-
-    public void bumpPivotLeft() {
-        setDesiredPivotAngle(getCurrentPivotAngle() - config.bumpPivotValue);
-    }
-
     public void setPivotPower(double pivotPower) {
         pivotMotor.set(pivotPower);
     }
