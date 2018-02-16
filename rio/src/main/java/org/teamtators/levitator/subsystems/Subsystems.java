@@ -23,6 +23,7 @@ public class Subsystems extends SubsystemsBase {
     private Drive drive;
     private Picker picker;
     private Lift lift;
+    private Elevators elevators;
     //private YourSubsystem yourSubsystem;
 
     public Subsystems() {
@@ -30,9 +31,11 @@ public class Subsystems extends SubsystemsBase {
         drive = new Drive();
         picker = new Picker();
         lift = new Lift();
+        elevators = new Elevators();
 
         //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift /*, yourSubsystem */);
+
+        subsystems = Arrays.asList(oi, drive, picker, lift, elevators /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
     }

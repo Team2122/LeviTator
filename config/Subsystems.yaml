@@ -66,3 +66,8 @@ lift:
 
   heightTolerance: .25
   angleTolerance: 3.0
+
+elevator:
+  rightElevatorSolenoid: { channel: 0 }
+  leftElevatorSolenoid: { channel: 0 }
+  releaser: { channel: 0 }
