@@ -2,11 +2,7 @@ package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import org.teamtators.common.config.Configurable;
-<<<<<<< HEAD
 import org.teamtators.common.config.helpers.SolenoidConfig;
-=======
-import org.teamtators.common.config.SolenoidConfig;
->>>>>>> 4c9baa6a5d161caa8b2f7beb11496112489cd7cd
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.SolenoidTest;
