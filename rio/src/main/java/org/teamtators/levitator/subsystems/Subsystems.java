@@ -37,7 +37,7 @@ public class Subsystems extends SubsystemsBase
         vision = new Vision(drive);
         elevators = new Elevators();
         drive = new Drive(robot);
-        picker = new Picker(robot);
+        picker = new Picker();
         lift = new Lift(robot);
 
         //your subsystems here

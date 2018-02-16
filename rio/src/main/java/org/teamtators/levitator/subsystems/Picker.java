@@ -1,5 +1,6 @@
 package org.teamtators.levitator.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -15,7 +16,6 @@ import org.teamtators.common.tester.automated.MotorCurrentTest;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
-import org.teamtators.levitator.TatorRobot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,20 +28,16 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private DigitalSensor upperCubeSensor;
     private DigitalSensor lowerCubeSensor;
 
-    private TatorRobot robot;
-    private Config config;
-
-    public Picker(TatorRobot robot) {
+    public Picker() {
         super("Picker");
-        this.robot = robot;
     }
 
     public double getLeftCurrent() {
-        return robot.getPDP().getCurrent(config.leftMotor.getPowerChannel());
+        return ((WPI_TalonSRX)leftMotor).getOutputCurrent();
     }
 
     public double getRightCurrent() {
-        return robot.getPDP().getCurrent(config.rightMotor.getPowerChannel());
+        return ((WPI_TalonSRX)rightMotor).getOutputCurrent();
     }
 
     public void setRollerPowers(double left, double right) {
@@ -118,15 +114,16 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     public List<AutomatedTest> createAutomatedTests() {
         return Arrays.asList(
                 new MotorCurrentTest("PickerLeftMotorCurrentTest", this::setLeftMotorPower, this::getLeftCurrent),
-                new MotorCurrentTest("PickerRightMotorCurrentTest", this::setRightMotorPower, this::getRightCurrent)
-                //TODO: Hybrid tests
+                new MotorCurrentTest("PickerRightMotorCurrentTest", this::setRightMotorPower, this::getRightCurrent),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectSensorTest", this::isCubeDetected),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectLeftSensorTest", this::isCubeDetectedLeft),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectRightSensorTest", this::isCubeDetectedRight)
         );
     }
 
     @Override
     public void configure(Config config) {
         super.configure();
-        this.config = config;
 
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();

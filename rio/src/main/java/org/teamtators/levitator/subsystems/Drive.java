@@ -221,11 +221,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     }
 
     public double getLeftCurrent() {
-        return robot.getPDP().getCurrent(config.leftMotor.getPowerChannel());
+        return config.leftMotor.getTotalCurrent(robot.getPDP());
     }
 
     public double getRightCurrent() {
-        return robot.getPDP().getCurrent(config.rightMotor.getPowerChannel());
+        return config.rightMotor.getTotalCurrent(robot.getPDP());
     }
 
     public double getLeftRate() {
