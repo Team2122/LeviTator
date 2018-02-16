@@ -35,7 +35,7 @@ public class Subsystems extends SubsystemsBase
     public Subsystems(TatorRobot robot) {
         oi = new OperatorInterface();
         drive = new Drive(robot);
-        picker = new Picker(robot);
+        picker = new Picker();
         lift = new Lift(robot);
         pivot = new Pivot(robot);
         lift.linkTo(pivot);

@@ -580,7 +580,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         protected void finish(boolean interrupted) {
             super.finish(interrupted);
-            if ((lowerLimit ? isAtBottomLimit() : isAtTopLimit())) {
+            if((lowerLimit ? isAtBottomLimit() : isAtTopLimit())) {
                 sendMessage("Lift has successfully reached limit", AutomatedTestMessage.Level.INFO);
             } else {
                 sendMessage("Lift has failed to reached limit", AutomatedTestMessage.Level.ERROR);
