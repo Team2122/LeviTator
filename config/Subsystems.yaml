@@ -23,6 +23,8 @@ lift:
   limitSensorBottom: { channel: 10, type: NPN }
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: { channel: 0, fullRange: 360.0, offset: -207.0 }
+  pivotLockSolenoid: { channel: 1 }
+  pivotSensor: { channel: 16, type: PNP }
 
   heightController:
     kpP: 0.2

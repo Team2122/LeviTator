@@ -1,6 +1,7 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
@@ -26,6 +27,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private DigitalSensor limitSensorBottom;
     private SpeedController pivotMotor;
     private AnalogPotentiometer pivotEncoder;
+    private Solenoid pivotLockSolenoid;
+    private DigitalSensor pivotSensor;
 
     private double desiredPivotAngle;
     private double desiredHeight;
@@ -226,8 +229,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setPivotPower(double pivotPower) {
-        pivotMotor.set(pivotPower);
+        if(!isPivotLocked()) {
+            pivotMotor.set(pivotPower);
+        } else {
+            pivotMotor.set(0);
+        }
     }
+
 
     public TrapezoidalProfileFollower getLiftController() {
         return liftController;
@@ -235,6 +243,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public PidController getPivotController() {
         return pivotController;
+    }
+
+    public boolean isPivotLocked() {
+        return pivotSensor.get();
+    }
+
+    public void setPivotLockSolenoid(boolean lock) {
+        pivotLockSolenoid.set(lock);
     }
 
     @Override
@@ -283,6 +299,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.limitSensorBottom = config.limitSensorBottom.create();
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
+        this.pivotLockSolenoid = config.pivotLockSolenoid.create();
+        this.pivotSensor = config.pivotSensor.create();
 
         this.liftController.configure(config.heightController);
         this.liftProfile = config.baseHeightProfile;
@@ -319,6 +337,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return desiredHeight; // if picker is all good, go wherever we need to
     }
 
+    public void setPivotControllerEnabled(boolean enabled) {
+        if (enabled) {
+            pivotController.start();
+        } else {
+            pivotController.stop();
+        }
+    }
+
     public enum HeightPreset {
         PICK,
         SWITCH,
@@ -340,6 +366,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig limitSensorBottom;
         public SpeedControllerConfig pivotMotor;
         public AnalogPotentiometerConfig pivotEncoder;
+        public SolenoidConfig pivotLockSolenoid;
+        public DigitalSensorConfig pivotSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
         public TrapezoidalProfile baseHeightProfile;
