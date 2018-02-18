@@ -22,3 +22,8 @@ LiftPick: { class: LiftHeightPreset, preset: PICK }
 LiftSwitch: { class: LiftHeightPreset, preset: SWITCH }
 LiftScaleLow: { class: LiftHeightPreset, preset: SCALE_LOW }
 LiftScaleHigh: { class: LiftHeightPreset, preset: SCALE_HIGH }
+
+LiftContinuous:
+  pivotSweepPower:
+  startSweepAngle:
+  sweepTimeout:

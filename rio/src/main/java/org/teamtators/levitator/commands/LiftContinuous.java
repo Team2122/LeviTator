@@ -1,6 +1,7 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
+import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Lift;
@@ -13,6 +14,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private double desiredPivotAngle;
     private boolean locking;
     private double sweepTarget;
+    private Timer sweepTimer = new Timer();
     private Config config;
 
     public LiftContinuous(TatorRobot robot) {
@@ -35,8 +37,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             }
             //Apply the configured power with a sign that is the same as our target (i.e. positive power moves right, increasing angle)
             lift.setPivotPower(config.pivotSweepPower * Math.signum(sweepTarget));
-            //If our solenoid is locked in
-            if (lift.isPivotLocked()) {
+            //If our solenoid is locked in or the timer ran out
+            if (lift.isPivotLocked() || sweepTimer.hasPeriodElapsed(config.sweepTimeoutSeconds)) {
                 //Reset sweep target
                 sweepTarget = 0;
                 //Stop locking
@@ -53,6 +55,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 locking = true;
                 //Disable PID
                 lift.setPivotControllerEnabled(false);
+                //Start the timer
+                sweepTimer.restart();
             }
             //If we want to go somewhere other than the center
             if (desiredPivotAngle != lift.getAnglePreset(Lift.AnglePreset.CENTER)) {
@@ -61,7 +65,9 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 //Enable the PID Controller
                 lift.setPivotControllerEnabled(true);
             }
+            //Set the lift target height to the desired height
             lift.setTargetHeight(desiredHeight);
+            //Set the pivot target angle to the desired angle
             lift.setTargetAngle(desiredPivotAngle);
         }
         return false;
@@ -75,5 +81,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     public static class Config {
         public double pivotSweepPower;
         public double startSweepAngle;
+        public double sweepTimeoutSeconds;
     }
 }

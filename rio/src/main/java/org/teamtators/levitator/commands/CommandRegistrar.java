@@ -24,7 +24,7 @@ public class CommandRegistrar {
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();
-        commandStore.putCommand("LiftContinuous", new LiftContinuous(robot));
+        commandStore.registerCommand("LiftContinuous", () -> new LiftContinuous(robot));
         commandStore.registerCommand("LiftHeightPreset", () -> new LiftHeightPreset(robot));
         commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
 
