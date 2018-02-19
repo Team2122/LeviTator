@@ -16,12 +16,17 @@ public class LiftHeightPreset extends Command implements Configurable<LiftHeight
 
     @Override
     protected void initialize() {
-        lift.setDesiredHeightPreset(config.preset);
     }
 
     @Override
     protected boolean step() {
-        return true;
+        if(lift.isPivotAt(Lift.AnglePreset.CENTER)) {
+            lift.setDesiredHeightPreset(config.preset);
+            return true;
+        } else {
+            lift.setDesiredAnglePreset(Lift.AnglePreset.CENTER);
+            return false;
+        }
     }
 
     @Override

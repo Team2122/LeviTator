@@ -238,6 +238,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         setDesiredPivotAngle(getCurrentPivotAngle() - config.bumpPivotValue);
     }
 
+    public boolean isPivotAt(double position) {
+        return getCurrentPivotAngle() - config.angleTolerance > position && getCurrentPivotAngle() + config.angleTolerance < position;
+    }
+
+    public boolean isPivotAt(AnglePreset preset) {
+        return isPivotAt(getAnglePreset(preset));
+    }
+
     public void setPivotPower(double pivotPower) {
         if(!isPivotLocked()) {
             pivotMotor.set(pivotPower);
