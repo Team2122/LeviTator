@@ -27,6 +27,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("LiftContinuous", () -> new LiftContinuous(robot));
         commandStore.registerCommand("LiftHeightPreset", () -> new LiftHeightPreset(robot));
         commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
+        commandStore.putCommand("WaitForCenter", new WaitForCenter(robot));
 
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
         commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));

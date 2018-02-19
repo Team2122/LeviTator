@@ -120,9 +120,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         if (targetHeight == height) {
             return;
         }
-        if (getSafeLiftHeight(height) != height) {
-            logger.warn("Target height is unsafe with current picker conditions: {}", height);
-            height = getCurrentHeight();
+        double safeHeight = getSafeLiftHeight(height);
+        if (safeHeight != height) {
+            logger.warn("Target height is unsafe with current picker conditions: {}. Moving to {}", height, safeHeight);
+            height = safeHeight;
         }
         if (height < config.heightBottomLimit) {
             logger.warn("Lift target height exceeded bottom height limit ({} < {})", height, config.heightBottomLimit);
@@ -194,6 +195,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setTargetAngle(double angle) {
+        double safeAngle = getSafePivotAngle(angle);
+        if (safeAngle != angle) {
+            logger.warn("Cannot move to pivot angle {} safely. Moving to {}", angle, safeAngle);
+            angle = safeAngle;
+        }
         pivotController.setSetpoint(angle);
     }
 
@@ -332,9 +338,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         double currentPivotAngle = getCurrentPivotAngle();
         double currentLiftHeight = getCurrentHeight();
         if (currentPivotAngle < (config.anglePresetCenter - config.angleTolerance) ||
-                currentPivotAngle > (config.anglePresetCenter + config.angleTolerance)) { // if the picker is out far enough that we can't go below level of elevators
+                currentPivotAngle > (config.anglePresetCenter + config.angleTolerance) ||
+                !isPivotLocked()) { // if the picker is out far enough that we can't go below level of elevators
             if (currentLiftHeight < config.heightPresetSwitch) { // if we are not above the elevators
-                return config.heightPresetSwitch; // don't move
+                return getCurrentHeight(); // don't move
             }
             if (desiredHeight < config.heightPresetSwitch) { // if we want to descend to below the elevators
                 return config.heightPresetSwitch; // then descend to the minimum height at which we can rotate

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teamtators.common.commands.CancelCommand;
+import org.teamtators.common.commands.LogCommand;
 import org.teamtators.common.commands.WaitCommand;
 import org.teamtators.common.commands.WaitForCommand;
 import org.teamtators.common.config.ConfigCommandStore;
@@ -223,6 +224,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         commandStore.registerCommand("Cancel", () -> new CancelCommand(this));
         commandStore.registerCommand("Wait", () -> new WaitCommand(this));
         commandStore.registerCommand("WaitFor", () -> new WaitForCommand(this));
+        commandStore.registerCommand("Log", LogCommand::new);
     }
 
     protected Command getAutoCommand() {

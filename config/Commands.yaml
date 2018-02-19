@@ -17,11 +17,27 @@ PivotLeft: { class: PivotAnglePreset, preset: LEFT }
 PivotCenter: { class: PivotAnglePreset, preset: CENTER }
 PivotRight: { class: PivotAnglePreset, preset: RIGHT }
 
-LiftHome: { class: LiftHeightPreset, preset: HOME }
-LiftPick: { class: LiftHeightPreset, preset: PICK }
-LiftSwitch: { class: LiftHeightPreset, preset: SWITCH }
-LiftScaleLow: { class: LiftHeightPreset, preset: SCALE_LOW }
-LiftScaleHigh: { class: LiftHeightPreset, preset: SCALE_HIGH }
+$LiftHome:
+  - $PrepareLiftMovement
+  - { class: LiftHeightPreset, preset: HOME }
+$LiftPick:
+  - $PrepareLiftMovement
+  - { class: LiftHeightPreset, preset: PICK }
+$LiftSwitch:
+  - $PrepareLiftMovement
+  - { class: LiftHeightPreset, preset: SWITCH }
+$LiftScaleLow:
+  - $PrepareLiftMovement
+  - { class: LiftHeightPreset, preset: SCALE_LOW }
+$LiftScaleHigh:
+  - $PrepareLiftMovement
+  - { class: LiftHeightPreset, preset: SCALE_HIGH }
+
+$PrepareLiftMovement:
+  - { class: Log, message: "Preparing to move lift" }
+  - PickerRetract
+  - PivotCenter
+  - WaitForCenter
 
 LiftContinuous:
   pivotSweepPower: 0.2

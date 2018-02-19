@@ -6,9 +6,9 @@ driver:
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight
-  X: start whenPressed LiftHome
-  Y: start whenPressed LiftSwitch
-  BUMPER_RIGHT: start whenPressed LiftScaleLow
-  BUMPER_LEFT: start whenPressed LiftScaleHigh
+  X: start whenPressed $LiftHome
+  Y: start whenPressed $LiftSwitch
+  BUMPER_RIGHT: start whenPressed $LiftScaleLow
+  BUMPER_LEFT: start whenPressed $LiftScaleHigh
   TRIGGER_LEFT: start whenPressed PickerExtend
   TRIGGER_RIGHT: start whenPressed PickerRetract
