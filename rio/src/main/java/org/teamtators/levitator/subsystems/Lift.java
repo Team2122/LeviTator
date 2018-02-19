@@ -28,7 +28,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private SpeedController pivotMotor;
     private AnalogPotentiometer pivotEncoder;
     private Solenoid pivotLockSolenoid;
-    private DigitalSensor pivotSensor;
+    private DigitalSensor pivotLockSensor;
 
     private double desiredPivotAngle;
     private double desiredHeight;
@@ -119,6 +119,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     public void setTargetHeight(double height) {
         if (targetHeight == height) {
             return;
+        }
+        if (getSafeLiftHeight(height) != height) {
+            logger.warn("Target height is unsafe with current picker conditions: {}", height);
+            height = getCurrentHeight();
         }
         if (height < config.heightBottomLimit) {
             logger.warn("Lift target height exceeded bottom height limit ({} < {})", height, config.heightBottomLimit);
@@ -246,7 +250,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public boolean isPivotLocked() {
-        return pivotSensor.get();
+        return !pivotLockSensor.get();
     }
 
     public void setPivotLockSolenoid(boolean lock) {
@@ -259,8 +263,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             case AUTONOMOUS:
             case TELEOP:
                 setDesiredHeight(getCurrentHeight());
-                setDesiredPivotAngle(getCurrentPivotAngle());
-                setTargetAngle(getCurrentPivotAngle());
+                setDesiredAnglePreset(AnglePreset.CENTER);
+                setTargetAngle(getAnglePreset(AnglePreset.CENTER));
                 pivotController.start();
                 enableLiftController();
                 break;
@@ -280,6 +284,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new DigitalSensorTest("limitSensorBottom", limitSensorBottom));
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
+        tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
+        tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
         tests.addTest(new MotionCalibrationTest(liftController));
         tests.addTest(new ControllerTest(pivotController));
@@ -300,7 +306,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
         this.pivotLockSolenoid = config.pivotLockSolenoid.create();
-        this.pivotSensor = config.pivotSensor.create();
+        this.pivotLockSensor = config.pivotLockSensor.create();
 
         this.liftController.configure(config.heightController);
         this.liftProfile = config.baseHeightProfile;
@@ -367,7 +373,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public SpeedControllerConfig pivotMotor;
         public AnalogPotentiometerConfig pivotEncoder;
         public SolenoidConfig pivotLockSolenoid;
-        public DigitalSensorConfig pivotSensor;
+        public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
         public TrapezoidalProfile baseHeightProfile;

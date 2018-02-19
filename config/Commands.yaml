@@ -24,6 +24,6 @@ LiftScaleLow: { class: LiftHeightPreset, preset: SCALE_LOW }
 LiftScaleHigh: { class: LiftHeightPreset, preset: SCALE_HIGH }
 
 LiftContinuous:
-  pivotSweepPower:
-  startSweepAngle:
-  sweepTimeout:
+  pivotSweepPower: 0.2
+  startSweepAngle: 5.0
+  sweepTimeoutSeconds: 5.0

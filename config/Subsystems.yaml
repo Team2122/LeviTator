@@ -8,9 +8,9 @@ drive:
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
   rotationController: {}
 picker:
-  leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
-  rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
-  extensionSolenoid: { channel: 6 }
+  leftMotor: { type: TALON_SRX, config: { id: 1 } }
+  rightMotor: { type: TALON_SRX, config: { id: 2, inverted: true } }
+  extensionSolenoid: { channel: 0 }
   cubeDetectSensor: { channel: 14, type: PNP }
   cubeDetectLeftSensor: { channel: 13, type: NPN }
   cubeDetectRightSensor: { channel: 12, type: NPN }
@@ -22,15 +22,15 @@ lift:
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: { channel: 0, fullRange: 360.0, offset: -207.0 }
+  pivotEncoder: { channel: 0, fullRange: 360.0, offset: -237.5 }
   pivotLockSolenoid: { channel: 1 }
-  pivotSensor: { channel: 16, type: PNP }
+  pivotLockSensor: { channel: 16, type: PNP }
 
   heightController:
     kpP: 0.2
     kiP: 0.0
     kpV: 0.005
-    kfV: 0.00963
+    kfV: 0.009
     kMinOutput: 0.0823
     kfA: 0.00089
     kHoldPower: 0.129
@@ -38,8 +38,8 @@ lift:
     minOutput: -0.5
 
   baseHeightProfile:
-    maxAcceleration: 80.0
-    travelVelocity: 60.0
+    maxAcceleration: 40.0
+    travelVelocity: 30.0
     endVelocity: 0.0
 
   pivotController:
@@ -48,8 +48,8 @@ lift:
     D: 0 #-0.08
     maxIError: 0.5
     maxAbsoluteSetpoint: 90.0
-    maxAbsoluteOutput: 0.3
-    target: { within: 0.5 }
+    maxAbsoluteOutput: 0.2
+    target: { within: 2.0 }
     holdPower: 0.0
 
   anglePresetLeft: -90
