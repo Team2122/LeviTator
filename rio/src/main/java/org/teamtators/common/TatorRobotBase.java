@@ -15,11 +15,11 @@ import org.teamtators.common.commands.WaitCommand;
 import org.teamtators.common.commands.WaitForCommand;
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.ConfigLoader;
-import org.teamtators.common.controllers.TriggerBinder;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.UpdatableCollection;
 import org.teamtators.common.control.Updater;
+import org.teamtators.common.controllers.TriggerBinder;
 import org.teamtators.common.datalogging.Dashboard;
 import org.teamtators.common.datalogging.DashboardUpdatable;
 import org.teamtators.common.datalogging.DashboardUpdater;
@@ -29,10 +29,9 @@ import org.teamtators.common.tester.AutomatedTester;
 import org.teamtators.common.tester.ManualTester;
 import org.teamtators.common.util.FMSData;
 
-import java.util.Arrays;
 import java.util.List;
 
-public abstract class TatorRobotBase implements RobotStateListener, Updatable {
+public abstract class TatorRobotBase implements RobotStateListener, Updatable, FMSDataListener {
     public static final Logger logger = LoggerFactory.getLogger(TatorRobotBase.class);
     public static final ObjectMapper configMapper = new ObjectMapper(new YAMLFactory());
     protected final ConfigLoader configLoader;
@@ -94,6 +93,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         subsystemList = subsystems.getSubsystemList();
         for (Subsystem subsystem : subsystemList) {
             getScheduler().registerStateListener(subsystem);
+            getScheduler().registerDataListener(subsystem);
             getTester().registerTestGroup(subsystem.createManualTests());
             getAutomatedTester().addTests(subsystem.createAutomatedTests());
         }
@@ -145,6 +145,11 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         }
     }
 
+    @Override
+    public void onFMSData(FMSData data) {
+        this.getScheduler().onFMSData(data);
+    }
+
     public double getStateTime() {
         return stateTimer.get();
     }
@@ -157,7 +162,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable {
         if (!fmsDataCurrent.equals(fmsData)) {
             logger.info("FMS Data updated: " + fmsDataCurrent);
             fmsData = fmsDataCurrent;
-            // TODO: some sort of callback/notification system for this
+            this.onFMSData(fmsData);
         }
 
         if (getState() != RobotState.TEST) {

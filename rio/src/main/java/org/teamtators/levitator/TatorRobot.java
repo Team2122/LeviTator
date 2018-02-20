@@ -18,7 +18,7 @@ public class TatorRobot extends TatorRobotBase {
     public TatorRobot(String configDir) {
         super(configDir);
 
-        subsystems = new Subsystems();
+        subsystems = new Subsystems(this);
     }
 
     @Override

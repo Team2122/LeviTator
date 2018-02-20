@@ -7,11 +7,12 @@ import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.AutomatedTestable;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.ManualTestable;
+import org.teamtators.common.util.FMSData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable {
+public class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable, FMSDataListener {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final String name;
 
@@ -60,5 +61,9 @@ public class Subsystem implements Updatable, RobotStateListener, ManualTestable,
     @Override
     public List<AutomatedTest> createAutomatedTests() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public void onFMSData(FMSData data) {
     }
 }

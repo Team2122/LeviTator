@@ -3,13 +3,14 @@ package org.teamtators.common.scheduler;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.util.FMSData;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class Scheduler implements CommandRunContext, RobotStateListener {
+public final class Scheduler implements CommandRunContext, RobotStateListener, FMSDataListener {
     private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
     private Map<TriggerSource, List<TriggerScheduler>> triggerSchedulers = new HashMap<>();
@@ -17,8 +18,10 @@ public final class Scheduler implements CommandRunContext, RobotStateListener {
     private Set<Command> defaultCommands = new HashSet<>();
 
     private Set<RobotStateListener> stateListeners = new HashSet<>();
+    private Set<FMSDataListener> dataListeners = new HashSet<>();
 
     private RobotState robotState = RobotState.DISABLED;
+    private FMSData fmsData;
 
     public Scheduler() {
     }
@@ -43,6 +46,11 @@ public final class Scheduler implements CommandRunContext, RobotStateListener {
     public void registerStateListener(RobotStateListener subsystem) {
         Preconditions.checkNotNull(subsystem);
         stateListeners.add(subsystem);
+    }
+
+    public void registerDataListener(FMSDataListener subsystem) {
+        Preconditions.checkNotNull(subsystem);
+        dataListeners.add(subsystem);
     }
 
     public void addTrigger(TriggerSource source, TriggerScheduler scheduler) {
@@ -158,6 +166,14 @@ public final class Scheduler implements CommandRunContext, RobotStateListener {
         this.robotState = currentState;
         for (RobotStateListener listener : stateListeners) {
             listener.onEnterRobotState(currentState);
+        }
+    }
+
+    @Override
+    public void onFMSData(FMSData data) {
+        this.fmsData = data;
+        for (FMSDataListener listener : dataListeners) {
+            listener.onFMSData(data);
         }
     }
 }

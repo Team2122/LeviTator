@@ -63,8 +63,8 @@ lift:
     minOutput: -0.5
 
   baseHeightProfile:
-    maxAcceleration: 40.0
-    travelVelocity: 30.0
+    maxAcceleration: 80.0
+    travelVelocity: 60.0
     endVelocity: 0.0
 
   pivotController:
@@ -93,3 +93,6 @@ lift:
 
   heightTolerance: .25
   angleTolerance: 3.0
+auto:
+  autoChoices: ["NoAuto", "LineCrossAuto"]
+  defaultChoice: "NoAuto"

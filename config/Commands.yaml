@@ -55,6 +55,25 @@ TestDriveRotate:
   maxAcceleration: 30
 
 
-^Drive.Straight: { speed: 84.0, endSpeed: 0.0, maxAcceleration: 140 }
-^Drive.Rotate: { rotationSpeed: 180, maxAcceleration: 400 }
-^Drive.Arc: { speed: 40.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
+^DriveStraight: { speed: 84.0, endSpeed: 0.0, maxAcceleration: 140 }
+^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
+^DriveArc: { speed: 40.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
+
+
+
+
+#############################################################################################
+#                                                                                           #
+#                                  AUTO SEQUENCES                                           #
+#                                                                                           #
+#############################################################################################
+
+LineCrossAuto: { class: DriveStraight, distance: -125 }
+$ScaleAutoL:
+  - { class: DriveStraight, distance: -100 }
+  - { class: DriveRotate, angle: 180 }
+  - $LiftSwitch
+  - { class: DriveStraight, distance: 20 }
+  - PickerExtend
+  - { class: Wait, period: 1 }
+  - PickerRelease
