@@ -24,11 +24,11 @@ public abstract class DriveRotateBase extends Command {
 
     @Override
     protected void initialize() {
-        double initialAngle = drive.getYawAngle();
-        double delta = angle - initialAngle;
-        TrapezoidalProfile profile = new TrapezoidalProfile(delta, 0,
-                Math.copySign(config.rotationSpeed, delta), 0.0, config.maxAcceleration);
-        drive.driveRotationProfile(profile, predicate);
+        drive.getRotationMotionFollower().setTravelVelocity(config.rotationSpeed);
+        drive.getRotationMotionFollower().resetEndVelocity();
+        drive.getRotationMotionFollower().setMaxAcceleration(config.maxAcceleration);
+        drive.getRotationMotionFollower().setOnTargetPredicate(predicate);
+        drive.driveRotationProfile(angle);
     }
 
     protected boolean step() {

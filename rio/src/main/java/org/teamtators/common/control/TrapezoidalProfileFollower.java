@@ -124,6 +124,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
     }
 
     protected synchronized void updateProfile() {
+        initialPosition = positionProvider.getControllerInput();
         initialVelocity = velocityProvider.getControllerInput();
         baseProfile.setStartVelocity(initialVelocity);
         calculator.updateProfile(baseProfile);

@@ -28,6 +28,9 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         TrapezoidalProfile straightProfile = new TrapezoidalProfile(arcLength, drive.getAverageRate(),
                 Math.copySign(config.speed, arcLength), Math.copySign(config.endSpeed, arcLength),
                 config.maxAcceleration);
+        drive.getStraightMotionFollower().setTravelVelocity(config.speed);
+        drive.getStraightMotionFollower().setEndVelocity(Math.copySign(config.endSpeed, arcLength));
+        drive.getStraightMotionFollower().setMaxAcceleration(config.maxAcceleration);
 
 
         double straightTime = straightProfile.createCalculator().getTotalTime();
@@ -42,10 +45,13 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
 
         TrapezoidalProfile rotationProfile = new TrapezoidalProfile(angleDelta, 0, Math.copySign(max_a_v, angleDelta),
                 0, config.maxAngularAcceleration);
+        drive.getRotationMotionFollower().setTravelVelocity(max_a_v);
+        drive.getRotationMotionFollower().resetEndVelocity();
+        drive.getRotationMotionFollower().setMaxAcceleration(config.maxAngularAcceleration);
         double rotationTime = rotationProfile.createCalculator().getTotalTime();
 
         logger.debug("straightTime={}, max_a_v={}, rotationTime={}", straightTime, max_a_v, rotationTime);
-        drive.driveArcProfile(straightProfile, rotationProfile);
+        drive.driveArcProfile(arcLength, config.angle);
 
         logger.info("Driving arc from angle {} to {} (rate {}), of distance {} (rate {})",
                 startAngle, config.angle, max_a_v, arcLength, config.speed);

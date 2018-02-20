@@ -9,7 +9,6 @@ import org.teamtators.levitator.subsystems.Drive;
 public class DriveStraight extends Command implements Configurable<DriveStraight.Config> {
     private Drive drive;
     private Config config;
-    private TrapezoidalProfile profile;
 
     public DriveStraight(TatorRobot robot) {
         super("DriveStraight");
@@ -30,7 +29,10 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
         }
         logger.info("Driving at {} for distance of {} at top speed of {}",
                 angleStr, config.distance, config.speed);
-        drive.driveStraightProfile(angle, profile);
+        drive.getStraightMotionFollower().setTravelVelocity(config.speed);
+        drive.getStraightMotionFollower().setEndVelocity(Math.copySign(config.endSpeed, config.distance));
+        drive.getStraightMotionFollower().setMaxAcceleration(config.maxAcceleration);
+        drive.driveStraightProfile(angle, config.distance);
     }
 
     @Override
@@ -54,8 +56,6 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
 
     public void configure(Config config) {
         this.config = config;
-        profile = new TrapezoidalProfile(config.distance, 0, Math.copySign(config.speed, config.distance),
-                Math.copySign(config.endSpeed, config.distance), config.maxAcceleration);
     }
 
     public static class Config {

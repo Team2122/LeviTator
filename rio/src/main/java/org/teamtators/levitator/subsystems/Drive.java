@@ -117,71 +117,40 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         rotationController.stop();
     }
 
-
-    public void driveStraightProfile(double heading, TrapezoidalProfile profile,
-                                     Predicate<TrapezoidalProfileFollower> targetCondition) {
+    public void driveStraightProfile(double heading, double distance) {
         rotationController.stop();
         rotationMotionFollower.stop();
-        profile.setStartVelocity(getAverageRate());
-        straightMotionFollower.setBaseProfile(profile);
-        straightMotionFollower.setOnTargetPredicate(targetCondition);
-        yawAngleController.setSetpoint(heading);
         outputController.setMode(OutputMode.StraightAndRotation);
 
-        if (straightMotionFollower.isRunning()) {
-            straightMotionFollower.updateProfile();
-        } else {
-            straightMotionFollower.start();
-        }
+        yawAngleController.setSetpoint(heading);
+        straightMotionFollower.moveDistance(distance);
+
+        straightMotionFollower.start();
         yawAngleController.start();
         outputController.start();
     }
 
-    public void driveStraightProfile(double heading, TrapezoidalProfile profile) {
-        driveStraightProfile(heading, profile, ControllerPredicates.finished());
-    }
-
-    public void driveRotationProfile(TrapezoidalProfile profile,
-                                     Predicate<TrapezoidalProfileFollower> targetCondition) {
+    public void driveRotationProfile(double heading) {
         rotationController.stop();
         straightMotionFollower.stop();
         yawAngleController.stop();
-        profile.setStartVelocity(getYawRate());
-        rotationMotionFollower.setBaseProfile(profile);
-        rotationMotionFollower.setOnTargetPredicate(targetCondition);
         outputController.setMode(OutputMode.RotationOnly);
 
-        if (rotationMotionFollower.isRunning()) {
-            rotationMotionFollower.updateProfile();
-        } else {
-            rotationMotionFollower.start();
-        }
+        rotationMotionFollower.moveToPosition(heading);
+        rotationMotionFollower.start();
         outputController.start();
     }
 
-    public void driveRotationProfile(TrapezoidalProfile profile) {
-        driveRotationProfile(profile, ControllerPredicates.finished());
-    }
-
-    public void driveArcProfile(TrapezoidalProfile straightProfile, TrapezoidalProfile rotationProfile) {
+    public void driveArcProfile(double arcLength, double endAngle) {
         rotationController.stop();
         yawAngleController.stop();
-        straightMotionFollower.setBaseProfile(straightProfile);
-        straightMotionFollower.setOnTargetPredicate(DEFAULT_PREDICATE);
-        rotationMotionFollower.setBaseProfile(rotationProfile);
-        rotationMotionFollower.setOnTargetPredicate(DEFAULT_PREDICATE);
         outputController.setMode(OutputMode.StraightAndRotation);
 
-        if (straightMotionFollower.isRunning()) {
-            straightMotionFollower.updateProfile();
-        } else {
-            straightMotionFollower.start();
-        }
-        if (rotationMotionFollower.isRunning()) {
-            rotationMotionFollower.updateProfile();
-        } else {
-            rotationMotionFollower.start();
-        }
+        straightMotionFollower.moveDistance(arcLength);
+        rotationMotionFollower.moveToPosition(endAngle);
+
+        straightMotionFollower.start();
+        rotationMotionFollower.start();
         outputController.start();
     }
 
@@ -291,9 +260,9 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
 
     @Override
     public void onEnterRobotState(RobotState state) {
-        if(state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
+        if (state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
             gyro.finishCalibration();
-            if(state == RobotState.AUTONOMOUS) {
+            if (state == RobotState.AUTONOMOUS) {
                 gyro.resetAngle();
             }
         } else {
@@ -334,6 +303,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         leftEncoder.free();
         rightEncoder.free();
         gyro.free();
+    }
+
+    private enum OutputMode {
+        StraightOnly, RotationOnly, StraightAndRotation, None
     }
 
     public static class Config {
@@ -391,9 +364,5 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
                 logger.trace("not driving, something was NaN: {}, {}", left, right);
             }
         }
-    }
-
-    private enum OutputMode {
-        StraightOnly, RotationOnly, StraightAndRotation, None
     }
 }
