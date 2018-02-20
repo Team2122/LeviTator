@@ -1,10 +1,8 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
@@ -21,8 +19,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController rightMotor;
     private Solenoid extensionSolenoid;
     private DigitalSensor cubeDetectSensor;
-    private DigitalSensor cubeDetectLeftSensor;
-    private DigitalSensor cubeDetectRightSensor;
+    private DigitalSensor upperCubeSensor;
+    private DigitalSensor lowerCubeSensor;
 
     public Picker() {
         super("Picker");
@@ -55,15 +53,15 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public boolean isCubeDetectedLeft() {
-        return cubeDetectLeftSensor.get();
+        return upperCubeSensor.get();
     }
 
     public boolean isCubeDetectedRight() {
-        return cubeDetectRightSensor.get();
+        return lowerCubeSensor.get();
     }
 
     public boolean isCubeInPicker() {
-        return cubeDetectRightSensor.get();
+        return lowerCubeSensor.get();
     }
 
     public void extend(){
@@ -81,8 +79,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         tests.addTest(new SpeedControllerTest("rightMotor", rightMotor));
         tests.addTest(new SolenoidTest("extensionSolenoid", extensionSolenoid));
         tests.addTest(new DigitalSensorTest("cubeDetectSensor", cubeDetectSensor));
-        tests.addTest(new DigitalSensorTest("cubeDetectLeftSensor", cubeDetectLeftSensor));
-        tests.addTest(new DigitalSensorTest("cubeDetectRightSensor", cubeDetectRightSensor));
+        tests.addTest(new DigitalSensorTest("upperCubeSensor", upperCubeSensor));
+        tests.addTest(new DigitalSensorTest("lowerCubeSensor", lowerCubeSensor));
         return tests;
     }
 
@@ -92,15 +90,15 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.rightMotor = config.rightMotor.create();
         this.extensionSolenoid = config.extensionSolenoid.create();
         this.cubeDetectSensor = config.cubeDetectSensor.create();
-        this.cubeDetectLeftSensor = config.cubeDetectLeftSensor.create();
-        this.cubeDetectRightSensor = config.cubeDetectRightSensor.create();
+        this.upperCubeSensor = config.cubeDetectLeftSensor.create();
+        this.lowerCubeSensor = config.cubeDetectRightSensor.create();
 
         ((Sendable) leftMotor).setName("Picker", "leftMotor");
         ((Sendable) rightMotor).setName("Picker", "rightMotor");
         extensionSolenoid.setName("Picker", "extensionSolenoid");
         cubeDetectSensor.setName("Picker", "cubeDetectSensor");
-        cubeDetectLeftSensor.setName("Picker", "cubeDetectLeftSensor");
-        cubeDetectRightSensor.setName("Picker", "cubeDetectRightSensor");
+        upperCubeSensor.setName("Picker", "upperCubeSensor");
+        lowerCubeSensor.setName("Picker", "lowerCubeSensor");
     }
 
     public static class Config {
