@@ -12,3 +12,4 @@ driver:
   BUMPER_LEFT: start whenPressed $LiftScaleHigh
   TRIGGER_LEFT: start whenPressed PickerExtend
   TRIGGER_RIGHT: start whenPressed PickerRetract
+  START: start whenPressed TestDriveRotate

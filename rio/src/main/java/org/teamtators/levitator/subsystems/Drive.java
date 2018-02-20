@@ -9,6 +9,7 @@ import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.hw.ADXRS453;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.ADXRS453Test;
@@ -289,6 +290,15 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         tests.addTests(new ControllerTest(rotationController, 180));
 
         return tests;
+    }
+
+    @Override
+    public void onEnterRobotState(RobotState state) {
+        if(state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
+            gyro.finishCalibration();
+        } else {
+            gyro.startCalibration();
+        }
     }
 
     @Override

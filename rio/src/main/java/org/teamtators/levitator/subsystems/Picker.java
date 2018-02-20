@@ -90,8 +90,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.rightMotor = config.rightMotor.create();
         this.extensionSolenoid = config.extensionSolenoid.create();
         this.cubeDetectSensor = config.cubeDetectSensor.create();
-        this.upperCubeSensor = config.cubeDetectLeftSensor.create();
-        this.lowerCubeSensor = config.cubeDetectRightSensor.create();
+        this.upperCubeSensor = config.upperCubeSensor.create();
+        this.lowerCubeSensor = config.lowerCubeSensor.create();
 
         ((Sendable) leftMotor).setName("Picker", "leftMotor");
         ((Sendable) rightMotor).setName("Picker", "rightMotor");
@@ -106,8 +106,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         public SpeedControllerConfig rightMotor;
         public SolenoidConfig extensionSolenoid;
         public DigitalSensorConfig cubeDetectSensor;
-        public DigitalSensorConfig cubeDetectLeftSensor;
-        public DigitalSensorConfig cubeDetectRightSensor;
+        public DigitalSensorConfig upperCubeSensor;
+        public DigitalSensorConfig lowerCubeSensor;
     }
 
     public static class RollerPowers {

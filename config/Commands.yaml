@@ -43,3 +43,18 @@ LiftContinuous:
   pivotSweepPower: 0.2
   startSweepAngle: 5.0
   sweepTimeoutSeconds: 5.0
+TestDriveStraight:
+  class: DriveStraight
+  speed: 48.0
+  distance: 12.0
+  maxAcceleration: 84.0
+TestDriveRotate:
+  class: DriveRotate
+  angle: 90
+  rotationSpeed: 30
+  maxAcceleration: 30
+
+
+^Drive.Straight: { speed: 84.0, endSpeed: 0.0, maxAcceleration: 140 }
+^Drive.Rotate: { rotationSpeed: 180, maxAcceleration: 400 }
+^Drive.Arc: { speed: 40.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }

@@ -16,6 +16,9 @@ public class CommandRegistrar {
     public void register(ConfigCommandStore commandStore) {
         // Drive commands
         commandStore.registerCommand("DriveTank", () -> new DriveTank(robot));
+        commandStore.registerCommand("DriveStraight", () -> new DriveStraight(robot));
+        commandStore.registerCommand("DriveRotate", () -> new DriveRotate(robot));
+        commandStore.registerCommand("DriveArc", () -> new DriveArc(robot));
 
         // Picker commands
         Picker picker = robot.getSubsystems().getPicker();
