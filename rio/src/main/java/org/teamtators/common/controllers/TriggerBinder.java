@@ -3,16 +3,12 @@ package org.teamtators.common.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.wpilibj.Joystick;
-import jdk.nashorn.internal.ir.ObjectNode;
-import jdk.nashorn.internal.ir.PropertyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.scheduler.*;
 
-import javax.naming.ldap.Control;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
