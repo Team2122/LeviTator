@@ -19,22 +19,17 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
     private static final double EPSILON = 1e-5;
     private final DataCollector dataCollector = DataCollector.getDataCollector();
     private final LogDataProvider logDataProvider = new TrapezoidalProfileFollower.ControllerLogDataProvider();
-
+    private final TrapezoidalProfile baseProfile = new TrapezoidalProfile();
+    private final TrapezoidalProfileCalculator calculator = baseProfile.createCalculator();
     // Inputs and outputs
     private ControllerInput positionProvider;
     private ControllerInput velocityProvider;
     private ControllerOutput outputConsumer;
-    private Predicate<TrapezoidalProfileFollower> onTargetPredicate = ControllerPredicates.finished();
-
     private Config config = new Config();
-    private TrapezoidalProfile baseProfile;
-
     private volatile double maxOutput = Double.POSITIVE_INFINITY;
     private volatile double minOutput = Double.NEGATIVE_INFINITY;
     private volatile double holdPower = 0.0;
-
     // Variable data
-    private volatile TrapezoidalProfileCalculator calculator;
     private volatile double initialPosition;
     private volatile double initialVelocity;
     private volatile double currentPosition;
@@ -44,6 +39,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
     private volatile double output;
     private volatile double totalPError;
     private volatile boolean finished;
+    private Predicate<TrapezoidalProfileFollower> onTargetPredicate = ControllerPredicates.finished();
     private volatile boolean onTarget;
 
     public TrapezoidalProfileFollower(String name) {
@@ -104,22 +100,69 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         this.outputConsumer = outputConsumer;
     }
 
-    public TrapezoidalProfile getBaseProfile() {
-        return baseProfile;
+    public void moveToPosition(double position) {
+        double distance = position - positionProvider.getControllerInput();
+        moveDistance(distance);
     }
 
-    public synchronized void setBaseProfile(TrapezoidalProfile baseProfile) {
-        this.baseProfile = baseProfile;
-    }
-
-    public synchronized void updateProfile() {
+    public void moveDistance(double distance) {
         initialPosition = positionProvider.getControllerInput();
-        initialVelocity = velocityProvider.getControllerInput();
-        if (calculator == null) {
-            calculator = baseProfile.createCalculator();
-        } else {
-            calculator.updateProfile(baseProfile);
+        double endPosition = distance + initialPosition;
+        if (endPosition > config.maxPosition) {
+            logger.warn(String.format("Attempted to move past maxPosition (%.3f > %.3f)",
+                    endPosition, config.maxPosition));
+            distance = config.maxPosition - initialPosition;
+        } else if (endPosition < config.minPosition) {
+            logger.warn(String.format("Attempted to move past minPosition (%.3f < %.3f)",
+                    endPosition, config.minPosition));
+            distance = config.minPosition - initialPosition;
         }
+        baseProfile.setDistance(distance);
+        baseProfile.setTravelVelocity(Math.copySign(baseProfile.getTravelVelocity(), distance));
+        logger.trace("Moving based on profile: " + baseProfile);
+        updateProfile();
+    }
+
+    protected synchronized void updateProfile() {
+        initialVelocity = velocityProvider.getControllerInput();
+        baseProfile.setStartVelocity(initialVelocity);
+        calculator.updateProfile(baseProfile);
+    }
+
+    public synchronized void setEndVelocity(double endVelocity) {
+        baseProfile.setEndVelocity(endVelocity);
+    }
+
+    public void resetEndVelocity() {
+        setEndVelocity(config.endVelocity);
+    }
+
+    public synchronized double getEndVelocity() {
+        return baseProfile.getEndVelocity();
+    }
+
+    public synchronized void setTravelVelocity(double travelVelocity) {
+        baseProfile.setTravelVelocity(travelVelocity);
+    }
+
+    public void resetTravelVelocity() {
+        setTravelVelocity(config.travelVelocity);
+    }
+
+    public synchronized double getTravelVelocity() {
+        return baseProfile.getTravelVelocity();
+    }
+
+    public synchronized void setMaxAcceleration(double maxAcceleration) {
+        baseProfile.setMaxAcceleration(maxAcceleration);
+    }
+
+    public void resetMaxAcceleration() {
+        setMaxAcceleration(config.maxAcceleration);
+    }
+
+    public synchronized double getMaxAcceleration() {
+        return baseProfile.getMaxAcceleration();
     }
 
     public Predicate<TrapezoidalProfileFollower> getOnTargetPredicate() {
@@ -325,6 +368,12 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         public double maxAbsoluteOutput = Double.NaN; // maximum absolute output power
         public double maxOutput = Double.POSITIVE_INFINITY; // maximum output power
         public double minOutput = Double.NEGATIVE_INFINITY; // minumum output power
+        public double minPosition = Double.NEGATIVE_INFINITY; // the minimum position the follower will move to
+        public double maxPosition = Double.POSITIVE_INFINITY; // the maximum position the follower will move to
+
+        public double endVelocity = 0.0; // default endVelocity for the profile
+        public double travelVelocity = 0.0; // default travelVelocity for the profile
+        public double maxAcceleration = 0.0; // default maxAcceleration for the profile
 
         public boolean logData = false; // whether datalog is enabled or not
     }

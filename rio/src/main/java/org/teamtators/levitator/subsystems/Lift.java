@@ -39,7 +39,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private PidController pivotController;
 
     private Config config;
-    private TrapezoidalProfile liftProfile;
 
     public Lift() {
         super("Lift");
@@ -80,12 +79,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
      * @param desiredHeight height in inches
      */
     public void setDesiredHeight(double desiredHeight) {
-        if (desiredHeight < config.heightBottomLimit) {
-            logger.warn("Lift desired height exceeded bottom height limit ({} < {})", desiredHeight, config.heightBottomLimit);
-            desiredHeight = config.heightBottomLimit;
-        } else if (desiredHeight > config.heightTopLimit) {
-            logger.warn("Lift desired height exceeded top height limit ({} > {})", desiredHeight, config.heightTopLimit);
-            desiredHeight = config.heightTopLimit;
+        if (desiredHeight < config.heightController.minPosition) {
+            logger.warn("Lift desired height exceeded bottom height limit ({} < {})", desiredHeight,
+                    config.heightController.minPosition);
+            desiredHeight = config.heightController.minPosition;
+        } else if (desiredHeight > config.heightController.maxPosition) {
+            logger.warn("Lift desired height exceeded top height limit ({} > {})", desiredHeight,
+                    config.heightController.maxPosition);
+            desiredHeight = config.heightController.maxPosition;
         }
 //        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
             logger.info("Setting desired lift height to {}", desiredHeight);
@@ -133,22 +134,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.warn("Target height is unsafe with current picker conditions: {}. Moving to {}", height, safeHeight);
             height = safeHeight;
         }
-        if (height < config.heightBottomLimit) {
-            logger.warn("Lift target height exceeded bottom height limit ({} < {})", height, config.heightBottomLimit);
-            height = config.heightBottomLimit;
-        } else if (height > config.heightTopLimit) {
-            logger.warn("Lift target height exceeded top height limit ({} > {})", height, config.heightTopLimit);
-            height = config.heightTopLimit;
-        }
-        this.targetHeight = height;
         double distance = height - getCurrentHeight();
         logger.debug(String.format("Setting lift target height to %.3f (distance to move: %.3f)",
                 height, distance));
-        liftProfile.setDistance(distance);
-        liftProfile.setStartVelocity(getLiftVelocity());
-        liftProfile.setTravelVelocity(Math.copySign(liftProfile.getTravelVelocity(), distance));
-        logger.trace("Profile: " + liftProfile);
-        liftController.updateProfile();
+        liftController.moveToPosition(height);
     }
 
     private void enableLiftController() {
@@ -324,8 +313,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.pivotLockSensor = config.pivotLockSensor.create();
 
         this.liftController.configure(config.heightController);
-        this.liftProfile = config.baseHeightProfile;
-        liftController.setBaseProfile(liftProfile);
         this.pivotController.configure(config.pivotController);
 
         liftMotor.setName("Lift", "liftMotor");
@@ -406,15 +393,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
-        public TrapezoidalProfile baseHeightProfile;
         public PidController.Config pivotController;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
         public double anglePresetRight;
 
-        public double heightBottomLimit;
-        public double heightTopLimit;
         public double heightPresetPick;
         public double heightPresetSwitch;
         public double heightPresetScaleLow;
@@ -448,8 +432,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public void onButtonDown(LogitechF310.Button button) {
             switch (button) {
                 case A:
-                    double height = (config.heightTopLimit - config.heightBottomLimit)
-                            * ((axisValue + 1) / 2) + config.heightBottomLimit;
+                    double height = (config.heightController.maxPosition - config.heightController.minPosition)
+                            * ((axisValue + 1) / 2) + config.heightController.minPosition;
                     setDesiredHeight(height);
                     break;
                 case Y:

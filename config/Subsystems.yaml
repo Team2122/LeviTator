@@ -61,6 +61,8 @@ lift:
     kHoldPower: 0.129
     maxOutput: 1.0
     minOutput: -0.5
+    minPosition: 0.0
+    maxPosition: 85.0
 
   baseHeightProfile:
     maxAcceleration: 80.0
@@ -80,8 +82,6 @@ lift:
   anglePresetLeft: -90
   anglePresetCenter: 0
   anglePresetRight: 90
-  heightBottomLimit: 0.0
-  heightTopLimit: 85.0
   heightPresetPick: 2
   heightPresetSwitch: 46
   heightPresetScaleLow: 70
