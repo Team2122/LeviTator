@@ -3,7 +3,7 @@ package org.teamtators.common.math;
 /**
  * A function in the form a*x^b
  */
-public class PowerFunction {
+public class PowerFunction implements DoubleFunction {
     public double a = 0.0;
     public double b = 0.0;
 

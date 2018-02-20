@@ -3,7 +3,7 @@ package org.teamtators.common.math;
 /**
  * @author Alex Mikhalev
  */
-public class Polynomial3 {
+public class Polynomial3 implements DoubleFunction {
     private double a;
     private double b;
     private double c;

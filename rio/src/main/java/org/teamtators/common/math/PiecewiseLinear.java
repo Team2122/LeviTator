@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * @author Alex Mikhalev
  */
-public class PiecewiseLinear {
+public class PiecewiseLinear implements DoubleFunction {
     private InterpolableTreeMap<InterpolableDouble, InterpolableDouble> points = new InterpolableTreeMap<>();
 
     public double calculate(double x) {
