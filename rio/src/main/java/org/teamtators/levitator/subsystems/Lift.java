@@ -86,12 +86,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.warn("Lift desired height exceeded top height limit ({} > {})", desiredHeight, config.heightTopLimit);
             desiredHeight = config.heightTopLimit;
         }
-        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
+//        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
             logger.info("Setting desired lift height to {}", desiredHeight);
             this.desiredHeight = desiredHeight;
-        } else {
-            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
-        }
+//        } else {
+//            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
+//        }
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
@@ -169,12 +169,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredPivotAngle(double desiredAngle) {
-        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
+//        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
             logger.info("Setting desired pivot angle {}", desiredAngle);
             this.desiredPivotAngle = desiredAngle;
-        } else {
-            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
-        }
+//        } else {
+//            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
+//        }
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {

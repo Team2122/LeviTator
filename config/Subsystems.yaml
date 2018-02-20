@@ -83,7 +83,7 @@ lift:
   heightBottomLimit: 0.0
   heightTopLimit: 85.0
   heightPresetPick: 2
-  heightPresetSwitch: 45
+  heightPresetSwitch: 46
   heightPresetScaleLow: 70
   heightPresetScaleHigh: 80
   heightPresetHome: 0
@@ -91,8 +91,8 @@ lift:
   bumpHeightValue: 1
   bumpPivotValue: 5
 
-  heightTolerance: .25
+  heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "$ScaleAutoL"]
   defaultChoice: "NoAuto"

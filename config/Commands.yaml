@@ -18,19 +18,19 @@ PivotCenter: { class: PivotAnglePreset, preset: CENTER }
 PivotRight: { class: PivotAnglePreset, preset: RIGHT }
 
 $LiftHome:
-  - $PrepareLiftMovement
+#  - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: HOME }
 $LiftPick:
-  - $PrepareLiftMovement
+#  - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: PICK }
 $LiftSwitch:
-  - $PrepareLiftMovement
+#  - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: SWITCH }
 $LiftScaleLow:
-  - $PrepareLiftMovement
+#  - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: SCALE_LOW }
 $LiftScaleHigh:
-  - $PrepareLiftMovement
+#  - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: SCALE_HIGH }
 
 $PrepareLiftMovement:
@@ -58,22 +58,33 @@ TestDriveRotate:
 ^DriveStraight: { speed: 84.0, endSpeed: 0.0, maxAcceleration: 140 }
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 40.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
+WaitForHeight: { tolerance: 1 }
+WaitForAngle: { tolerance: 0.5 }
 
-
-
+PickerQuickDeploy:
+  kickPower: 1
+  timeBeforeKick: 0.2
+  timeBeforeRetract: 0.6
+  timeToKick: 0.8
 
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #
 #                                                                                           #
 #############################################################################################
-
+NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
+
+$LiftSequence:
+  - $LiftScaleLow
+#  - WaitForHeight
+  - PivotLeft
+
 $ScaleAutoL:
-  - { class: DriveStraight, distance: -100 }
-  - { class: DriveRotate, angle: 180 }
-  - $LiftSwitch
-  - { class: DriveStraight, distance: 20 }
-  - PickerExtend
-  - { class: Wait, period: 1 }
-  - PickerRelease
+  - { parallel: true, name: $LiftSequence }
+  - { class: DriveStraight, distance: -288 }
+  - WaitForHeight
+  - WaitForAngle
+  - PickerQuickDeploy
+  - PivotCenter
+  - $LiftHome

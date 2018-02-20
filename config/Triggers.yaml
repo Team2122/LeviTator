@@ -2,7 +2,7 @@ defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   A: toggle whenPressed PickerPick
-  B: whilePressed PickerRelease
+  B: start whenPressed PickerQuickDeploy
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight

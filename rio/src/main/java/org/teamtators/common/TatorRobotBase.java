@@ -104,7 +104,6 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         registerCommands(getCommandStore());
         ObjectNode commandsConfig = (ObjectNode) configLoader.load("Commands.yaml");
         getCommandStore().createCommandsFromConfig(commandsConfig);
-        this.autoCommand = this.getAutoCommand();
     }
 
     protected void configureTests() {
@@ -137,6 +136,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         this.getScheduler().onEnterRobotState(state);
 
         if (state == RobotState.AUTONOMOUS) {
+            this.autoCommand = this.getAutoCommand();
             if (autoCommand == null) {
                 logger.warn("No auto command was specified");
             } else {

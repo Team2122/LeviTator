@@ -296,6 +296,9 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
     public void onEnterRobotState(RobotState state) {
         if(state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
             gyro.finishCalibration();
+            if(state == RobotState.AUTONOMOUS) {
+                gyro.resetAngle();
+            }
         } else {
             gyro.startCalibration();
         }

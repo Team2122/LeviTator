@@ -98,6 +98,10 @@ public class Subsystems extends SubsystemsBase {
         return oi.getDriverJoystick();
     }
 
+    public Auto getAuto() {
+        return auto;
+    }
+
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;

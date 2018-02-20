@@ -24,12 +24,15 @@ public class CommandRegistrar {
         Picker picker = robot.getSubsystems().getPicker();
         commandStore.registerCommand("PickerPick", () -> new PickerPick(robot));
         commandStore.registerCommand("PickerRelease", () -> new PickerRelease(robot));
+        commandStore.registerCommand("PickerQuickDeploy", () -> new PickerQuickDeploy(robot));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();
         commandStore.registerCommand("LiftContinuous", () -> new LiftContinuous(robot));
         commandStore.registerCommand("LiftHeightPreset", () -> new LiftHeightPreset(robot));
         commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
+        commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
+        commandStore.registerCommand("WaitForHeight", () -> new WaitForHeight(robot));
         commandStore.putCommand("WaitForCenter", new WaitForCenter(robot));
 
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
