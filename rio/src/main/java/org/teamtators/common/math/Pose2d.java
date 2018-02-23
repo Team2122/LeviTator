@@ -23,6 +23,14 @@ public class Pose2d {
         return new Pose2d(Translation2d.zero(), Rotation.zero());
     }
 
+    public Pose2d withTranslation(Translation2d translation) {
+        return new Pose2d(translation, this.getYaw());
+    }
+
+    public Pose2d withYaw(Rotation yawRotation) {
+        return new Pose2d(new Translation2d(this.translation), yawRotation);
+    }
+
     public Translation2d getTranslation() {
         return translation;
     }

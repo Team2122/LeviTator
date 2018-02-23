@@ -30,6 +30,16 @@ public class Rotation {
         return fromRadians(Math.toRadians(degrees));
     }
 
+    public void setRadians(double radians) {
+        this.sin = Math.sin(radians);
+        this.cos = Math.cos(radians);
+        normalize();
+    }
+
+    public void setDegrees(double degrees) {
+        setDegrees(Math.toRadians(degrees));
+    }
+
     public double sin() {
         return sin;
     }
