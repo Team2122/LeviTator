@@ -13,6 +13,11 @@ public class Rotation {
         this.normalize();
     }
 
+    public Rotation(Rotation other) {
+        this.sin = other.sin;
+        this.cos = other.cos;
+    }
+
     public static Rotation zero() {
         return new Rotation(0.0, 1.0);
     }

@@ -12,6 +12,11 @@ public class Translation2d {
         this.y = y;
     }
 
+    public Translation2d(Translation2d translation) {
+        this.x = translation.x;
+        this.y = translation.y;
+    }
+
     public static Translation2d zero() {
         return new Translation2d(0.0, 0.0);
     }

@@ -14,6 +14,11 @@ public class Pose2d {
         this.yaw = Preconditions.checkNotNull(yaw);
     }
 
+    public Pose2d(Pose2d other) {
+        this.translation = new Translation2d(other.translation);
+        this.yaw = new Rotation(other.yaw);
+    }
+
     public static Pose2d zero() {
         return new Pose2d(Translation2d.zero(), Rotation.zero());
     }
@@ -50,9 +55,13 @@ public class Pose2d {
         return new Pose2d(this.translation.neg(), this.yaw.neg());
     }
 
+    public Pose2d rotateBy(Rotation rotation) {
+        return new Pose2d(this.translation.rotateBy(rotation),
+                this.yaw.add(rotation));
+    }
+
     public Pose2d concat(Pose2d other) {
-        return new Pose2d(this.translation.add(other.translation.rotateBy(this.yaw)),
-                this.yaw.add(other.yaw));
+        return this.add(other.rotateBy(this.yaw));
     }
 
     @Override
