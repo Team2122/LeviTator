@@ -48,9 +48,25 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         stateListeners.add(subsystem);
     }
 
-    public void registerDataListener(FMSDataListener subsystem) {
-        Preconditions.checkNotNull(subsystem);
-        dataListeners.add(subsystem);
+    public void unregisterStateListener(RobotStateListener subsystem) {
+        stateListeners.remove(subsystem);
+    }
+
+    public void clearStateListeners() {
+        stateListeners.clear();
+    }
+
+    public void registerFMSDataListener(FMSDataListener listener) {
+        Preconditions.checkNotNull(listener);
+        dataListeners.add(listener);
+    }
+
+    public void unregisterFMSDataListener(FMSDataListener listener) {
+        dataListeners.remove(listener);
+    }
+
+    public void clearFMSDataListeners() {
+        dataListeners.clear();
     }
 
     public void addTrigger(TriggerSource source, TriggerScheduler scheduler) {
@@ -64,6 +80,10 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
 
     public TriggerAdder onTrigger(TriggerSource triggerSource) {
         return new TriggerAdder(this, triggerSource);
+    }
+
+    public void clearTriggers() {
+        triggerSchedulers.clear();
     }
 
     public void execute() {

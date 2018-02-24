@@ -25,4 +25,8 @@ public class CommandStore {
             throw new IllegalArgumentException("No command with name \"" + name + "\" created");
         return command;
     }
+
+    public void clearCommands() {
+        commands.clear();
+    }
 }

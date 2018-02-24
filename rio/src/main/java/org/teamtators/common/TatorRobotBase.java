@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -71,6 +73,24 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         setUpDashboards();
         startThreads();
         postInitialize();
+
+        NetworkTableInstance.getDefault().getTable("SmartDashboard").getEntry("reinitialize").addListener(entryNotification -> {
+            logger.debug(entryNotification.name + ": " + entryNotification.value);
+        }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }
+
+    public void deinitialize() {
+        logger.info("Deinitializing " + getName());
+        stopThreads();
+        deconfigureTests();
+        deconfigureTriggers();
+        deconfigureCommands();
+        deconfigureSubsystems();
+    }
+
+    public void reinitialize() {
+        deinitialize();
+        reinitialize();
     }
 
     public void addSmartDashboardUpdatable(DashboardUpdatable smartDashboardUpdatable) {
@@ -93,10 +113,24 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         subsystemList = subsystems.getSubsystemList();
         for (Subsystem subsystem : subsystemList) {
             getScheduler().registerStateListener(subsystem);
-            getScheduler().registerDataListener(subsystem);
+            getScheduler().registerFMSDataListener(subsystem);
             getTester().registerTestGroup(subsystem.createManualTests());
             getAutomatedTester().addTests(subsystem.createAutomatedTests());
         }
+    }
+
+    protected void deconfigureSubsystems() {
+        logger.debug("Deconfiguring subsystems");
+        pdp.free();
+        LiveWindow.remove(pdp);
+        this.controllers.clear();
+
+        getScheduler().clearStateListeners();
+        getScheduler().clearFMSDataListeners();
+        getTester().clearTestGroups();
+        getAutomatedTester().clearTests();
+
+        getSubsystemsBase().deconfigure();
     }
 
     protected void configureCommands() {
@@ -104,6 +138,12 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         registerCommands(getCommandStore());
         ObjectNode commandsConfig = (ObjectNode) configLoader.load("Commands.yaml");
         getCommandStore().createCommandsFromConfig(commandsConfig);
+    }
+
+    protected void deconfigureCommands() {
+        logger.debug("Deconfiguring commands");
+        getCommandStore().clearCommands();
+        getCommandStore().clearRegistrations();
     }
 
     protected void configureTests() {
@@ -114,11 +154,21 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         //getAutomatedTester().initialize(configLoader);
     }
 
+    protected void deconfigureTests() {
+        logger.debug("Deconfiguring tests");
+    }
+
     protected void configureTriggers() {
         logger.debug("Configuring triggers");
         getTriggerBinder().putControllers(getSubsystemsBase().getControllers());
         ObjectNode triggersConfig = (ObjectNode) configLoader.load("Triggers.yaml");
         triggerBinder.bindTriggers(triggersConfig);
+    }
+
+    protected void deconfigureTriggers() {
+        logger.debug("Deconfiguring triggers");
+        getTriggerBinder().clearControllers();
+        getScheduler().clearTriggers();
     }
 
     protected void startThreads() {
@@ -127,6 +177,14 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         controllerUpdater.start();
         dataCollectorUpdater.start();
         dashboardUpdater.start();
+    }
+
+    protected void stopThreads() {
+        logger.debug("Stopping threads");
+        updater.stop();
+        controllerUpdater.stop();
+        dataCollectorUpdater.stop();
+        dashboardUpdater.stop();
     }
 
     @Override

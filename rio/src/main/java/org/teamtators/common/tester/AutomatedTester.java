@@ -39,6 +39,10 @@ public class AutomatedTester extends ManualTest {
         testList.addAll(newTests);
     }
 
+    public void clearTests() {
+        testList.clear();
+    }
+
     @Override
     public void start() {
         super.start();

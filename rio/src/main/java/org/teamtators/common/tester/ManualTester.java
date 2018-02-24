@@ -194,4 +194,12 @@ public class ManualTester extends Command {
     public void registerTestGroup(ManualTestGroup group) {
         testGroups.add(group);
     }
+
+    public void unregisterTestGroup(ManualTestGroup group) {
+        testGroups.remove(group);
+    }
+
+    public void clearTestGroups() {
+        testGroups.clear();
+    }
 }

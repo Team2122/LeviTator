@@ -105,6 +105,11 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         this.hid = new Joystick(config.port);
     }
 
+    @Override
+    public void deconfigure() {
+        this.hid = null;
+    }
+
     public static class Config {
         public int port;
     }

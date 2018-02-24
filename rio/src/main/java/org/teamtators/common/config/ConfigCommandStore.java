@@ -57,6 +57,10 @@ public class ConfigCommandStore extends CommandStore {
         return supplier;
     }
 
+    public void clearRegistrations() {
+        commandSuppliers.clear();
+    }
+
     public <T extends Command> void registerClass(String name, Class<T> commandClass) {
         final Constructor<T> constructor = getConstructor(commandClass);
         Supplier<Command> commandSupplier = () -> {
