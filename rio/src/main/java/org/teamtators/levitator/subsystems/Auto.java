@@ -38,12 +38,19 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
 
     @Override
     public void configure(Config config) {
+        super.configure();
         this.config = config;
         for(String choice : config.autoChoices) {
             simpleAutoChoices.addObject(choice, choice);
         }
         simpleAutoChoices.addDefault(config.defaultChoice, config.defaultChoice);
          SmartDashboard.putData(simpleAutoChoices);
+    }
+
+    @Override
+    public void deconfigure() {
+        super.deconfigure();
+        simpleAutoChoices.free();
     }
 
     private class BooleanChooser extends SendableChooser<Boolean> {

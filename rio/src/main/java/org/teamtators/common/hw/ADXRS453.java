@@ -327,8 +327,9 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     }
 
     @Override
-    public void finalize() throws Throwable {
+    public void free() {
         spi.free();
+        startup.interrupt();
     }
 
     private boolean checkParity(int data) {

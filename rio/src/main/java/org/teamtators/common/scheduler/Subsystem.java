@@ -2,6 +2,7 @@ package org.teamtators.common.scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.config.Deconfigurable;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.AutomatedTestable;
@@ -12,7 +13,8 @@ import org.teamtators.common.util.FMSData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable, FMSDataListener {
+public class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable, FMSDataListener,
+        Deconfigurable {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final String name;
 
@@ -65,5 +67,14 @@ public class Subsystem implements Updatable, RobotStateListener, ManualTestable,
 
     @Override
     public void onFMSData(FMSData data) {
+    }
+
+    public void configure() {
+        logger.debug("Configuring subsystem {}", getName());
+    }
+
+    @Override
+    public void deconfigure() {
+        logger.debug("Deconfiguring subsystem {}", getName());
     }
 }

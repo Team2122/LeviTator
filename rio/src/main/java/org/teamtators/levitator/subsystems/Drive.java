@@ -1,9 +1,6 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.*;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
@@ -306,6 +303,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
 
     @Override
     public void configure(Config config) {
+        super.configure();
         this.config = config;
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
@@ -325,6 +323,17 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         leftEncoder.setName("Drive", "leftEncoder");
         rightEncoder.setName("Drive", "rightEncoder");
         gyro.setName("Drive", "gyro");
+    }
+
+    @Override
+    public void deconfigure() {
+        super.deconfigure();
+        this.config = null;
+        SpeedControllerConfig.free(leftMotor);
+        SpeedControllerConfig.free(rightMotor);
+        leftEncoder.free();
+        rightEncoder.free();
+        gyro.free();
     }
 
     public static class Config {

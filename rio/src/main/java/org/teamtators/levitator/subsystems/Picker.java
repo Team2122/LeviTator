@@ -86,6 +86,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     @Override
     public void configure(Config config) {
+        super.configure();
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
         this.extensionSolenoid = config.extensionSolenoid.create();
@@ -99,6 +100,17 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.setName("Picker", "cubeDetectSensor");
         upperCubeSensor.setName("Picker", "upperCubeSensor");
         lowerCubeSensor.setName("Picker", "lowerCubeSensor");
+    }
+
+    @Override
+    public void deconfigure() {
+        super.deconfigure();
+        SpeedControllerConfig.free(leftMotor);
+        SpeedControllerConfig.free(rightMotor);
+        extensionSolenoid.free();
+        cubeDetectSensor.free();
+        upperCubeSensor.free();
+        lowerCubeSensor.free();
     }
 
     public static class Config {

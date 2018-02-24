@@ -30,6 +30,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
 
     @Override
     public void configure(Config config) {
+        super.configure();
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
 

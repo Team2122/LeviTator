@@ -1,6 +1,7 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
@@ -310,6 +311,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     @Override
     public void configure(Config config) {
+        super.configure();
         this.config = config;
 
         this.liftMotor = config.liftMotor.create();
@@ -330,8 +332,22 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftEncoder.setName("Lift", "liftEncoder");
         limitSensorTop.setName("Lift", "limitSensorTop");
         limitSensorBottom.setName("Lift", "limitSensorBottom");
-        //((Sendable) pivotMotor).setName("Lift", "pivotMotor");
+        ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
         pivotEncoder.setName("Lift", "pivotEncoder");
+    }
+
+    @Override
+    public void deconfigure() {
+        super.deconfigure();
+
+        SpeedControllerConfig.free(liftMotor);
+        liftEncoder.free();
+        limitSensorTop.free();
+        limitSensorBottom.free();
+        SpeedControllerConfig.free(pivotMotor);
+        pivotEncoder.free();
+        pivotLockSolenoid.free();
+        pivotLockSensor.free();
     }
 
     private double getSafePivotAngle(double desiredAngle) {

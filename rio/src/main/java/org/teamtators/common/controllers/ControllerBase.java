@@ -3,6 +3,7 @@ package org.teamtators.common.controllers;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import org.teamtators.common.config.Configurable;
+import org.teamtators.common.config.Deconfigurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.scheduler.TriggerSource;
@@ -11,7 +12,7 @@ import org.teamtators.common.scheduler.TriggerSource;
  * @author Alex Mikhalev
  */
 public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerBase.Config>
-        implements Controller<TButton, TAxis>, Updatable, Configurable<TConfig> {
+        implements Controller<TButton, TAxis>, Updatable, Configurable<TConfig>, Deconfigurable {
     private String name;
     private GenericHID hid = null;
 

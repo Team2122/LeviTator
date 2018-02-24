@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.config.ConfigLoader;
+import org.teamtators.common.config.Configurable;
+import org.teamtators.common.config.Deconfigurable;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.controllers.Controller;
 import org.teamtators.common.controllers.LogitechF310;
@@ -14,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Subsystems extends SubsystemsBase {
+public class Subsystems extends SubsystemsBase
+        implements Configurable<Subsystems.Config>, Deconfigurable {
     private static final String SUBSYSTEMS_CONFIG_FILE = "Subsystems.yaml";
     private final List<Subsystem> subsystems;
     private final List<Updatable> updatables;
@@ -59,6 +62,7 @@ public class Subsystems extends SubsystemsBase {
         }
     }
 
+    @Override
     public void configure(Config config) {
         TatorRobot.logger.trace("Configuring subsystems...");
         oi.configure(config.operatorInterface);
@@ -70,6 +74,18 @@ public class Subsystems extends SubsystemsBase {
         updatables.addAll(drive.getUpdatables());
         updatables.add(lift.getLiftController());
         updatables.add(lift.getPivotController());
+    }
+
+    @Override
+    public void deconfigure() {
+        TatorRobot.logger.trace("Deconfiguring subsystems...");
+        oi.deconfigure();
+        drive.deconfigure();
+        picker.deconfigure();
+        lift.deconfigure();
+        auto.deconfigure();
+
+        updatables.clear();
     }
 
     public Drive getDrive() {
