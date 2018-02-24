@@ -42,5 +42,10 @@ public class CommandRegistrar {
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
         commandStore.putCommand("BumpPivotRight", Commands.instant(lift::bumpPivotRight));
         commandStore.putCommand("BumpPivotLeft", Commands.instant(lift::bumpPivotRight));
+
+        commandStore.registerCommand("AutoSelector", () -> new AutoSelector(robot));
+
+        // FMS Data commands
+        commandStore.putCommand("WaitForData", new WaitForData(robot));
     }
 }

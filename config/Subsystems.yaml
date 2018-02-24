@@ -103,5 +103,5 @@ lift:
   heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "$ScaleAutoL"]
-  defaultChoice: "NoAuto"
+  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale"]
+  defaultChoice: "$Scale"

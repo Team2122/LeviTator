@@ -6,20 +6,25 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.util.FMSData;
+import org.teamtators.common.util.FieldSide;
 import org.teamtators.levitator.TatorRobot;
 
 public class Auto extends Subsystem implements Configurable<Auto.Config> {
 
-    private SendableChooser<String> simpleAutoChoices = new SendableChooser<>();
+    private SendableChooser<String> autoChoices = new SendableChooser<>();
     private FMSData data;
     private Config config;
     private TatorRobot robot;
 
-    //private BooleanChooser
+    private SendableChooser<String> startPosition = new SendableChooser<>();
 
     public Auto(TatorRobot robot) {
         super("Auto");
-        simpleAutoChoices.setName("Auto", "Choices");
+        autoChoices.setName("Auto", "Choices");
+        startPosition.setName("Auto", "StartPos");
+        startPosition.addDefault("Left", "Left");
+        startPosition.addObject("Center", "Center");
+        startPosition.addObject("Right", "Right");
         this.robot = robot;
     }
 
@@ -33,18 +38,26 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
     }
 
     public Command getSelectedCommand() {
-        return robot.getCommandStore().getCommand(simpleAutoChoices.getSelected());
+        return robot.getCommandStore().getCommand(autoChoices.getSelected());
     }
 
     @Override
     public void configure(Config config) {
         super.configure();
         this.config = config;
-        for(String choice : config.autoChoices) {
-            simpleAutoChoices.addObject(choice, choice);
+        for (String choice : config.autoChoices) {
+            autoChoices.addObject(choice, choice);
         }
-        simpleAutoChoices.addDefault(config.defaultChoice, config.defaultChoice);
-         SmartDashboard.putData(simpleAutoChoices);
+        autoChoices.addDefault(config.defaultChoice, config.defaultChoice);
+        SmartDashboard.putData(autoChoices);
+    }
+
+    public FieldSide getFieldConfiguration(int object) {
+        return data.elementSides[object];
+    }
+
+    public String getStartingPosition() {
+        return startPosition.getSelected();
     }
 
     @Override
