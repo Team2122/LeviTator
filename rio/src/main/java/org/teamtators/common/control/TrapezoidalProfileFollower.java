@@ -349,6 +349,10 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
             }
 
             setHoldPower(config.kHoldPower);
+
+            setEndVelocity(config.endVelocity);
+            setTravelVelocity(config.travelVelocity);
+            setMaxAcceleration(config.maxAcceleration);
         }
     }
 

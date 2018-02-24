@@ -300,9 +300,9 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         this.config = null;
         SpeedControllerConfig.free(leftMotor);
         SpeedControllerConfig.free(rightMotor);
-        leftEncoder.free();
-        rightEncoder.free();
-        gyro.free();
+        if (leftEncoder != null) leftEncoder.free();
+        if (rightEncoder != null) rightEncoder.free();
+        if (gyro != null) gyro.free();
     }
 
     private enum OutputMode {

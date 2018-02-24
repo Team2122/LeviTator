@@ -6,10 +6,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
-import org.teamtators.common.control.ControllerPredicates;
-import org.teamtators.common.control.PidController;
-import org.teamtators.common.control.TrapezoidalProfile;
-import org.teamtators.common.control.TrapezoidalProfileFollower;
+import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import org.teamtators.common.hw.DigitalSensor;
@@ -19,6 +16,9 @@ import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
@@ -34,9 +34,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double desiredPivotAngle;
     private double desiredHeight;
     private double targetHeight;
+    private double lastAttemptedHeight;
+    private double targetAngle;
+    private double lastAttemptedAngle;
 
     private TrapezoidalProfileFollower liftController;
-    private PidController pivotController;
+    private TrapezoidalProfileFollower pivotController;
+    private InputDerivative pivotVelocity;
 
     private Config config;
 
@@ -49,9 +53,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.setOutputConsumer(this::setLiftPower);
         liftController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
-        pivotController = new PidController("pivotController");
-        pivotController.setInputProvider(this::getCurrentPivotAngle);
+        pivotVelocity = new InputDerivative(this::getCurrentPivotAngle);
+        pivotController = new TrapezoidalProfileFollower("pivotController");
+        pivotController.setPositionProvider(this::getCurrentPivotAngle);
+        pivotController.setVelocityProvider(pivotVelocity);
         pivotController.setOutputConsumer(this::setPivotPower);
+        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
     }
 
     /**
@@ -131,12 +138,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         }
         double safeHeight = getSafeLiftHeight(height);
         if (safeHeight != height) {
-            logger.warn("Target height is unsafe with current picker conditions: {}. Moving to {}", height, safeHeight);
-            height = safeHeight;
+            if (targetHeight == safeHeight && lastAttemptedHeight == height) {
+                return;
+            } else {
+                logger.warn("Target height is unsafe with current picker conditions: {}. Moving to {}", height, safeHeight);
+                lastAttemptedHeight = height;
+                height = safeHeight;
+            }
         }
         double distance = height - getCurrentHeight();
         logger.debug(String.format("Setting lift target height to %.3f (distance to move: %.3f)",
                 height, distance));
+        targetHeight = height;
         liftController.moveToPosition(height);
     }
 
@@ -188,16 +201,37 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public double getTargetAngle() {
-        return pivotController.getSetpoint();
+        return targetAngle;
     }
 
     public void setTargetAngle(double angle) {
+        if (targetAngle == angle) {
+            return;
+        }
         double safeAngle = getSafePivotAngle(angle);
         if (safeAngle != angle) {
-            logger.warn("Cannot move to pivot angle {} safely. Moving to {}", angle, safeAngle);
-            angle = safeAngle;
+            if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
+                return;
+            } else {
+                logger.warn("Target angle is unsafe with current lift conditions: {}. Moving to {}", angle, safeAngle);
+                lastAttemptedAngle = angle;
+                angle = safeAngle;
+            }
         }
-        pivotController.setSetpoint(angle);
+        double distance = angle - getCurrentPivotAngle();
+        logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
+                angle, distance));
+        targetAngle = angle;
+        pivotController.moveToPosition(angle);
+    }
+
+    private void enablePivotController() {
+        setTargetAngle(0);
+        pivotController.start();
+    }
+
+    private void disablePivotController() {
+        pivotController.stop();
     }
 
     public boolean isAtBottomLimit() {
@@ -248,8 +282,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return liftController;
     }
 
-    public PidController getPivotController() {
+    public TrapezoidalProfileFollower getPivotController() {
         return pivotController;
+    }
+
+    public List<Updatable> getUpdatables() {
+        return Arrays.asList(pivotVelocity, pivotController, liftController);
     }
 
     public boolean isPivotLocked() {
@@ -291,7 +329,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
         tests.addTest(new MotionCalibrationTest(liftController));
-        tests.addTest(new ControllerTest(pivotController));
+        tests.addTest(new MotionCalibrationTest(pivotController));
 
         tests.addTest(new LiftTest());
 
@@ -393,7 +431,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
-        public PidController.Config pivotController;
+        public TrapezoidalProfileFollower.Config pivotController;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
@@ -421,11 +459,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         @Override
         public void start() {
-            logger.info("Press A to set lift target to joystick value. Hold Y to enable lift profiler");
+            logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
+            logger.info("Press B to set pivot target to joystick value. Hold Y to enable pivot profiler");
             disableLiftController();
-            //temp
-            pivotController.start();
-            pivotController.setSetpoint(0);
+            disablePivotController();
         }
 
         @Override
@@ -434,10 +471,19 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 case A:
                     double height = (config.heightController.maxPosition - config.heightController.minPosition)
                             * ((axisValue + 1) / 2) + config.heightController.minPosition;
-                    setDesiredHeight(height);
+                    setTargetHeight(height);
+                    break;
+                case B:
+                    double angle = (config.pivotController.maxPosition - config.pivotController.minPosition)
+                            * ((axisValue + 1) / 2) + config.pivotController.minPosition;
+                    logger.info("Moving pivot to angle {}", angle);
+                    pivotController.moveToPosition(angle);
+                    break;
+                case X:
+                    enableLiftController();
                     break;
                 case Y:
-                    enableLiftController();
+                    enablePivotController();
                     break;
             }
         }
@@ -445,8 +491,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void onButtonUp(LogitechF310.Button button) {
             switch (button) {
-                case Y:
+                case X:
                     disableLiftController();
+                    break;
+                case Y:
+                    disablePivotController();
                     break;
             }
         }
@@ -459,6 +508,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void stop() {
             disableLiftController();
+            disablePivotController();
         }
     }
 

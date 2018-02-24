@@ -72,8 +72,7 @@ public class Subsystems extends SubsystemsBase
         auto.configure(config.auto);
 
         updatables.addAll(drive.getUpdatables());
-        updatables.add(lift.getLiftController());
-        updatables.add(lift.getPivotController());
+        updatables.addAll(lift.getUpdatables());
     }
 
     @Override

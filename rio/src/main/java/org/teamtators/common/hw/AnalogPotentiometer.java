@@ -17,8 +17,6 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
     public AnalogPotentiometer(int channel) {
         analogInput = new AnalogInput(channel);
 
-        analogInput.setAverageBits(20);
-
         addChild(analogInput);
     }
 
@@ -76,6 +74,22 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
 
     public void setMinValue(double minValue) {
         this.minValue = minValue;
+    }
+
+    public void setAverageBits(int averageBits) {
+        analogInput.setAverageBits(averageBits);
+    }
+
+    public int getAverageBits() {
+        return analogInput.getAverageBits();
+    }
+
+    public void setOversampleBits(int oversampleBits) {
+        analogInput.setOversampleBits(oversampleBits);
+    }
+
+    public int getOversampleBits() {
+        return analogInput.getOversampleBits();
     }
 
     @Override

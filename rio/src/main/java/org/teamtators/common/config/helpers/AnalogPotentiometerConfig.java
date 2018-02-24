@@ -8,6 +8,8 @@ public class AnalogPotentiometerConfig implements ConfigHelper<AnalogPotentiomet
     public double offset = 0;
     public double minValue = 0.0;
     public boolean continuous = false;
+    public int averageBits = 1;
+    public int oversampleBits = 1;
 
     public AnalogPotentiometer create() {
         AnalogPotentiometer pot = new AnalogPotentiometer(channel);
@@ -15,6 +17,8 @@ public class AnalogPotentiometerConfig implements ConfigHelper<AnalogPotentiomet
         pot.setOffset(offset);
         pot.setMinValue(minValue);
         pot.setContinuous(true);
+        pot.setAverageBits(averageBits);
+        pot.setOversampleBits(oversampleBits);
         return pot;
     }
 }
