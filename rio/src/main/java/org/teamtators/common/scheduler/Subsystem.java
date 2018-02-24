@@ -70,11 +70,11 @@ public class Subsystem implements Updatable, RobotStateListener, ManualTestable,
     }
 
     public void configure() {
-        logger.debug("Configuring subsystem {}", getName());
+        logger.trace("Configuring subsystem {}", getName());
     }
 
     @Override
     public void deconfigure() {
-        logger.debug("Deconfiguring subsystem {}", getName());
+        logger.trace("Deconfiguring subsystem {}", getName());
     }
 }

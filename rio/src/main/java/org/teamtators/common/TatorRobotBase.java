@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -53,6 +55,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     protected final Timer stateTimer = new Timer();
     protected double lastDelta = 0.0;
 
+    protected boolean reinitialize = false;
+
     private PowerDistributionPanel pdp;
     private DriverStation driverStation;
     private Command autoCommand;
@@ -60,12 +64,45 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
     private FMSData fmsData = new FMSData();
 
+    private NetworkTableEntry reinitializeEntry;
+    protected int reinitializeListener;
+
     public TatorRobotBase(String configDir) {
         configMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         configLoader = new ConfigLoader(configDir, configMapper);
+
+        reinitializeEntry = NetworkTableInstance.getDefault()
+                .getTable("SmartDashboard")
+                .getEntry("reinitialize");
     }
 
-    public void initialize() {
+    protected void reinitializeListener(EntryNotification entryNotification) {
+        logger.trace(entryNotification.name + ": " + entryNotification.value.getString());
+        reinitialize = true;
+    }
+
+    protected void addReinitializeListener() {
+        reinitializeEntry.setString("initialized");
+        reinitializeListener = reinitializeEntry
+                .addListener(this::reinitializeListener, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+        logger.trace("Listening for reinitialization signal at {}", reinitializeEntry.getName());
+    }
+
+    protected void removeReinitializeListener() {
+        reinitializeEntry.removeListener(reinitializeListener);
+    }
+
+    protected void initialize() {
+        try {
+            doInitialize();
+        } catch (Throwable e) {
+            logger.error("Robot initialization failed. Fix your code/config!", e);
+        } finally {
+            addReinitializeListener();
+        }
+    }
+
+    protected void doInitialize() {
         configureSubsystems();
         configureCommands();
         configureTriggers();
@@ -73,24 +110,21 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         setUpDashboards();
         startThreads();
         postInitialize();
-
-        NetworkTableInstance.getDefault().getTable("SmartDashboard").getEntry("reinitialize").addListener(entryNotification -> {
-            logger.debug(entryNotification.name + ": " + entryNotification.value);
-        }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
 
-    public void deinitialize() {
+    protected void deinitialize() {
         logger.info("Deinitializing " + getName());
         stopThreads();
         deconfigureTests();
         deconfigureTriggers();
         deconfigureCommands();
         deconfigureSubsystems();
+        removeReinitializeListener();
     }
 
-    public void reinitialize() {
+    protected void reinitialize() {
         deinitialize();
-        reinitialize();
+        initialize();
     }
 
     public void addSmartDashboardUpdatable(DashboardUpdatable smartDashboardUpdatable) {
@@ -275,6 +309,10 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     }
 
     protected void onDriverStationData() {
+        if (reinitialize) {
+            reinitialize();
+            reinitialize = false;
+        }
     }
 
     public String getRobotName() {

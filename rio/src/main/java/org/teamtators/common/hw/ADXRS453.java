@@ -155,7 +155,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
 
     @Override
     public void startCalibration() {
-        logger.info("Starting gyro calibration");
+        logger.trace("Starting gyro calibration");
         writeLock.lock();
         try {
             calibrationOffset = 0;
@@ -180,7 +180,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
             }
             angle = 0;
             isCalibrating = false;
-            logger.info("Finished calibrating gyro. Offset is {}", calibrationOffset);
+            logger.debug("Finished calibrating gyro. Offset is {}", calibrationOffset);
         } finally {
             writeLock.unlock();
         }
@@ -406,7 +406,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         if ((pid & 0xff00) == 0x5200) {
             double temperature = getTemperature();
             int serial = getSerialNumber();
-            logger.info(String.format(
+            logger.debug(String.format(
                     "Part ID of gyro is correct (%#04x). Temperature: %f C. Serial: (%#08x)",
                     pid, temperature, serial));
             return true;
@@ -446,7 +446,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     }
 
     private void doStartup() throws InterruptedException {
-        logger.info("Starting up gyro");
+        logger.debug("Starting up gyro");
         int send, recv;
         send = fixParity(kSensorData | kChk);
         write(send);
