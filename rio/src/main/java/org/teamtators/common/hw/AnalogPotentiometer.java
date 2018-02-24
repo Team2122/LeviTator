@@ -9,31 +9,17 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
     public static final double DEFAULT_OFFSET = 0.0;
     public static final boolean DEFAULT_CONTINUOUS = false;
     private AnalogInput analogInput;
-    private double fullRange;
-    private double offset;
-    private boolean continuous;
+    private double fullRange = DEFAULT_FULL_RANGE;
+    private double offset = DEFAULT_OFFSET;
+    private double minValue = 0.0;
+    private boolean continuous = DEFAULT_CONTINUOUS;
 
-    public AnalogPotentiometer(int channel, double fullRange, double offset, boolean continuous) {
+    public AnalogPotentiometer(int channel) {
         analogInput = new AnalogInput(channel);
-        this.fullRange = fullRange;
-        this.offset = offset;
-        this.continuous = continuous;
 
         analogInput.setAverageBits(20);
 
         addChild(analogInput);
-    }
-
-    public AnalogPotentiometer(int channel, double fullRange, double offset) {
-        this(channel, fullRange, offset, DEFAULT_CONTINUOUS);
-    }
-
-    public AnalogPotentiometer(int channel, boolean continuous) {
-        this(channel, DEFAULT_FULL_RANGE, DEFAULT_OFFSET, continuous);
-    }
-
-    public AnalogPotentiometer(int channel) {
-        this(channel, DEFAULT_CONTINUOUS);
     }
 
     public double getRawVoltage() {
@@ -50,10 +36,10 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
         double p = analogInput.getAverageVoltage() / ControllerPower.getVoltage5V();
         double value = p * fullRange + offset;
         if (continuous) {
-            if (value < 0) {
+            if (value < minValue) {
                 value += fullRange;
             }
-            if (value > fullRange) {
+            if (value > (minValue + fullRange)) {
                 value -= fullRange;
             }
         }
@@ -82,6 +68,14 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
 
     public void setContinuous(boolean continuous) {
         this.continuous = continuous;
+    }
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(double minValue) {
+        this.minValue = minValue;
     }
 
     @Override
