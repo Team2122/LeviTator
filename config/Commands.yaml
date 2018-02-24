@@ -73,15 +73,35 @@ PickerQuickDeploy:
 #                                                                                           #
 #############################################################################################
 NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
+DebugChooserAuto: { class: Log, level: INFO, message: "Woohoo! The autochooser works!"}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
+
+$CommonDriveSequence:
+  - { parallel: true, name: $LiftSequence }
+  - { class: DriveStraight, distance: }
+
+$Scale:
+  - { class: AutoSelector, type: STARTING_POSITION, left: ScaleLeftChooser, center: ScaleCenterChooser, right: ScaleRightChooser}
+
+#ScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, L: $ScaleAutoCloseL, R: $ScaleAutoFarR }
+ScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: DebugChooserAuto, R: $ScaleAutoFarR }
+ScaleCenterChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: $ScaleAutoCenterL, R: $ScaleAutoCenterR }
+ScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: $ScaleAutoFarL, R: $ScaleAutoCloseR }
+
+
+$ScaleSwitch:
+  - $CommonDriveSequence
+
+$SmartScale:
+  - $CommonDriveSequence
 
 $LiftSequence:
   - $LiftScaleLow
 #  - WaitForHeight
   - PivotLeft
 
-$ScaleAutoL:
-  - { parallel: true, name: $LiftSequence }
+$ScaleAutoCloseL:
+  #TODO CHANGE THIS DISTANCE, REWORK
   - { class: DriveStraight, distance: -288 }
   - WaitForHeight
   - WaitForAngle

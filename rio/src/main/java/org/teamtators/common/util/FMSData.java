@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  */
 public class FMSData {
     public String gameSpecificMessage;
+    public FieldSide[] elementSides;
     public String eventName;
     public int matchNumber;
     public int replayNumber;
@@ -24,6 +25,7 @@ public class FMSData {
         data.replayNumber = ds.getReplayNumber();
         data.alliance = ds.getAlliance();
         data.station = ds.getLocation();
+        data.elementSides = FieldSide.fromString(data.gameSpecificMessage);
         return data;
     }
 

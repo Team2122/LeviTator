@@ -61,8 +61,8 @@ lift:
     kHoldPower: 0.129
     maxOutput: 1.0
     minOutput: -0.5
-
-  baseHeightProfile:
+    minPosition: 0.0
+    maxPosition: 85.0
     maxAcceleration: 80.0
     travelVelocity: 60.0
     endVelocity: 0.0
@@ -94,5 +94,5 @@ lift:
   heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "$ScaleAutoL"]
-  defaultChoice: "NoAuto"
+  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale"]
+  defaultChoice: "$Scale"
