@@ -40,8 +40,8 @@ $PrepareLiftMovement:
   - WaitForCenter
 
 LiftContinuous:
-  pivotSweepPower: 0.2
-  startSweepAngle: 5.0
+  pivotSweepPower: 0.1
+  startSweepAngle: 3.0
   sweepTimeoutSeconds: 5.0
 TestDriveStraight:
   class: DriveStraight
