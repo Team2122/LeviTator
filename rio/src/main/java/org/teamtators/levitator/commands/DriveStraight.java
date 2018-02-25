@@ -1,7 +1,6 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -31,7 +30,7 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
         logger.info("Driving at {} for distance of {} at top speed of {}",
                 angleStr, config.distance, config.speed);
         drive.getArcController().setMaxSpeed(config.speed);
-        drive.getArcController().setEndSpeed(Math.copySign(config.endSpeed, config.distance));
+        drive.getArcController().setEndVelocity(Math.copySign(config.endSpeed, config.distance));
         drive.getArcController().setMaxAcceleration(config.maxAcceleration);
         drive.getArcController().setOnTargetPredicate(DriveArcController::areStraightsOnTarget);
         drive.driveStraightProfile(angle, config.distance);
@@ -44,13 +43,13 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
 
     @Override
     protected void finish(boolean interrupted) {
-        drive.stop();
         double distance = drive.getArcController().getAverageDistance();
         double angle = drive.getYawAngle();
         String logString = String.format(" at distance %s (target %s), angle %s (target %s)",
                 distance, config.distance, angle, drive.getArcController().getYawAngleController().getSetpoint());
         if (interrupted) {
             logger.warn("Interrupted" + logString);
+            drive.stop();
         } else {
             logger.info("Finishing" + logString);
         }

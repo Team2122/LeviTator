@@ -1,8 +1,5 @@
 package org.teamtators.levitator.commands;
 
-import org.teamtators.common.control.ControllerPredicates;
-import org.teamtators.common.control.TrapezoidalProfile;
-import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -26,7 +23,7 @@ public abstract class DriveRotateBase extends Command {
     @Override
     protected void initialize() {
         drive.getArcController().setMaxSpeed(config.rotationSpeed);
-        drive.getArcController().setEndSpeed(0.0);
+        drive.getArcController().setEndVelocity(0.0);
         drive.getArcController().setMaxAcceleration(config.maxAcceleration);
         drive.getArcController().setOnTargetPredicate(predicate);
         drive.driveRotationProfile(angle);

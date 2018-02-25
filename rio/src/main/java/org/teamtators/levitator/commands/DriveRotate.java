@@ -33,6 +33,7 @@ public class DriveRotate extends DriveRotateBase implements Configurable<DriveRo
                 drive.getYawAngle(), angle);
         if (interrupted) {
             logger.warn("DriveRotate Interrupted" + logLine);
+            drive.stop();
         } else {
             logger.info("DriveRotate Finished" + logLine);
         }

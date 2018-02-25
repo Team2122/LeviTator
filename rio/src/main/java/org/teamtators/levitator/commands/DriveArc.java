@@ -1,7 +1,6 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -30,7 +29,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
 
         drive.getArcController().setMaxSpeed(config.speed);
         drive.getArcController().setMaxAcceleration(config.maxAcceleration);
-        drive.getArcController().setEndSpeed(config.endSpeed);
+        drive.getArcController().setEndVelocity(config.endSpeed);
         drive.getArcController().setOnTargetPredicate(DriveArcController::areStraightsOnTarget);
         drive.driveArcProfile(arcLength, config.angle);
 
@@ -51,6 +50,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
                 distance, arcLength, angle, config.angle);
         if (interrupted) {
             logger.warn("Interrupted" + logString);
+            drive.stop();
         } else {
             logger.info("Finishing" + logString);
         }

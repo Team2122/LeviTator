@@ -20,9 +20,6 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
     private double deltaCenterDistance;
 
     private double initialYawAngle;
-    private double maxSpeed;
-    private double maxAcceleration;
-    private double endSpeed;
     private boolean onTarget;
 
     public DriveArcController(Drive drive) {
@@ -72,7 +69,25 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
         leftMotionFollower.moveDistance(leftDistance);
         rightMotionFollower.moveDistance(rightDistance);
 
+        double leftTime = leftMotionFollower.getCalculator().getTotalTime();
+        double rightTime = rightMotionFollower.getCalculator().getTotalTime();
 
+        logger.trace("Initial left, right times: {}, {}", leftTime, rightTime);
+//        if (leftTime > rightTime) {
+//            double maxAcceleration = rightMotionFollower.getMaxAcceleration();
+//            double maxRightVelocity = Math.abs(-maxAcceleration * (-leftTime + Math.sqrt(Math.pow(leftTime, 2) - 4 * rightDistance / maxAcceleration)) / 2.0);
+//            rightMotionFollower.setTravelVelocity(maxRightVelocity);
+//            rightMotionFollower.moveDistance(rightDistance);
+//            rightTime = rightMotionFollower.getCalculator().getTotalTime();
+//            logger.trace("After slowing down right; left, right times: {}, {}", leftTime, rightTime);
+//        } else if (rightTime > leftTime) {
+//            double maxAcceleration = leftMotionFollower.getMaxAcceleration();
+//            double maxLeftVelocity = Math.abs(-maxAcceleration * (-rightTime + Math.sqrt(Math.pow(rightTime, 2) - 4 * leftDistance / maxAcceleration)) / 2.0);
+//            leftMotionFollower.setTravelVelocity(maxLeftVelocity);
+//            leftMotionFollower.moveDistance(leftDistance);
+//            leftTime = leftMotionFollower.getCalculator().getTotalTime();
+//            logger.trace("After slowing down left; left, right times: {}, {}", leftTime, rightTime);
+//        }
 
         yawAngleController.setSetpoint(initialYawAngle);
         super.start();
@@ -99,7 +114,7 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
 
         double leftDelta = leftMotionFollower.getCalculator().getPosition();
         double rightDelta = rightMotionFollower.getCalculator().getPosition();
-        double angleDelta = (leftDelta - rightDelta) / config.effectiveTrackWidth;
+        double angleDelta = Math.toDegrees((leftDelta - rightDelta) / config.effectiveTrackWidth);
         yawAngleController.setSetpoint(initialYawAngle + angleDelta);
         yawAngleController.update(delta);
 
@@ -161,27 +176,18 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
     }
 
     public void setMaxSpeed(double maxSpeed) {
-        this.maxSpeed = maxSpeed;
+        leftMotionFollower.setTravelVelocity(maxSpeed);
+        rightMotionFollower.setTravelVelocity(maxSpeed);
     }
 
     public void setMaxAcceleration(double maxAcceleration) {
-        this.maxAcceleration = maxAcceleration;
+        leftMotionFollower.setMaxAcceleration(maxAcceleration);
+        rightMotionFollower.setMaxAcceleration(maxAcceleration);
     }
 
-    public void setEndSpeed(double endSpeed) {
-        this.endSpeed = endSpeed;
-    }
-
-    public double getMaxSpeed() {
-        return maxSpeed;
-    }
-
-    public double getMaxAcceleration() {
-        return maxAcceleration;
-    }
-
-    public double getEndSpeed() {
-        return endSpeed;
+    public void setEndVelocity(double endVelocity) {
+        leftMotionFollower.setEndVelocity(endVelocity);
+        rightMotionFollower.setEndVelocity(endVelocity);
     }
 
     public void setOnTargetPredicate(Predicate<DriveArcController> onTargetPredicate) {
@@ -227,12 +233,12 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
 
             left += leftOutput;
             right += rightOutput;
-            leftOutput = Double.NaN;
-            rightOutput = Double.NaN;
+            leftOutput = /*Double.NaN*/ 0.0;
+            rightOutput = /*Double.NaN*/ 0.0;
 
             left += rotationOutput;
             right -= rotationOutput;
-            rotationOutput = Double.NaN;
+            rotationOutput = /*Double.NaN*/ 0.0;
 
             double scrubPower = (left - right) * config.scrubCoefficient;
             left += scrubPower;
