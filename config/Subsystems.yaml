@@ -11,23 +11,22 @@ drive:
       kpP: 1.0
       kiP: 0.0
       kpV: 0.025
-      kfV: .0077
+      kfV: .0074
       kMinOutput: .0461
-      kfA: 0.0016
+      kfA: 0.0025
       maxIError: 10.0
-  #    logData: true
+      logData: true
   yawAngleController:
-      P: 0.01
+      P: 0.1
       I: 0.0
-      D: 0.0
-      F: 0.0
+      D: -0.08
       maxIError: 12.0
   #    logData: true
   rotationMotionFollower:
-      kpP: 0.1
+      kpP: 0.2
       kiP: 0.5
-      kpV: 0.005
-      kfV: .0025
+      kpV: 0.01
+      kfV: .01
       kMinOutput: .1087
       kfA: 0.0004
       maxIError: 2.0
@@ -50,7 +49,7 @@ lift:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: -348.4
+    offset: -350.4
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
@@ -72,20 +71,23 @@ lift:
     endVelocity: 0.0
 
   pivotController:
-    kpP: 0.02 # 0.04
-    kiP: 0.0 # 0.04
-    kpV: 0.001
-    kfV: 0.002
-    kMinOutput: 0.0537
-    kfA: 0.0005
-    kHoldPower: 0.0
-    minPosition: -90.0
-    maxPosition: 90.0
-    maxOutput: 0.4
-    minOutput: -0.4
-    maxAcceleration: 180.0
-    travelVelocity: 90.0
-    endVelocity: 0.0
+#    kpP: 0.04 # 0.04
+#    kiP: 0.0 # 0.04
+#    kpV: 0.001
+#    kfV: 0.002
+#    kMinOutput: 0.0537
+#    kfA: 0.0005
+#    kHoldPower: 0.0
+#    minPosition: -90.0
+#    maxPosition: 90.0
+#    maxOutput: 0.4
+#    minOutput: -0.4
+#    maxAcceleration: 180.0
+#    travelVelocity: 90.0
+#    endVelocity: 0.0
+    maxAcceleration: 0.4
+    movePower: 0.3
+    endRamp: 40.0
     logData: true
 
   anglePresetLeft: -90
@@ -93,8 +95,8 @@ lift:
   anglePresetRight: 90
   heightPresetPick: 2
   heightPresetSwitch: 46
-  heightPresetScaleLow: 70
-  heightPresetScaleHigh: 80
+  heightPresetScaleLow: 58
+  heightPresetScaleHigh: 70
   heightPresetHome: 0
 
   bumpHeightValue: 1
@@ -103,5 +105,5 @@ lift:
   heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "$ScaleSwitch"]
   defaultChoice: "$Scale"

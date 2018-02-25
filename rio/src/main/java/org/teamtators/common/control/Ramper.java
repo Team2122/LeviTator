@@ -55,6 +55,14 @@ public class Ramper implements Updatable, Configurable<Ramper.Config> {
         this.onlyUp = config.onlyUp;
     }
 
+    public double getMaxAcceleration() {
+        return maxAcceleration;
+    }
+
+    public void setMaxAcceleration(double maxAcceleration) {
+        this.maxAcceleration = maxAcceleration;
+    }
+
     public double getValue() {
         return value;
     }

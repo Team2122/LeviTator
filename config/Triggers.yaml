@@ -2,7 +2,7 @@ defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   A: toggle whenPressed PickerPick
-  B: start whenPressed PickerQuickDeploy
+  B: start whenPressed $PickerReleaseTeleop
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight
@@ -12,4 +12,4 @@ driver:
   BUMPER_LEFT: start whenPressed $LiftScaleHigh
   TRIGGER_LEFT: start whenPressed PickerExtend
   TRIGGER_RIGHT: start whenPressed PickerRetract
-  START: start whenPressed TestDriveRotate
+  START: start whenPressed $TestDrive

@@ -39,7 +39,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double lastAttemptedAngle;
 
     private TrapezoidalProfileFollower liftController;
-    private TrapezoidalProfileFollower pivotController;
+    private /*TrapezoidalProfileFollower*/ StupidController pivotController;
     private InputDerivative pivotVelocity;
 
     private Config config;
@@ -54,11 +54,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
         pivotVelocity = new InputDerivative(this::getCurrentPivotAngle);
-        pivotController = new TrapezoidalProfileFollower("pivotController");
-        pivotController.setPositionProvider(this::getCurrentPivotAngle);
-        pivotController.setVelocityProvider(pivotVelocity);
+        pivotController = new /*TrapezoidalProfileFollower*/StupidController("pivotController");
+//        pivotController.setPositionProvider(this::getCurrentPivotAngle);
+//        pivotController.setVelocityProvider(pivotVelocity);
+        pivotController.setInputProvider(this::getCurrentPivotAngle);
         pivotController.setOutputConsumer(this::setPivotPower);
-        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
+//        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
     }
 
     /**
@@ -222,7 +223,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
                 angle, distance));
         targetAngle = angle;
-        pivotController.moveToPosition(angle);
+        pivotController./*moveToPosition*/setSetpoint(angle);
     }
 
     private void enablePivotController() {
@@ -282,7 +283,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return liftController;
     }
 
-    public TrapezoidalProfileFollower getPivotController() {
+    public Updatable getPivotController() {
         return pivotController;
     }
 
@@ -329,7 +330,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
         tests.addTest(new MotionCalibrationTest(liftController));
-        tests.addTest(new MotionCalibrationTest(pivotController));
+        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController));
 
         tests.addTest(new LiftTest());
 
@@ -431,7 +432,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
-        public TrapezoidalProfileFollower.Config pivotController;
+        public /*TrapezoidalProfileFollower*/StupidController.Config pivotController;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
@@ -474,10 +475,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                     setTargetHeight(height);
                     break;
                 case B:
-                    double angle = (config.pivotController.maxPosition - config.pivotController.minPosition)
-                            * ((axisValue + 1) / 2) + config.pivotController.minPosition;
+                    double angle = (config.pivotController./*maxPosition*/maxSetpoint - config.pivotController./*minPosition*/minSetpoint)
+                            * ((axisValue + 1) / 2) + config.pivotController./*minPosition*/minSetpoint;
                     logger.info("Moving pivot to angle {}", angle);
-                    pivotController.moveToPosition(angle);
+                    pivotController./*moveToPosition*/setSetpoint(angle);
                     break;
                 case X:
                     enableLiftController();

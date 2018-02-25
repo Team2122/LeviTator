@@ -63,7 +63,7 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
     @Override
     public void deconfigure() {
         super.deconfigure();
-        simpleAutoChoices.free();
+        autoChoices.free();
     }
 
     private class BooleanChooser extends SendableChooser<Boolean> {

@@ -65,8 +65,10 @@ public abstract class Command implements CommandRunContext {
 
     @Override
     public void cancelCommand(Command command) {
-        if (this.context == null || command.getContext() == null) {
-            logger.debug("Tried to cancel command that is not running");
+        if (this.context == null) {
+            logger.debug("Tried to cancel command WHILE not running: {}", command.getName());
+        } else if (command.getContext() == null) {
+            logger.debug("Tried to cancel command that is not running: {}", command.getName());
         } else
             this.context.cancelCommand(command);
     }
@@ -135,10 +137,11 @@ public abstract class Command implements CommandRunContext {
         boolean anyRequiring = false;
         for (Subsystem subsystem : requirements) {
             Command requiringCommand = subsystem.getRequiringCommand();
-            if (requiringCommand == null) {
+            if (requiringCommand == null || !requiringCommand.isRunning()) {
                 subsystem.setRequiringCommand(this);
                 continue;
             }
+            logger.trace("Potential requiring command for subsystem {}: {}", subsystem.getName(), requiringCommand.getName());
             if (isRequiring(subsystem, context))
                 continue;
             anyRequiring = true;

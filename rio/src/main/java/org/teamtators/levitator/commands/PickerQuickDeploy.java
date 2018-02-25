@@ -47,6 +47,13 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
         return endKick;
     }
 
+    @Override
+    protected void finish(boolean interrupted) {
+        super.finish(interrupted);
+        picker.setRollerPower(0.0);
+        picker.setPickerExtended(false);
+    }
+
     public static class Config {
         public double kickPower;
         public double timeBeforeKick;

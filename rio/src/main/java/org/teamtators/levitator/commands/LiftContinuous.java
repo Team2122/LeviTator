@@ -61,28 +61,31 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 }
             }
         } else {
+            //Retract the solenoid
             lift.setPivotLockSolenoid(false);
             //If we want to go to center and we're within the range of locking
-            if (desiredPivotAngle == centerAngle &&
-                    (currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle)) {
-                logger.debug("Pivot moving center, will engage lock");
-                //Start locking
-                locking = true;
-                sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
-                //Disable PID
-                lift.setPivotControllerEnabled(false);
-                //Start the timer
-                sweepTimer.restart();
+            if (desiredPivotAngle == centerAngle) {
+                if (currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle) {
+                    logger.debug("Pivot moving center, will engage lock");
+                    //Start locking
+                    locking = true;
+                    sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
+                    //Disable PID
+                    lift.setPivotControllerEnabled(false);
+                    //Start the timer
+                    sweepTimer.restart();
+                } else {
+                    lift.setPivotControllerEnabled(true);
+                    lift.setTargetAngle(Math.signum(currentAngle) * config.startSweepAngle);
+                }
             }
             //If we want to go somewhere other than the center
-            if (desiredPivotAngle != centerAngle) {
-                //Retract the solenoid
-                lift.setPivotLockSolenoid(false);
+            else {
                 //Enable the PID Controller
                 lift.setPivotControllerEnabled(true);
+                //Set the pivot target angle to the desired angle
+                lift.setTargetAngle(desiredPivotAngle);
             }
-            //Set the pivot target angle to the desired angle
-            lift.setTargetAngle(desiredPivotAngle);
         }
         //Set the lift target height to the desired height
         lift.setTargetHeight(desiredHeight);

@@ -39,7 +39,7 @@
         <appender-ref ref="Server"/>
     </appender>
 
-    <root level="debug">
+    <root level="trace">
         <appender-ref ref="Console"/>
         <appender-ref ref="AsyncFile"/>
         <appender-ref ref="AsyncServer"/>

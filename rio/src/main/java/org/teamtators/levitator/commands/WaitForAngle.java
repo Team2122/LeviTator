@@ -21,7 +21,11 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
 
     @Override
     protected boolean step() {
-        return lift.getCurrentPivotAngle() + config.tolerance > lift.getDesiredPivotAngle() && lift.getCurrentPivotAngle() - config.tolerance < lift.getDesiredPivotAngle();
+        double desiredAngle = lift.getDesiredPivotAngle();
+        if (config.preset != null) {
+            desiredAngle = lift.getAnglePreset(config.preset);
+        }
+        return Math.abs(lift.getCurrentPivotAngle() - desiredAngle) <= config.tolerance;
     }
 
     @Override
@@ -31,5 +35,6 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
 
     public static class Config {
         public double tolerance;
+        public Lift.AnglePreset preset;
     }
 }

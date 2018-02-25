@@ -72,7 +72,11 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
-        picker.setRollerPowers(config.holdPowers);
+        if (interrupted) {
+            picker.setRollerPower(0.0);
+        } else {
+            picker.setRollerPowers(config.holdPowers);
+        }
         picker.setPickerExtended(false);
     }
 

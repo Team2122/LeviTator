@@ -27,7 +27,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public void setRollerPowers(double left, double right) {
-        logger.trace("Setting roller powers to {}, {}", left, right);
+//        logger.trace("Setting roller powers to {}, {}", left, right);
         leftMotor.set(left);
         rightMotor.set(right);
     }
@@ -61,7 +61,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public boolean isCubeInPicker() {
-        return lowerCubeSensor.get();
+        return upperCubeSensor.get();
     }
 
     public void extend(){

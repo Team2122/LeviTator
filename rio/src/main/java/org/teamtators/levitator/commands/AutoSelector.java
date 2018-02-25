@@ -14,7 +14,6 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     private Config config;
     private Command selected;
     private boolean hasStarted;
-    private Timer waitForChildTimer = new Timer();
 
     public AutoSelector(TatorRobot robot) {
         super("AutoSelector");
@@ -33,23 +32,15 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     public void configure(Config config) {
         this.type = config.type;
         this.config = config;
-        waitForChildTimer.restart();
     }
 
     @Override
     protected boolean step() {
         if (selected != null) {
-            if (!hasStarted) {
-                try {
-                    logger.info("Starting chosen command: {}", selected.getName());
-                    startWithContext(selected, this);
-                    hasStarted = true;
-                } catch (IllegalArgumentException e) {
-                    logger.warn("Chosen command not found", e);
-                    return true;
-                }
+            if (selected.isRunning()) {
+                hasStarted = true;
             }
-            return !selected.isRunning() && waitForChildTimer.hasPeriodElapsed(10);
+            return hasStarted && !selected.isRunning();
         }
 
         String toStart = "$NoAuto";
@@ -75,8 +66,20 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
                 toStart = config.right;
             }
         }
-        selected = robot.getCommandStore().getCommand(toStart);
+        try {
+            selected = robot.getCommandStore().getCommand(toStart);
+            logger.info("Starting chosen command: {}", selected.getName());
+            startWithContext(selected, this);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Chosen command not found", e);
+            return true;
+        }
         return false;
+    }
+
+    public enum SelectorType {
+        STARTING_POSITION,
+        FIELD_CONFIGURATION
     }
 
     public static class Config {
@@ -91,10 +94,5 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
         public String L;
         public String R;
 
-    }
-
-    public enum SelectorType {
-        STARTING_POSITION,
-        FIELD_CONFIGURATION
     }
 }
