@@ -28,7 +28,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
     private Encoder leftEncoder;
     private ADXRS453 gyro;
 
-    private DriveArcController driveArcController = new DriveArcController(this);
+    private DriveArcController arcController = new DriveArcController(this);
 
 
     private Config config;
@@ -44,7 +44,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
      * @param rightPower the power for the right side
      */
     public void drivePowers(double leftPower, double rightPower) {
-        driveArcController.stop();
+        arcController.stop();
         setRightMotorPower(rightPower);
         setLeftMotorPower(leftPower);
     }
@@ -54,25 +54,31 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
     }
 
     public void driveStraightProfile(double heading, double distance) {
-        double headingDelta = heading - getYawAngle();
-        driveArcController.setParameters(headingDelta, headingDelta);
-        driveArcController.start();
+        double deltaHeading = heading - getYawAngle();
+        arcController.setInitialYawAngle(heading);
+        arcController.setDeltaHeading(deltaHeading);
+        arcController.setDeltaCenterDistance(distance);
+        arcController.start();
     }
 
     public void driveRotationProfile(double heading) {
-        double headingDelta = heading - getYawAngle();
-        driveArcController.setParameters(headingDelta, 0.0);
-        driveArcController.start();
+        double deltaHeading = heading - getYawAngle();
+        arcController.setInitialYawAngle(getYawAngle());
+        arcController.setDeltaHeading(deltaHeading);
+        arcController.setDeltaCenterDistance(0.0);
+        arcController.start();
     }
 
     public void driveArcProfile(double arcLength, double endAngle) {
-        double headingDelta = endAngle - getYawAngle();
-        driveArcController.setParameters(headingDelta, arcLength);
-        driveArcController.start();
+        double deltaHeading = endAngle - getYawAngle();
+        arcController.setInitialYawAngle(getYawAngle());
+        arcController.setDeltaHeading(deltaHeading);
+        arcController.setDeltaCenterDistance(arcLength);
+        arcController.start();
     }
 
     public boolean isArcOnTarget() {
-        return driveArcController.areStraightsOnTarget();
+        return arcController.isOnTarget();
     }
 
     public void setRightMotorPower(double power) {
@@ -124,9 +130,13 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         gyro.resetAngle();
     }
 
+    public DriveArcController getArcController() {
+        return arcController;
+    }
+
     public List<Updatable> getUpdatables() {
         return Arrays.asList(
-                gyro, driveArcController
+                gyro, arcController
         );
     }
 
@@ -140,9 +150,9 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         tests.addTests(new EncoderTest("RightEncoder", rightEncoder));
 
         tests.addTests(new ADXRS453Test("gyro", gyro));
-        tests.addTests(new ControllerTest(driveArcController.getYawAngleController(), 180));
-        tests.addTests(new MotionCalibrationTest(driveArcController.getLeftMotionFollower()));
-        tests.addTests(new MotionCalibrationTest(driveArcController.getRightMotionFollower()));
+        tests.addTests(new ControllerTest(arcController.getYawAngleController(), 180));
+        tests.addTests(new MotionCalibrationTest(arcController.getLeftMotionFollower()));
+        tests.addTests(new MotionCalibrationTest(arcController.getRightMotionFollower()));
 
         return tests;
     }
@@ -177,6 +187,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         leftEncoder.setName("Drive", "leftEncoder");
         rightEncoder.setName("Drive", "rightEncoder");
         gyro.setName("Drive", "gyro");
+
+        arcController.configure(config.arcController);
     }
 
     @Override
@@ -195,6 +207,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         public SpeedControllerConfig rightMotor;
         public EncoderConfig leftEncoder;
         public EncoderConfig rightEncoder;
+        public DriveArcController.Config arcController;
     }
 
 }

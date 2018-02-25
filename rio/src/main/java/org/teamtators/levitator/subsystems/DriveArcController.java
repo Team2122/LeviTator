@@ -5,26 +5,29 @@ import org.teamtators.common.control.AbstractUpdatable;
 import org.teamtators.common.control.PidController;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 
-class DriveArcController extends AbstractUpdatable implements Configurable<DriveArcController.Config> {
+import java.util.function.Predicate;
+
+public class DriveArcController extends AbstractUpdatable implements Configurable<DriveArcController.Config> {
     private final Drive drive;
     private final TrapezoidalProfileFollower leftMotionFollower = new TrapezoidalProfileFollower("Drive.leftMotionFollower");
     private final TrapezoidalProfileFollower rightMotionFollower = new TrapezoidalProfileFollower("Drive.rightMotionFollower");
     private final PidController yawAngleController = new PidController("Drive.yawAngleController");
-    private final OutputController outputController;
+    private final OutputController outputController = new OutputController();
 
     private Config config;
+    private Predicate<DriveArcController> onTargetPredicate = DriveArcController::areStraightsOnTarget;
     private double deltaHeading;
     private double deltaCenterDistance;
 
-    private double forcedInitialYawAngle;
     private double initialYawAngle;
-    private double leftDistance;
-    private double rightDistance;
+    private double maxSpeed;
+    private double maxAcceleration;
+    private double endSpeed;
+    private boolean onTarget;
 
     public DriveArcController(Drive drive) {
         super("DriveArcController");
         this.drive = drive;
-        outputController = new OutputController(drive);
 
         leftMotionFollower.setPositionProvider(drive::getLeftDistance);
         leftMotionFollower.setVelocityProvider(drive::getLeftRate);
@@ -35,20 +38,14 @@ class DriveArcController extends AbstractUpdatable implements Configurable<Drive
         rightMotionFollower.setOutputConsumer(outputController::setRightOutput);
         leftMotionFollower.setOutputConsumer(outputController::setLeftOutput);
         yawAngleController.setOutputConsumer(outputController::setRotationOutput);
-
-        resetForcedInitialYawAngle();
     }
 
-    public double getForcedInitialYawAngle() {
-        return forcedInitialYawAngle;
+    public double getInitialYawAngle() {
+        return initialYawAngle;
     }
 
-    public void setForcedInitialYawAngle(double forcedInitialYawAngle) {
-        this.forcedInitialYawAngle = forcedInitialYawAngle;
-    }
-
-    public void resetForcedInitialYawAngle() {
-        setForcedInitialYawAngle(Double.NaN);
+    public void setInitialYawAngle(double initialYawAngle) {
+        this.initialYawAngle = initialYawAngle;
     }
 
     public void setDeltaHeading(double deltaHeading) {
@@ -67,37 +64,23 @@ class DriveArcController extends AbstractUpdatable implements Configurable<Drive
         return deltaCenterDistance;
     }
 
-    public void setParameters(double deltaHeading, double deltaCenterDistance) {
-        setDeltaHeading(deltaHeading);
-        setDeltaCenterDistance(deltaCenterDistance);
-    }
-
-    public boolean isLeftOnTarget() {
-        return leftMotionFollower.isOnTarget();
-    }
-
-    public boolean isRightOnTarget() {
-        return rightMotionFollower.isOnTarget();
-    }
-
-    public boolean areStraightsOnTarget() {
-        return isLeftOnTarget() && isRightOnTarget();
-    }
-
     @Override
     public synchronized void start() {
-        double sideDelta = config.effectiveTrackWidth * Math.toRadians(deltaHeading);
-        leftDistance = deltaCenterDistance + .5 * sideDelta;
-        rightDistance = deltaCenterDistance - .5 * sideDelta;
+        double sideDelta = .5 * config.effectiveTrackWidth * Math.toRadians(deltaHeading);
+        double leftDistance = deltaCenterDistance + sideDelta;
+        double rightDistance = deltaCenterDistance - sideDelta;
         leftMotionFollower.moveDistance(leftDistance);
         rightMotionFollower.moveDistance(rightDistance);
-        initialYawAngle = drive.getYawAngle();
+
+
+
         yawAngleController.setSetpoint(initialYawAngle);
         super.start();
         leftMotionFollower.start();
         rightMotionFollower.start();
         yawAngleController.start();
         outputController.start();
+        onTarget = false;
     }
 
     @Override
@@ -119,6 +102,11 @@ class DriveArcController extends AbstractUpdatable implements Configurable<Drive
         double angleDelta = (leftDelta - rightDelta) / config.effectiveTrackWidth;
         yawAngleController.setSetpoint(initialYawAngle + angleDelta);
         yawAngleController.update(delta);
+
+        onTarget = onTargetPredicate.test(this);
+        if (onTarget) {
+            stop();
+        }
 
         outputController.update(delta);
     }
@@ -144,21 +132,77 @@ class DriveArcController extends AbstractUpdatable implements Configurable<Drive
         return rightMotionFollower;
     }
 
+    public boolean isLeftOnTarget() {
+        return leftMotionFollower.isOnTarget();
+    }
+
+    public boolean isRightOnTarget() {
+        return rightMotionFollower.isOnTarget();
+    }
+
+    public boolean areStraightsOnTarget() {
+        return isLeftOnTarget() && isRightOnTarget();
+    }
+
+    public boolean isOnTarget() {
+        return onTarget;
+    }
+
+    public double getLeftDistance() {
+        return leftMotionFollower.getCurrentPosition();
+    }
+
+    public double getRightDistance() {
+        return rightMotionFollower.getCurrentPosition();
+    }
+
+    public double getAverageDistance() {
+        return (getLeftDistance() + getRightDistance()) / 2.0;
+    }
+
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    public void setMaxAcceleration(double maxAcceleration) {
+        this.maxAcceleration = maxAcceleration;
+    }
+
+    public void setEndSpeed(double endSpeed) {
+        this.endSpeed = endSpeed;
+    }
+
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
+
+    public double getMaxAcceleration() {
+        return maxAcceleration;
+    }
+
+    public double getEndSpeed() {
+        return endSpeed;
+    }
+
+    public void setOnTargetPredicate(Predicate<DriveArcController> onTargetPredicate) {
+        this.onTargetPredicate = onTargetPredicate;
+    }
+
+    public Predicate<DriveArcController> getOnTargetPredicate() {
+        return onTargetPredicate;
+    }
+
     public static class Config {
         public double effectiveTrackWidth;
+        public double scrubCoefficient;
         public TrapezoidalProfileFollower.Config straightMotionFollower;
         public PidController.Config yawAngleController;
     }
 
-    private static class OutputController extends AbstractUpdatable {
+    private class OutputController extends AbstractUpdatable {
         private double leftOutput;
         private double rightOutput;
         private double rotationOutput;
-        private Drive drive;
-
-        public OutputController(Drive drive) {
-            this.drive = drive;
-        }
 
         public void setStraightOutput(double straightOutput) {
             setLeftOutput(straightOutput);
@@ -180,13 +224,19 @@ class DriveArcController extends AbstractUpdatable implements Configurable<Drive
         @Override
         protected void doUpdate(double delta) {
             double left = 0, right = 0;
+
             left += leftOutput;
             right += rightOutput;
             leftOutput = Double.NaN;
             rightOutput = Double.NaN;
+
             left += rotationOutput;
             right -= rotationOutput;
             rotationOutput = Double.NaN;
+
+            double scrubPower = (left - right) * config.scrubCoefficient;
+            left += scrubPower;
+            right -= scrubPower;
 
             if (!Double.isNaN(left) && !Double.isNaN(right)) {
                 drive.setLeftMotorPower(left);

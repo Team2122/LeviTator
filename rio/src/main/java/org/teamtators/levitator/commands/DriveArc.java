@@ -5,10 +5,12 @@ import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
+import org.teamtators.levitator.subsystems.DriveArcController;
 
 public class DriveArc extends Command implements Configurable<DriveArc.Config> {
     private final Drive drive;
     private Config config;
+    private double arcLength;
 
     public DriveArc(TatorRobot robot) {
         super("DriveArc");
@@ -21,11 +23,15 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         double startAngle = drive.getYawAngle();
         double angleDelta = config.angle - startAngle;
 
-        double arcLength = config.arcLength;
+        arcLength = config.arcLength;
         if (Double.isNaN(arcLength)) {
             arcLength = 2 * Math.PI * config.radius / (360.0 / Math.abs(angleDelta));
         }
 
+        drive.getArcController().setMaxSpeed(config.speed);
+        drive.getArcController().setMaxAcceleration(config.maxAcceleration);
+        drive.getArcController().setEndSpeed(config.endSpeed);
+        drive.getArcController().setOnTargetPredicate(DriveArcController::areStraightsOnTarget);
         drive.driveArcProfile(arcLength, config.angle);
 
         logger.info("Driving arc from angle {} to {} of distance {} (rate {})",
@@ -39,11 +45,10 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
 
     @Override
     protected void finish(boolean interrupted) {
-        double distance = drive.getStraightMotionFollower().getCurrentPosition();
-        double targetDistance = drive.getStraightMotionFollower().getCalculator().getPosition();
+        double distance = drive.getArcController().getAverageDistance();
         double angle = drive.getYawAngle();
         String logString = String.format(" at distance %s (target %s), angle %s (target %s)",
-                distance, targetDistance, angle, config.angle);
+                distance, arcLength, angle, config.angle);
         if (interrupted) {
             logger.warn("Interrupted" + logString);
         } else {
@@ -61,7 +66,6 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         public double speed;
         public double endSpeed;
         public double maxAcceleration;
-        public double maxAngularAcceleration;
         public double arcLength = Double.NaN;
         public double radius;
     }

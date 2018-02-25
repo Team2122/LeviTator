@@ -5,6 +5,7 @@ import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
+import org.teamtators.levitator.subsystems.DriveArcController;
 
 public class DriveStraight extends Command implements Configurable<DriveStraight.Config> {
     private Drive drive;
@@ -29,24 +30,25 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
         }
         logger.info("Driving at {} for distance of {} at top speed of {}",
                 angleStr, config.distance, config.speed);
-        drive.getStraightMotionFollower().setTravelVelocity(config.speed);
-        drive.getStraightMotionFollower().setEndVelocity(Math.copySign(config.endSpeed, config.distance));
-        drive.getStraightMotionFollower().setMaxAcceleration(config.maxAcceleration);
+        drive.getArcController().setMaxSpeed(config.speed);
+        drive.getArcController().setEndSpeed(Math.copySign(config.endSpeed, config.distance));
+        drive.getArcController().setMaxAcceleration(config.maxAcceleration);
+        drive.getArcController().setOnTargetPredicate(DriveArcController::areStraightsOnTarget);
         drive.driveStraightProfile(angle, config.distance);
     }
 
     @Override
     protected boolean step() {
-        return drive.isStraightProfileOnTarget();
+        return drive.isArcOnTarget();
     }
 
     @Override
     protected void finish(boolean interrupted) {
         drive.stop();
-        double distance = drive.getStraightMotionFollower().getCurrentPosition();
+        double distance = drive.getArcController().getAverageDistance();
         double angle = drive.getYawAngle();
         String logString = String.format(" at distance %s (target %s), angle %s (target %s)",
-                distance, config.distance, angle, drive.getYawAngleController().getSetpoint());
+                distance, config.distance, angle, drive.getArcController().getYawAngleController().getSetpoint());
         if (interrupted) {
             logger.warn("Interrupted" + logString);
         } else {
