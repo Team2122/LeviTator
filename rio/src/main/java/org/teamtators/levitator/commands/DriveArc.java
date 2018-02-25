@@ -29,7 +29,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
 
         drive.getArcController().setMaxSpeed(config.speed);
         drive.getArcController().setMaxAcceleration(config.maxAcceleration);
-        drive.getArcController().setEndVelocity(config.endSpeed);
+        drive.getArcController().setEndVelocity(Math.signum(arcLength) * Math.abs(config.endSpeed));
         drive.getArcController().setOnTargetPredicate(DriveArcController::areStraightsOnTarget);
         drive.driveArcProfile(arcLength, config.angle);
 

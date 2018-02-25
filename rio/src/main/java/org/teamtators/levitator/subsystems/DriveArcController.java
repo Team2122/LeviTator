@@ -84,10 +84,11 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
             fastSide = rightMotionFollower;
         }
         if (leftTime != rightTime) {
-            double start_a = slowSide.getMaxAcceleration();
-            double end_a = -slowSide.getMaxAcceleration();
             double start_v = slowSide.getInitialVelocity();
             double end_v = slowSide.getEndVelocity();
+            double travel_v = slowSide.getTravelVelocity();
+            double start_a = slowSide.getMaxAcceleration() * Math.signum((travel_v * .9) - start_v);
+            double end_a = slowSide.getMaxAcceleration() * Math.signum(end_v - (travel_v * .9));
             double tt = fastSide.getCalculator().getTotalTime();
             double distance = slowDistance;
             double max_velocity =

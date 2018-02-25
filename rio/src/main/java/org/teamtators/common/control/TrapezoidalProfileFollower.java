@@ -119,7 +119,6 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         }
         baseProfile.setDistance(distance);
         baseProfile.setTravelVelocity(Math.copySign(baseProfile.getTravelVelocity(), distance));
-        logger.trace("Moving based on profile: " + baseProfile);
         updateProfile();
     }
 
@@ -127,6 +126,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         initialPosition = positionProvider.getControllerInput();
         initialVelocity = velocityProvider.getControllerInput();
         baseProfile.setStartVelocity(initialVelocity);
+        logger.trace("Moving based on profile: " + baseProfile);
         calculator.updateProfile(baseProfile);
     }
 

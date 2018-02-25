@@ -59,9 +59,9 @@ LiftContinuous:
   sweepTimeoutSeconds: 5.0
 $TestDrive:
 #  - { class: DriveRotate, angle: 90.0 }
-  - { class: DriveStraight, angle: 0.0, distance: -144.0, speed: 60, endSpeed: 60.0 }
-  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60.0 }
-  - { class: DriveStraight, distance: -138, angle: -90, speed: 60, endSpeed: 60 }
+  - { class: DriveStraight, angle: 0.0, distance: -144.0, speed: 60, endSpeed: 30.0 }
+  - { class: DriveArc, angle: -90, radius: -48, speed: 60, endSpeed: 30.0 }
+  - { class: DriveStraight, distance: -138, angle: -90, speed: 60 }
 #  maxAcceleration: 84.0
 #TestDriveRotate:
 #  class: DriveRotate
@@ -72,7 +72,7 @@ $TestDrive:
 
 ^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
 ^DriveRotate: { rotationSpeed: 60, maxAcceleration: 100 }
-^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 80 }
+^DriveArc: { speed: 40.0, endSpeed: 0.0, maxAcceleration: 120 }
 
 PickerQuickDeploy:
   kickPower: 1
