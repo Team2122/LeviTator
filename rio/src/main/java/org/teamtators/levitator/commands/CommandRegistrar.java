@@ -38,9 +38,7 @@ public class CommandRegistrar {
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
         commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
 
-        commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
-        commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
-        commandStore.putCommand("BumpPivotRight", Commands.instant(lift::bumpPivotRight));
-        commandStore.putCommand("BumpPivotLeft", Commands.instant(lift::bumpPivotRight));
+        commandStore.registerCommand("BumpLift", () -> new BumpLift(robot, true, 8));
+        commandStore.registerCommand("BumpPivot", () -> new BumpPivot(robot, false, 56));
     }
 }
