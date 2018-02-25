@@ -25,42 +25,16 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         if (Double.isNaN(arcLength)) {
             arcLength = 2 * Math.PI * config.radius / (360.0 / Math.abs(angleDelta));
         }
-        TrapezoidalProfile straightProfile = new TrapezoidalProfile(arcLength, drive.getAverageRate(),
-                Math.copySign(config.speed, arcLength), Math.copySign(config.endSpeed, arcLength),
-                config.maxAcceleration);
-        drive.getStraightMotionFollower().setTravelVelocity(config.speed);
-        drive.getStraightMotionFollower().setEndVelocity(Math.copySign(config.endSpeed, arcLength));
-        drive.getStraightMotionFollower().setMaxAcceleration(config.maxAcceleration);
 
-
-        double straightTime = straightProfile.createCalculator().getTotalTime();
-        double max_a_a = config.maxAngularAcceleration;
-        double max_a_v = Math.abs(-max_a_a * (-straightTime + Math.sqrt(Math.pow(straightTime, 2) - 4 * angleDelta / max_a_a)) / 2.0);
-
-        if (Double.isNaN(max_a_v)) {
-            logger.warn("Trying to arc too quickly (arcLength={}, deltaAngle={}). Falling back to default max_a_v",
-                    arcLength, angleDelta);
-            max_a_v = 100;
-        }
-
-        TrapezoidalProfile rotationProfile = new TrapezoidalProfile(angleDelta, 0, Math.copySign(max_a_v, angleDelta),
-                0, config.maxAngularAcceleration);
-        drive.getRotationMotionFollower().setTravelVelocity(max_a_v);
-        drive.getRotationMotionFollower().resetEndVelocity();
-        drive.getRotationMotionFollower().setMaxAcceleration(config.maxAngularAcceleration);
-        double rotationTime = rotationProfile.createCalculator().getTotalTime();
-
-        logger.debug("straightTime={}, max_a_v={}, rotationTime={}", straightTime, max_a_v, rotationTime);
         drive.driveArcProfile(arcLength, config.angle);
 
-        logger.info("Driving arc from angle {} to {} (rate {}), of distance {} (rate {})",
-                startAngle, config.angle, max_a_v, arcLength, config.speed);
+        logger.info("Driving arc from angle {} to {} of distance {} (rate {})",
+                startAngle, config.angle, arcLength, config.speed);
     }
 
     @Override
     protected boolean step() {
-//        return drive.isArcOnTarget();
-        return drive.isStraightProfileOnTarget();
+        return drive.isArcOnTarget();
     }
 
     @Override

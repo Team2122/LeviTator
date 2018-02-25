@@ -4,6 +4,19 @@ import jaci.openrio.gradle.frc.FRCJavaArtifact
 import jaci.openrio.gradle.frc.RoboRIO
 import org.gradle.api.java.archives.internal.DefaultManifest
 
+buildscript {
+    repositories.maven { repo ->
+        repo.name = "WPI"
+        repo.url = "http://first.wpi.edu/FRC/roborio/maven/release"
+    }
+    dependencies {
+//        classpath "edu.wpi.first.ntcore:ntcore-java:4.0.0"
+//        classpath "edu.wpi.first.wpiutil:wpiutil-java:3.1.0"
+//        classpath "edu.wpi.first.ntcore:ntcore-cpp:4.0.0:asdf@zip"
+    }
+//    System.setProperty("java.library.path", "asdf")
+}
+
 plugins {
     id "java"
     id "jaci.openrio.gradle.GradleRIO" version "2018.02.17"
@@ -29,8 +42,13 @@ deploy {
             files = rootProject.fileTree('config/')
             directory = 'config'
             postdeploy << { DeployContext ctx ->
-                ctx.execute("chmod 755 .; chown lvuser .")
+                ctx.execute("chmod -R 755 .; chown -R lvuser .")
                 ctx.execute("sync")
+//                def nt = edu.wpi.first.networktables.NetworkTableInstance.create()
+//                nt.setServerTeam(2122)
+//                nt.addConnectionListener({
+//                    println "Connected to nt server"
+//                }, true)
             }
         }
         artifact('dependencies', FileCollectionArtifact) {
