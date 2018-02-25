@@ -54,9 +54,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
     }
 
     public void driveStraightProfile(double heading, double distance) {
-        double deltaHeading = heading - getYawAngle();
         arcController.setInitialYawAngle(heading);
-        arcController.setDeltaHeading(deltaHeading);
+        arcController.setDeltaHeading(0.0);
         arcController.setDeltaCenterDistance(distance);
         arcController.start();
     }
