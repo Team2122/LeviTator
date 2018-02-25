@@ -71,23 +71,38 @@ public class DriveArcController extends AbstractUpdatable implements Configurabl
 
         double leftTime = leftMotionFollower.getCalculator().getTotalTime();
         double rightTime = rightMotionFollower.getCalculator().getTotalTime();
-
         logger.trace("Initial left, right times: {}, {}", leftTime, rightTime);
-//        if (leftTime > rightTime) {
-//            double maxAcceleration = rightMotionFollower.getMaxAcceleration();
-//            double maxRightVelocity = Math.abs(-maxAcceleration * (-leftTime + Math.sqrt(Math.pow(leftTime, 2) - 4 * rightDistance / maxAcceleration)) / 2.0);
-//            rightMotionFollower.setTravelVelocity(maxRightVelocity);
-//            rightMotionFollower.moveDistance(rightDistance);
-//            rightTime = rightMotionFollower.getCalculator().getTotalTime();
-//            logger.trace("After slowing down right; left, right times: {}, {}", leftTime, rightTime);
-//        } else if (rightTime > leftTime) {
-//            double maxAcceleration = leftMotionFollower.getMaxAcceleration();
-//            double maxLeftVelocity = Math.abs(-maxAcceleration * (-rightTime + Math.sqrt(Math.pow(rightTime, 2) - 4 * leftDistance / maxAcceleration)) / 2.0);
-//            leftMotionFollower.setTravelVelocity(maxLeftVelocity);
-//            leftMotionFollower.moveDistance(leftDistance);
-//            leftTime = leftMotionFollower.getCalculator().getTotalTime();
-//            logger.trace("After slowing down left; left, right times: {}, {}", leftTime, rightTime);
-//        }
+        TrapezoidalProfileFollower slowSide, fastSide;
+        double slowDistance;
+        if (leftTime > rightTime) {
+            slowSide = rightMotionFollower;
+            slowDistance = rightDistance;
+            fastSide = leftMotionFollower;
+        } else {
+            slowSide = leftMotionFollower;
+            slowDistance = leftDistance;
+            fastSide = rightMotionFollower;
+        }
+        double max_a = slowSide.getMaxAcceleration();
+        double start_v = slowSide.getInitialVelocity();
+        double end_v = slowSide.getEndVelocity();
+        double tt = fastSide.getCalculator().getTotalTime();
+        double distance = slowDistance;
+        double max_velocity = (Math.pow(end_v, 2) - 2 * distance * max_a -
+                Math.pow(start_v, 2)) / (2 * end_v - 2 * start_v -
+                2 * max_a * tt);
+        slowSide.setTravelVelocity(max_velocity);
+        slowSide.moveDistance(slowDistance);
+        double slowTime = rightMotionFollower.getCalculator().getTotalTime();
+        if (leftTime > rightTime) {
+            rightTime = slowTime;
+            logger.trace("After slowing down right to max vel {}; left, right times: {}, {}",
+                    max_velocity, leftTime, rightTime);
+        } else if (rightTime > leftTime) {
+            leftTime = slowTime;
+            logger.trace("After slowing down left to max vel {}; left, right times: {}, {}",
+                    max_velocity, leftTime, rightTime);
+        }
 
         yawAngleController.setSetpoint(initialYawAngle);
         super.start();
