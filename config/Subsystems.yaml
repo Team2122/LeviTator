@@ -10,7 +10,7 @@ drive:
   straightMotionFollower:
       kpP: 1.0
       kiP: 0.0
-      kpV: 0.025
+      kpV: 0.015
       kfV: .0074
       kMinOutput: .0461
       kfA: 0.0025
@@ -23,7 +23,7 @@ drive:
       maxIError: 12.0
   #    logData: true
   rotationMotionFollower:
-      kpP: 0.2
+      kpP: 0.15
       kiP: 0.5
       kpV: 0.01
       kfV: .01
