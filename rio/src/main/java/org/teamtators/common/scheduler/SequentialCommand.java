@@ -101,6 +101,10 @@ public class SequentialCommand extends Command implements CommandRunContext {
         boolean finished;
         do {
             SequentialCommandRun run = currentRun();
+            if (run == null) {
+                logger.warn("Sequential command run is null???");
+                return true;
+            }
             if (run.cancel) {
                 cancelRun(run);
                 return true;

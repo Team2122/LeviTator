@@ -85,15 +85,21 @@ lift:
 #    maxAcceleration: 180.0
 #    travelVelocity: 90.0
 #    endVelocity: 0.0
+    target: { within: 10.0 }
+    minSetpoint: -90.0
+    maxSetpoint: 90.0
     maxAcceleration: 0.4
-    movePower: 0.3
-    endRamp: 40.0
+    movePower: 0.4
+    endRamp: 20.0
     logData: true
+
+  pivotHoldPower: 0.15
 
   anglePresetLeft: -90
   anglePresetCenter: 0
   anglePresetRight: 90
   heightPresetPick: 2
+  heightPresetLowSwitch: 12
   heightPresetSwitch: 46
   heightPresetScaleLow: 58
   heightPresetScaleHigh: 70
@@ -105,5 +111,5 @@ lift:
   heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "$ScaleSwitch"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "$ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"

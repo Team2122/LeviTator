@@ -25,6 +25,8 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
         startPosition.addDefault("Left", "Left");
         startPosition.addObject("Center", "Center");
         startPosition.addObject("Right", "Right");
+
+        startPosition.addDefault("Unselected", "!!!unselected_start_pos!!!");
         this.robot = robot;
     }
 

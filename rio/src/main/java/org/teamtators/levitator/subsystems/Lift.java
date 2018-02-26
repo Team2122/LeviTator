@@ -117,6 +117,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             case SWITCH:
                 heightValue = config.heightPresetSwitch;
                 break;
+            case SWITCH_LOW:
+                heightValue = config.heightPresetLowSwitch;
+                break;
             case SCALE_LOW:
                 heightValue = config.heightPresetScaleLow;
                 break;
@@ -155,7 +158,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private void enableLiftController() {
-        setTargetHeight(getCurrentHeight());
+        targetHeight = getCurrentHeight();
+        liftController.moveToPosition(targetHeight);
         liftController.start();
     }
 
@@ -224,6 +228,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 angle, distance));
         targetAngle = angle;
         pivotController./*moveToPosition*/setSetpoint(angle);
+        pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
     private void enablePivotController() {
@@ -330,7 +335,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
         tests.addTest(new MotionCalibrationTest(liftController));
-        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController));
+        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController, 90.0));
 
         tests.addTest(new LiftTest());
 
@@ -409,6 +414,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public enum HeightPreset {
         PICK,
+        SWITCH_LOW,
         SWITCH,
         SCALE_LOW,
         SCALE_HIGH,
@@ -433,6 +439,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         public TrapezoidalProfileFollower.Config heightController;
         public /*TrapezoidalProfileFollower*/StupidController.Config pivotController;
+        public double pivotHoldPower;
 
         public double anglePresetLeft;
         public double anglePresetCenter;
@@ -440,6 +447,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         public double heightPresetPick;
         public double heightPresetSwitch;
+        public double heightPresetLowSwitch;
         public double heightPresetScaleLow;
         public double heightPresetScaleHigh;
         public double heightPresetHome;
