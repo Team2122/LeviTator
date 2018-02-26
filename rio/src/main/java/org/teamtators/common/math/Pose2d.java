@@ -68,8 +68,12 @@ public class Pose2d {
                 this.yaw.add(rotation));
     }
 
-    public Pose2d concat(Pose2d other) {
+    public Pose2d chain(Pose2d other) {
         return this.add(other.rotateBy(this.yaw));
+    }
+
+    public Pose2d extend(double distance) {
+        return new Pose2d(this.translation.add(yaw.toTranslation().scale(distance)), this.yaw);
     }
 
     @Override

@@ -4,14 +4,14 @@ package org.teamtators.common.math;
  * @author Alex Mikhalev
  */
 public class TankKinematics {
-    private double wheelBase = 0.0;
+    private double effectiveWheelBase = 0.0;
 
-    public double getWheelBase() {
-        return wheelBase;
+    public double getEffectiveWheelBase() {
+        return effectiveWheelBase;
     }
 
-    public void setWheelBase(double wheelBase) {
-        this.wheelBase = wheelBase;
+    public void setEffectiveWheelBase(double effectiveWheelBase) {
+        this.effectiveWheelBase = effectiveWheelBase;
     }
 
     public Pose2d relativeForwardKinematics(Rotation deltaHeading, double deltaWheel) {
@@ -38,6 +38,5 @@ public class TankKinematics {
     public Pose2d integrateForwardKinematics(Pose2d initialPose, Rotation endHeading, double deltaWheel) {
         return initialPose.add(forwardKinematics(initialPose.getYaw(), endHeading, deltaWheel));
     }
-
 
 }

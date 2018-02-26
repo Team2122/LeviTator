@@ -4,8 +4,8 @@ package org.teamtators.common.math;
  * @author Alex Mikhalev
  */
 public class Translation2d {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     public Translation2d(double x, double y) {
         this.x = x;
@@ -19,14 +19,6 @@ public class Translation2d {
 
     public static Translation2d zero() {
         return new Translation2d(0.0, 0.0);
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public double getX() {
@@ -43,7 +35,7 @@ public class Translation2d {
     }
 
     public Rotation getDirection() {
-        return new Rotation(this.x, this.y);
+        return new Rotation(this.y, this.x);
     }
 
     public double getMagnitude() {

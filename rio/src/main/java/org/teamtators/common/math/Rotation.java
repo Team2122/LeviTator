@@ -30,6 +30,7 @@ public class Rotation {
         return fromRadians(Math.toRadians(degrees));
     }
 
+/*
     public void setRadians(double radians) {
         this.sin = Math.sin(radians);
         this.cos = Math.cos(radians);
@@ -39,6 +40,7 @@ public class Rotation {
     public void setDegrees(double degrees) {
         setDegrees(Math.toRadians(degrees));
     }
+*/
 
     public double sin() {
         return sin;
@@ -84,6 +86,26 @@ public class Rotation {
     public Rotation sub(Rotation other) {
         return new Rotation(this.sin * other.cos - this.cos * other.sin,
                 this.cos * other.cos + this.sin * other.sin);
+    }
+
+    public Rotation mult(double scaleNum) {
+        return Rotation.fromRadians(scaleNum * toRadians());
+    }
+
+    public Rotation normal() {
+        return new Rotation(this.cos, -this.sin);
+    }
+
+    public Rotation inverse() {
+        return new Rotation(-this.sin, -this.cos);
+    }
+
+    public Rotation complement() {
+        return new Rotation(this.sin, -this.cos);
+    }
+
+    public Translation2d toTranslation() {
+        return new Translation2d(this.cos, this.sin);
     }
 
     public void normalize() {
