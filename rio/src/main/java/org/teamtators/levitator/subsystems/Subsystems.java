@@ -27,6 +27,7 @@ public class Subsystems extends SubsystemsBase
     private Picker picker;
     private Lift lift;
     private Auto auto;
+    private PixyVision vision;
     //private YourSubsystem yourSubsystem;
 
     public Subsystems(TatorRobot robot) {
@@ -35,8 +36,9 @@ public class Subsystems extends SubsystemsBase
         picker = new Picker();
         lift = new Lift();
         auto = new Auto(robot);
+        vision = new PixyVision();
         //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
     }

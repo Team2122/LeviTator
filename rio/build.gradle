@@ -70,6 +70,9 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
 
+    compile name: 'pixyjava', ext: 'jar'
+    nativeZip name: 'pixyjava', ext: 'zip'
+
     compile wpilib()
     compile ctre()
 //    compile navx()
