@@ -113,6 +113,18 @@ public class Pose2d {
         return getIntersection(normalPose);
     }
 
+    public double getDistanceAhead(Translation2d point) {
+        Translation2d diff = point.sub(translation);
+        Rotation direction = diff.getDirection();
+        if (direction.isParallel(yaw)) {
+            return diff.getMagnitude();
+        } else if (direction.inverse().isParallel(yaw)) {
+            return -diff.getMagnitude();
+        } else {
+            return Double.NaN;
+        }
+    }
+
     @Override
     public String toString() {
         return "Pose2d{" +

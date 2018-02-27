@@ -80,7 +80,9 @@ public class StraightSegment implements DriveSegment {
         return nearestPoint.add(startPose.getYaw().toTranslation().scale(distance));
     }
 
-    public double
+    public double getRemainingDistance(Translation2d point) {
+        return -getEndPose().getDistanceAhead(point);
+    }
 
     @Override
     public String toString() {
