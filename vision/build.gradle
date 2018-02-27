@@ -1,0 +1,93 @@
+import edu.wpi.first.wpiutil.RuntimeDetector
+import org.gradle.internal.os.OperatingSystem
+
+import java.nio.file.Paths
+
+buildscript {
+    ext.versions = [
+            opencv: '3.2.0',
+            cscore: '1.2.0',
+            ntcore: '4.0.0',
+            wpiutil: '3.1.0'
+    ]
+
+    repositories {
+        maven {
+            name "WPI"
+            url "http://first.wpi.edu/FRC/roborio/maven/release"
+        }
+    }
+    dependencies {
+        classpath "edu.wpi.first.wpiutil:wpiutil-java:${versions.wpiutil}"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    maven {
+        name "WPI"
+        url "http://first.wpi.edu/FRC/roborio/maven/release"
+    }
+}
+
+configurations {
+    nativeZipLocal
+    nativeZipRemote
+    source
+}
+
+def localClassifier = (
+    OperatingSystem.current().isWindows() ? 'windowsx86-64' :
+            OperatingSystem.current().isMacOsX() ? 'osxx86-64' :
+                    OperatingSystem.current().isLinux() ? 'linuxx86-64' :
+                            null
+)
+
+def remoteClassifier = 'linuxathena'
+
+dependencies {
+    nativeZipLocal "org.opencv:opencv-jni:${versions.opencv}:${localClassifier}"
+    nativeZipLocal "org.opencv:opencv-cpp:${versions.opencv}:${localClassifier}@zip"
+    nativeZipLocal "edu.wpi.first.cscore:cscore-cpp:${versions.cscore}:${localClassifier}@zip"
+    nativeZipLocal "edu.wpi.first.ntcore:ntcore-cpp:${versions.ntcore}:${localClassifier}@zip"
+    nativeZipLocal "edu.wpi.first.wpiutil:wpiutil-cpp:${versions.wpiutil}:${localClassifier}@zip"
+
+    nativeZipRemote "org.opencv:opencv-jni:${versions.opencv}:${remoteClassifier}"
+    nativeZipRemote "org.opencv:opencv-cpp:${versions.opencv}:${remoteClassifier}@zip"
+    nativeZipRemote "edu.wpi.first.cscore:cscore-cpp:${versions.cscore}:${remoteClassifier}@zip"
+    nativeZipRemote "edu.wpi.first.ntcore:ntcore-cpp:${versions.ntcore}:${remoteClassifier}@zip"
+    nativeZipRemote "edu.wpi.first.wpiutil:wpiutil-cpp:${versions.wpiutil}:${remoteClassifier}@zip"
+
+    compile "edu.wpi.first.wpiutil:wpiutil-java:${versions.wpiutil}"
+    compile "edu.wpi.first.ntcore:ntcore-java:${versions.ntcore}"
+    compile "org.opencv:opencv-java:${versions.opencv}"
+    compile "edu.wpi.first.cscore:cscore-java:${versions.cscore}"
+
+    source "edu.wpi.first.ntcore:ntcore-java:${versions.ntcore}:sources"
+    source "org.opencv:opencv-java:${versions.opencv}:sources"
+    source "edu.wpi.first.cscore:cscore-java:${versions.cscore}:sources"
+}
+
+def nativeLocalDir = file(Paths.get(project.buildDir.absolutePath, 'nativeLocal'))
+
+task copyNativeLocal(type: Copy) {
+    from configurations.nativeZipLocal.collect { File dep ->
+        project.zipTree(dep).matching {
+            include '**/*' + RuntimeDetector.getFileExtension()
+        }.files
+    }
+    into nativeLocalDir
+}
+
+mainClassName = 'org.teamtators.vision.VisionMain'
+applicationDefaultJvmArgs = ['-Djava.library.path=' + nativeLocalDir.absolutePath]
+
+run {
+    environment 'DYLD_LIBRARY_PATH': nativeLocalDir.absolutePath
+}
+
+tasks.getByName('run').dependsOn copyNativeLocal
