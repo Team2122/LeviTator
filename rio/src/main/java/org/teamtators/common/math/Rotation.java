@@ -18,7 +18,7 @@ public class Rotation {
         this.cos = other.cos;
     }
 
-    public static Rotation zero() {
+    public static Rotation identity() {
         return new Rotation(0.0, 1.0);
     }
 

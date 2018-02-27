@@ -14,3 +14,4 @@ driver:
   TRIGGER_LEFT: start whenPressed PickerExtend
   TRIGGER_RIGHT: start whenPressed PickerRetract
   START: start whenPressed $TestDrive
+  BACK: start whenPressed PrintPose

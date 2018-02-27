@@ -1,8 +1,10 @@
 package org.teamtators.levitator.commands;
 
+import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
+import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Lift;
 
@@ -15,6 +17,7 @@ public class CommandRegistrar {
 
     public void register(ConfigCommandStore commandStore) {
         // Drive commands
+        Drive drive = robot.getSubsystems().getDrive();
         commandStore.registerCommand("DriveTank", () -> new DriveTank(robot));
         commandStore.registerCommand("DriveStraight", () -> new DriveStraight(robot));
         commandStore.registerCommand("DriveRotate", () -> new DriveRotate(robot));
@@ -48,5 +51,8 @@ public class CommandRegistrar {
 
         // FMS Data commands
         commandStore.putCommand("WaitForData", new WaitForData(robot));
+
+        commandStore.putCommand("PrintPose", Commands.instant(() ->
+                TatorRobotBase.logger.info("Pose: " + drive.getPose())));
     }
 }

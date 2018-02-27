@@ -1,7 +1,6 @@
-package org.teamtators.common.paths;
+package org.teamtators.common.drive;
 
 import org.teamtators.common.math.Pose2d;
-import org.teamtators.common.math.Translation2d;
 
 public class StraightSegment implements DriveSegment {
     private double startSpeed;

@@ -5,14 +5,14 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
+import org.teamtators.common.drive.PoseEstimator;
+import org.teamtators.common.drive.TankDrive;
 import org.teamtators.common.hw.ADXRS453;
+import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.common.tester.components.ADXRS453Test;
-import org.teamtators.common.tester.components.ControllerTest;
-import org.teamtators.common.tester.components.EncoderTest;
-import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.common.tester.components.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.function.Predicate;
  * Has 2 sets of wheels (on the left and right) which can be independently controlled with motors. Also has 2
  * encoders and a gyroscope to measure the movements of the robot
  */
-public class Drive extends Subsystem implements Configurable<Drive.Config> {
+public class Drive extends Subsystem implements Configurable<Drive.Config>, TankDrive {
 
     public static final Predicate<TrapezoidalProfileFollower> DEFAULT_PREDICATE = ControllerPredicates.finished();
     private SpeedController leftMotor;
@@ -39,6 +39,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
     private TrapezoidalProfileFollower rotationMotionFollower =
             new TrapezoidalProfileFollower("DriveRotationMotionFollower");
 
+    private PoseEstimator poseEstimator = new PoseEstimator(this);
+
     private Config config;
     private double speed;
 
@@ -52,8 +54,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         });
 
 
-        straightMotionFollower.setPositionProvider(this::getAverageDistance);
-        straightMotionFollower.setVelocityProvider(this::getAverageRate);
+        straightMotionFollower.setPositionProvider(this::getCenterDistance);
+        straightMotionFollower.setVelocityProvider(this::getCenterRate);
         straightMotionFollower.setOutputConsumer(outputController::setStraightOutput);
 
         yawAngleController.setInputProvider(this::getYawAngle);
@@ -199,10 +201,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         return rightEncoder.getRate();
     }
 
-    public double getAverageRate() {
-        return (getRightRate() + getLeftRate()) / 2.0;
-    }
-
     public double getLeftDistance() {
         return leftEncoder.getDistance();
     }
@@ -211,11 +209,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         return rightEncoder.getDistance();
     }
 
-    public double getAverageDistance() {
-        return (getLeftDistance() + getRightDistance()) / 2.0;
-    }
-
-    public void resetDistance() {
+    public void resetDistances() {
         leftEncoder.reset();
         rightEncoder.reset();
     }
@@ -228,13 +222,25 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         return gyro.getRate();
     }
 
+    public void setYawAngle(double yawAngle) {
+        gyro.setAngle(yawAngle);
+    }
+
     public void resetYawAngle() {
         gyro.resetAngle();
     }
 
+    public PoseEstimator getPoseEstimator() {
+        return poseEstimator;
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getPose();
+    }
+
     public List<Updatable> getUpdatables() {
         return Arrays.asList(
-                gyro, rotationController, yawAngleController,
+                gyro, poseEstimator, rotationController, yawAngleController,
                 straightMotionFollower, yawAngleController, outputController, rotationMotionFollower
         );
     }
@@ -254,6 +260,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
 
         tests.addTests(new ADXRS453Test("gyro", gyro));
         tests.addTests(new ControllerTest(rotationController, 180));
+        tests.addTests(new PoseEstimatorTest(poseEstimator));
 
         return tests;
     }
@@ -292,6 +299,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config> {
         leftEncoder.setName("Drive", "leftEncoder");
         rightEncoder.setName("Drive", "rightEncoder");
         gyro.setName("Drive", "gyro");
+
+        poseEstimator.start();
     }
 
     @Override

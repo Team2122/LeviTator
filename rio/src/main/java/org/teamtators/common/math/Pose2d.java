@@ -20,7 +20,7 @@ public class Pose2d {
     }
 
     public static Pose2d zero() {
-        return new Pose2d(Translation2d.zero(), Rotation.zero());
+        return new Pose2d(Translation2d.zero(), Rotation.identity());
     }
 
     public Pose2d withTranslation(Translation2d translation) {
@@ -55,6 +55,14 @@ public class Pose2d {
         return new Pose2d(this.translation.add(other.translation), this.yaw.add(other.yaw));
     }
 
+    public Pose2d addTranslation(Translation2d translation) {
+        return new Pose2d(this.translation.add(translation), this.yaw);
+    }
+
+    public Pose2d addYaw(Rotation yaw) {
+        return new Pose2d(this.translation, this.yaw.add(yaw));
+    }
+
     public Pose2d sub(Pose2d other) {
         return new Pose2d(this.translation.sub(other.translation), this.yaw.sub(other.yaw));
     }
@@ -69,7 +77,8 @@ public class Pose2d {
     }
 
     public Pose2d chain(Pose2d other) {
-        return this.add(other.rotateBy(this.yaw));
+        return this.addTranslation(other.getTranslation().rotateBy(this.yaw))
+                .addYaw(other.yaw);
     }
 
     public Pose2d extend(double distance) {

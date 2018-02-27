@@ -25,7 +25,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         if (Double.isNaN(arcLength)) {
             arcLength = 2 * Math.PI * config.radius / (360.0 / Math.abs(angleDelta));
         }
-        TrapezoidalProfile straightProfile = new TrapezoidalProfile(arcLength, drive.getAverageRate(),
+        TrapezoidalProfile straightProfile = new TrapezoidalProfile(arcLength, drive.getCenterRate(),
                 Math.copySign(config.speed, arcLength), Math.copySign(config.endSpeed, arcLength),
                 config.maxAcceleration);
         drive.getStraightMotionFollower().setTravelVelocity(config.speed);
