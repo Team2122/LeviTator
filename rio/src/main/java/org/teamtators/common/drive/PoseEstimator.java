@@ -14,7 +14,7 @@ public class PoseEstimator extends AbstractUpdatable {
     private Pose2d pose;
     private Pose2d lastPose;
     private double lastCenterDistance;
-    private TankKinematics kinematics = new TankKinematics();
+    private TankKinematics kinematics;
 
     public PoseEstimator(TankDrive drive) {
         this.drive = drive;
@@ -54,5 +54,13 @@ public class PoseEstimator extends AbstractUpdatable {
         lastCenterDistance = centerDistance;
         lastPose = pose;
         pose = newPose;
+    }
+
+    public void setKinematics(TankKinematics tankKinematics) {
+        this.kinematics = tankKinematics;
+    }
+
+    public TankKinematics getKinematics() {
+        return kinematics;
     }
 }

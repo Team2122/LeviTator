@@ -97,6 +97,11 @@ public class ArcSegment implements DriveSegment {
     }
 
     @Override
+    public double getArcLength() {
+        return Math.abs(endAngle.sub(startAngle).toRadians() * radius);
+    }
+
+    @Override
     public String toString() {
         return "ArcSegment{" +
                 "startSpeed=" + startSpeed +

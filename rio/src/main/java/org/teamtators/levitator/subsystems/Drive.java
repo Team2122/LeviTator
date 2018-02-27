@@ -7,6 +7,7 @@ import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.drive.PoseEstimator;
 import org.teamtators.common.drive.TankDrive;
+import org.teamtators.common.drive.TankKinematics;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.scheduler.RobotState;
@@ -39,6 +40,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     private TrapezoidalProfileFollower rotationMotionFollower =
             new TrapezoidalProfileFollower("DriveRotationMotionFollower");
 
+    private TankKinematics tankKinematics;
     private PoseEstimator poseEstimator = new PoseEstimator(this);
 
     private Config config;
@@ -230,6 +232,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         gyro.resetAngle();
     }
 
+    @Override
+    public TankKinematics getTankKinematics() {
+        return tankKinematics;
+    }
+
     public PoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
@@ -281,6 +288,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     public void configure(Config config) {
         super.configure();
         this.config = config;
+        this.tankKinematics = config.tankKinematics;
+        poseEstimator.setKinematics(tankKinematics);
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
         this.leftEncoder = config.leftEncoder.create();
@@ -327,6 +336,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         public TrapezoidalProfileFollower.Config straightMotionFollower;
         public PidController.Config yawAngleController;
         public TrapezoidalProfileFollower.Config rotationMotionFollower;
+        public TankKinematics tankKinematics;
     }
 
     private class OutputController extends AbstractUpdatable {

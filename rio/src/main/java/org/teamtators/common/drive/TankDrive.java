@@ -22,4 +22,6 @@ public interface TankDrive {
         setYawAngle(0.0);
     }
     double getYawRate();
+
+    TankKinematics getTankKinematics();
 }

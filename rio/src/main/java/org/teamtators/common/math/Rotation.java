@@ -120,4 +120,12 @@ public class Rotation {
     public String toString() {
         return toDegrees() + "°";
     }
+
+    public boolean isParallel(Rotation yaw) {
+        return equalsEpsilon(yaw) || equalsEpsilon(yaw.inverse());
+    }
+
+    public boolean equalsEpsilon(Rotation other) {
+        return Math.abs(toRadians() - other.toRadians()) <= 1E-9;
+    }
 }

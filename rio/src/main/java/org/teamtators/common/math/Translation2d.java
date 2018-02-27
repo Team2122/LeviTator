@@ -21,6 +21,10 @@ public class Translation2d {
         return new Translation2d(0.0, 0.0);
     }
 
+    public static Translation2d nan() {
+        return new Translation2d(Double.NaN, Double.NaN);
+    }
+
     public double getX() {
         return x;
     }
@@ -65,5 +69,9 @@ public class Translation2d {
     @Override
     public String toString() {
         return "<" + x + ", " + y + ">";
+    }
+
+    public double cross(Translation2d other) {
+        return this.x * other.y - this.y * other.x;
     }
 }

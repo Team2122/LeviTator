@@ -1,6 +1,7 @@
 package org.teamtators.common.drive;
 
 import org.teamtators.common.math.Pose2d;
+import org.teamtators.common.math.Translation2d;
 
 public class StraightSegment implements DriveSegment {
     private double startSpeed;
@@ -43,6 +44,11 @@ public class StraightSegment implements DriveSegment {
         this.length = length;
     }
 
+    @Override
+    public double getArcLength() {
+        return length;
+    }
+
     public Pose2d getStartPose() {
         return startPose;
     }
@@ -54,6 +60,27 @@ public class StraightSegment implements DriveSegment {
     public Pose2d getEndPose() {
         return startPose.extend(length);
     }
+
+    public Translation2d getNearestPoint(Translation2d point) {
+        Translation2d nearestPoint = startPose.getNearestPoint(point);
+        Translation2d diff = nearestPoint.sub(startPose.getTranslation());
+        if (Math.abs(diff.getMagnitude()) > 1E-9) {
+            if (diff.getDirection().equalsEpsilon(startPose.getYaw())) {
+                if (diff.getMagnitude() > length) {
+                    return getEndPose().getTranslation();
+                }
+            } else {
+                return getStartPose().getTranslation();
+            }
+        }
+        return nearestPoint;
+    }
+
+    public Translation2d getLookAhead(Translation2d nearestPoint, double distance) {
+        return nearestPoint.add(startPose.getYaw().toTranslation().scale(distance));
+    }
+
+    public double
 
     @Override
     public String toString() {

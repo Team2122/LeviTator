@@ -85,6 +85,34 @@ public class Pose2d {
         return new Pose2d(this.translation.add(yaw.toTranslation().scale(distance)), this.yaw);
     }
 
+    public Translation2d getIntersection(Pose2d other) {
+        if (yaw.isParallel(other.yaw)) {
+            return Translation2d.nan();
+        }
+        if (Math.abs(yaw.cos()) < Math.abs(other.yaw.cos())) {
+            return intersectionHelper(this, other);
+        } else {
+            return intersectionHelper(other, this);
+        }
+    }
+
+    private static Translation2d intersectionHelper(Pose2d a, Pose2d b) {
+        Rotation a_r = a.getYaw();
+        Rotation b_r = b.getYaw();
+        Translation2d a_t = a.getTranslation();
+        Translation2d b_t = b.getTranslation();
+
+        double tan_b = b_r.tan();
+        double t = ((a_t.getX() - b_t.getX()) * tan_b + b_t.getY() - a_t.getY())
+                / (a_r.sin() - a_r.cos() * tan_b);
+        return a_t.add(a_r.toTranslation().scale(t));
+    }
+
+    public Translation2d getNearestPoint(Translation2d point) {
+        Pose2d normalPose = new Pose2d(point, yaw.normal());
+        return getIntersection(normalPose);
+    }
+
     @Override
     public String toString() {
         return "Pose2d{" +
