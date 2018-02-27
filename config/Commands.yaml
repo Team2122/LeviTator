@@ -4,7 +4,7 @@ DriveTank:
 PickerPick:
   pickPowers: { left: 1.0, right: 0.5 }
   unjamPowers: { left: 0.4, right: -0.4 }
-  holdPowers: { left: 0.15, right: 0.15 }
+  holdPowers: { left: 0.3, right: 0.3 }
   jamDetectPeriod: 0.05
   unjamPeriod: 0.2
   afterUnjamWait: 0.5
@@ -12,7 +12,7 @@ PickerPick:
 
 PickerRegrip:
   gripPower: 1
-  holdPower: 0.15
+  holdPower: 0.3
 
 PickerRelease:
   powers: { left: -0.7, right: -0.7 }
