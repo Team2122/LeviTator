@@ -1,5 +1,10 @@
 package org.teamtators.levitator;
 
+import edu.wpi.cscore.MjpegServer;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.UsbCameraInfo;
+import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.wpilibj.CameraServer;
 import org.teamtators.common.SubsystemsBase;
 import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.config.ConfigCommandStore;
@@ -28,6 +33,25 @@ public class TatorRobot extends TatorRobotBase {
 
     public Subsystems getSubsystems() {
         return subsystems;
+    }
+
+    @Override
+    protected void initialize() {
+        super.initialize();
+        setupCameras();
+    }
+
+    public void setupCameras() {
+        UsbCameraInfo[] usbCameras = UsbCamera.enumerateUsbCameras();
+        logger.info("CameraServer reports {} usb cameras", usbCameras.length);
+        if (usbCameras.length > 0) {
+            logger.info("Using camera source: " + usbCameras[0].name);
+            UsbCamera usbCamera = CameraServer.getInstance().startAutomaticCapture("USBWebCam_Pick", usbCameras[0].dev);
+            MjpegServer server = CameraServer.getInstance().addServer("CameraServer2122");
+            usbCamera.setResolution(320, 240);
+        } else {
+            logger.warn("No USB webcam!");
+        }
     }
 
     @Override

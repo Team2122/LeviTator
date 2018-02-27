@@ -11,6 +11,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.hal.FRCNetComm;
@@ -122,7 +123,7 @@ public class Robot {
         // Call a CameraServer JNI function to force OpenCV native library loading
         // Needed because all the OpenCV JNI functions don't have built in loading
         // TODO: Have a way to enable this if/when we use CameraServer
-//        CameraServerJNI.enumerateSinks();
+        CameraServerJNI.enumerateSinks();
     }
 
     /**
