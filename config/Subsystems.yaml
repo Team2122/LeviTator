@@ -126,3 +126,15 @@ lift:
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "$ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"
+vision:
+  lowerThreshold: [60.0, 60.0, 60.0]
+  upperThreshold: [120.0, 120.0, 120.0]
+
+  minWidth:
+  maxWidth:
+
+  minHeight:
+  maxHeight:
+
+  saturation: 50
+  exposure: 50

@@ -36,25 +36,6 @@ public class TatorRobot extends TatorRobotBase {
     }
 
     @Override
-    protected void initialize() {
-        super.initialize();
-        setupCameras();
-    }
-
-    public void setupCameras() {
-        UsbCameraInfo[] usbCameras = UsbCamera.enumerateUsbCameras();
-        logger.info("CameraServer reports {} usb cameras", usbCameras.length);
-        if (usbCameras.length > 0) {
-            logger.info("Using camera source: " + usbCameras[0].name);
-            UsbCamera usbCamera = CameraServer.getInstance().startAutomaticCapture("USBWebCam_Pick", usbCameras[0].dev);
-            MjpegServer server = CameraServer.getInstance().addServer("CameraServer2122");
-            usbCamera.setResolution(320, 240);
-        } else {
-            logger.warn("No USB webcam!");
-        }
-    }
-
-    @Override
     public SubsystemsBase getSubsystemsBase() {
         return subsystems;
     }

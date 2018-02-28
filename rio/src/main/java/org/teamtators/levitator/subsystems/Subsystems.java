@@ -27,6 +27,7 @@ public class Subsystems extends SubsystemsBase
     private Picker picker;
     private Lift lift;
     private Auto auto;
+    private Vision vision;
     //private YourSubsystem yourSubsystem;
 
     public Subsystems(TatorRobot robot) {
@@ -35,8 +36,9 @@ public class Subsystems extends SubsystemsBase
         picker = new Picker();
         lift = new Lift();
         auto = new Auto(robot);
+        vision = new Vision(robot);
         //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
     }
@@ -70,6 +72,7 @@ public class Subsystems extends SubsystemsBase
         picker.configure(config.picker);
         lift.configure(config.lift);
         auto.configure(config.auto);
+        vision.configure(config.vision);
 
         updatables.addAll(drive.getUpdatables());
         updatables.addAll(lift.getUpdatables());
@@ -83,6 +86,7 @@ public class Subsystems extends SubsystemsBase
         picker.deconfigure();
         lift.deconfigure();
         auto.deconfigure();
+        vision.deconfigure();
 
         updatables.clear();
     }
@@ -123,5 +127,6 @@ public class Subsystems extends SubsystemsBase
         public Picker.Config picker;
         public Lift.Config lift;
         public Auto.Config auto;
+        public Vision.Config vision;
     }
 }
