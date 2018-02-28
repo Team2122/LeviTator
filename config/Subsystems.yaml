@@ -31,6 +31,8 @@ drive:
       kfA: 0.0004
       maxIError: 2.0
   #    logData: true
+  driveSegmentsFollower:
+
   tankKinematics: { effectiveWheelBase: 33.0 }
 picker:
   leftMotor: { type: TALON_SRX, config: { id: 1 } }

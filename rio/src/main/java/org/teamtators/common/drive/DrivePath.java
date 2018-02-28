@@ -1,5 +1,6 @@
 package org.teamtators.common.drive;
 
+import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
@@ -16,9 +17,9 @@ import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 public class DrivePath {
     public static class Point {
         private Translation2d translation;
-        private double radius;
-        private double speed;
-        private double arcSpeed;
+        private double radius = Double.NaN;
+        private double speed = Double.NaN;
+        private double arcSpeed = Double.NaN;
 
         public Point(Translation2d translation) {
             this.translation = translation;
@@ -47,19 +48,22 @@ public class DrivePath {
             return translation.getX();
         }
 
-//        public void setX(double x) {
-//            translation.setX(x);
-//        }
+        public void setX(double x) {
+            translation = translation.withX(x);
+        }
 
         public double getY() {
             return translation.getY();
         }
 
-//        public void setY(double y) {
-//            translation.setY(y);
-//        }
+        public void setY(double y) {
+            translation = translation.withY(y);
+        }
 
         public double getRadius() {
+            if (Double.isNaN(radius)) {
+                throw new ConfigException("radius on DrivePath.Point not set");
+            }
             return radius;
         }
 
@@ -68,6 +72,9 @@ public class DrivePath {
         }
 
         public double getSpeed() {
+            if (Double.isNaN(speed)) {
+                throw new ConfigException("speed on DrivePath.Point not set");
+            }
             return speed;
         }
 
@@ -76,6 +83,9 @@ public class DrivePath {
         }
 
         public double getArcSpeed() {
+            if (Double.isNaN(arcSpeed)) {
+                throw new ConfigException("arcSpeed on DrivePath.Point not set");
+            }
             return arcSpeed;
         }
 

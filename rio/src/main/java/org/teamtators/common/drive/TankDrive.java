@@ -4,16 +4,12 @@ import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Twist2d;
 
 public interface TankDrive {
-    void drivePowers(double left, double right);
-    default void drivePowers(DriveOutputs outputs) {
-        drivePowers(outputs.getLeft(), outputs.getRight());
+    void setPowers(double left, double right);
+    default void setPowers(DriveOutputs outputs) {
+        setPowers(outputs.getLeft(), outputs.getRight());
     }
-    default void driveTwist(Twist2d twist, double power) {
-        drivePowers(getTankKinematics().calculateOutputs(twist, power));
-    }
-    default void stop() {
-        drivePowers(0.0, 0.0);
-    }
+
+    void stop();
 
     double getLeftDistance();
     double getRightDistance();

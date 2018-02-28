@@ -5,9 +5,7 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
-import org.teamtators.common.drive.PoseEstimator;
-import org.teamtators.common.drive.TankDrive;
-import org.teamtators.common.drive.TankKinematics;
+import org.teamtators.common.drive.*;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.scheduler.RobotState;
@@ -42,6 +40,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     private TankKinematics tankKinematics;
     private PoseEstimator poseEstimator = new PoseEstimator(this);
+    private DriveSegmentsFollower driveSegmentsFollower = new DriveSegmentsFollower(this);
 
     private Config config;
     private double speed;
@@ -101,30 +100,17 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         rotationMotionFollower.stop();
         outputController.stop();
         outputController.setMode(OutputMode.None);
+        driveSegmentsFollower.stop();
 
         setRightMotorPower(rightPower);
         setLeftMotorPower(leftPower);
-    }
-
-    /**
-     * Drives with certain speeds
-     *
-     * @param rightSpeed the speed (inches/sec) for the right side
-     * @param leftSpeed  the speed (in/sec) for the left side
-     */
-    public void driveSpeeds(double leftSpeed, double rightSpeed) {
-        straightMotionFollower.stop();
-        yawAngleController.stop();
-        rotationMotionFollower.stop();
-        outputController.stop();
-        outputController.setMode(OutputMode.None);
-        rotationController.stop();
     }
 
     public void driveStraightProfile(double heading, double distance) {
         rotationController.stop();
         rotationMotionFollower.stop();
         outputController.setMode(OutputMode.StraightAndRotation);
+        driveSegmentsFollower.stop();
 
         yawAngleController.setSetpoint(heading);
         straightMotionFollower.moveDistance(distance);
@@ -139,6 +125,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         straightMotionFollower.stop();
         yawAngleController.stop();
         outputController.setMode(OutputMode.RotationOnly);
+        driveSegmentsFollower.stop();
 
         rotationMotionFollower.moveToPosition(heading);
         rotationMotionFollower.start();
@@ -149,6 +136,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         rotationController.stop();
         yawAngleController.stop();
         outputController.setMode(OutputMode.StraightAndRotation);
+        driveSegmentsFollower.stop();
 
         straightMotionFollower.moveDistance(arcLength);
         rotationMotionFollower.moveToPosition(endAngle);
@@ -156,6 +144,18 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         straightMotionFollower.start();
         rotationMotionFollower.start();
         outputController.start();
+    }
+
+    public void driveSegments(DriveSegments segments) {
+        rotationController.stop();
+        straightMotionFollower.stop();
+        yawAngleController.stop();
+        rotationMotionFollower.stop();
+        outputController.stop();
+        outputController.setMode(OutputMode.None);
+
+        driveSegmentsFollower.setSegments(segments);
+        driveSegmentsFollower.start();
     }
 
     public boolean isStraightProfileOnTarget() {
@@ -168,6 +168,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     public boolean isArcOnTarget() {
         return straightMotionFollower.isOnTarget() && rotationMotionFollower.isOnTarget();
+    }
+
+    public boolean isDriveSegmentsFollowerFinished() {
+        return !driveSegmentsFollower.isRunning();
     }
 
     public TrapezoidalProfileFollower getStraightMotionFollower() {
@@ -186,6 +190,15 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return rotationMotionFollower;
     }
 
+    public DriveSegmentsFollower getDriveSegmentsFollower() {
+        return driveSegmentsFollower;
+    }
+
+    @Override
+    public void setPowers(double left, double right) {
+        setLeftMotorPower(left);
+        setRightMotorPower(right);
+    }
 
     public void setRightMotorPower(double power) {
         rightMotor.set(power);
@@ -297,6 +310,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         this.straightMotionFollower.configure(config.straightMotionFollower);
         this.yawAngleController.configure(config.yawAngleController);
         this.rotationMotionFollower.configure(config.rotationMotionFollower);
+        this.driveSegmentsFollower.configure(config.driveSegmentsFollower);
 
         gyro = new ADXRS453(SPI.Port.kOnboardCS0);
         this.rotationController.configure(config.rotationController);
@@ -337,6 +351,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         public PidController.Config yawAngleController;
         public TrapezoidalProfileFollower.Config rotationMotionFollower;
         public TankKinematics tankKinematics;
+        public DriveSegmentsFollower.Config driveSegmentsFollower;
     }
 
     private class OutputController extends AbstractUpdatable {

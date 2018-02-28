@@ -25,6 +25,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private double speedPower;
 
     public DriveSegmentsFollower(TankDrive drive) {
+        super("DriveSegmentsFollower");
         this.drive = drive;
 
         speedFollower = new TrapezoidalProfileFollower("DriveSegmentsFollower.speedFollower");
@@ -186,6 +187,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     @Override
     protected void doUpdate(double delta) {
         if (isFinished()) {
+            drive.stop();
             stop();
         }
         Pose2d currentPose = drive.getPose();
@@ -194,7 +196,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         Twist2d twist = getTwist(currentPose, report.lookaheadPoint.getTranslation());
         speedFollower.update(delta);
         DriveOutputs driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
-        drive.drivePowers(driveOutputs);
+        drive.setPowers(driveOutputs);
     }
 
     @Override

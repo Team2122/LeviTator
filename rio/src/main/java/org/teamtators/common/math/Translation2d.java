@@ -33,6 +33,14 @@ public class Translation2d {
         return y;
     }
 
+    public Translation2d withX(double x) {
+        return new Translation2d(x, this.y);
+    }
+
+    public Translation2d withY(double y) {
+        return new Translation2d(this.x, y);
+    }
+
     public boolean isNaN() {
         return Double.isNaN(x) || Double.isNaN(y);
     }
