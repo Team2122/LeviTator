@@ -121,6 +121,10 @@ public class Subsystems extends SubsystemsBase
         return auto;
     }
 
+    public Vision getVision() {
+        return vision;
+    }
+
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;

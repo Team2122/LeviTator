@@ -79,6 +79,16 @@ $TestDrive:
       - { x: 144, y: 144 }
       - { x: 144, y: 0 }
       - { x: 0, y: 0 }
+
+PickerAutoPick:
+  velocity: 48.0
+  maxDriveDistance: 24.0
+
+$PickerAutoPick:
+  - { parallel: true, name: PickerPick }
+  - PickerAutoPick
+  - { class: Cancel, command: PickerPick }
+
 #  maxAcceleration: 84.0
 #TestDriveRotate:
 #  class: DriveRotate

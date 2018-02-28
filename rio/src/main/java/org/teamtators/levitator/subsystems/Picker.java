@@ -64,6 +64,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return upperCubeSensor.get();
     }
 
+    public boolean isCubeDetectedAny() {
+        return cubeDetectSensor.get() || upperCubeSensor.get() || lowerCubeSensor.get();
+    }
+
     public void extend(){
         setPickerExtended(true);
     }

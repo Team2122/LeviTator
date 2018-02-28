@@ -42,6 +42,7 @@ public class CommandRegistrar {
 
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
         commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
+        commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
 
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));

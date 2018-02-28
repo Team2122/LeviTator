@@ -193,6 +193,14 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         return lastOutput.get();
     }
 
+    public Double getDistance(VisionOutput output) {
+        if(output.y == null) {
+            return null;
+        }
+        //noinspection SuspiciousNameCombination
+        return config.distanceCalculator.calculate(output.y);
+    }
+
     public void killThreads() {
         Thread.getAllStackTraces().forEach(((thread, stackTraceElements) -> {
             if (thread.getName().startsWith("TatorVision2Processing-")) {
