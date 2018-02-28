@@ -72,8 +72,20 @@ public class Rotation {
         return Math.atan2(sin, cos);
     }
 
+    public double toPositiveRadians() {
+        double radians = toRadians();
+        if (radians < 0) {
+            radians += Math.PI * 2;
+        }
+        return radians;
+    }
+
     public double toDegrees() {
         return Math.toDegrees(this.toRadians());
+    }
+
+    public double toPositiveDegrees() {
+        return Math.toDegrees(this.toPositiveRadians());
     }
 
     public Rotation neg() {

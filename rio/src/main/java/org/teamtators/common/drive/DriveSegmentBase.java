@@ -1,5 +1,6 @@
 package org.teamtators.common.drive;
 
+import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Translation2d;
 
@@ -11,6 +12,7 @@ public abstract class DriveSegmentBase implements DriveSegment {
     private double travelSpeed;
     private double endSpeed;
 
+    @Override
     public double getStartSpeed() {
         return startSpeed;
     }
@@ -19,6 +21,7 @@ public abstract class DriveSegmentBase implements DriveSegment {
         this.startSpeed = startSpeed;
     }
 
+    @Override
     public double getTravelSpeed() {
         return travelSpeed;
     }
@@ -27,6 +30,7 @@ public abstract class DriveSegmentBase implements DriveSegment {
         this.travelSpeed = travelSpeed;
     }
 
+    @Override
     public double getEndSpeed() {
         return endSpeed;
     }

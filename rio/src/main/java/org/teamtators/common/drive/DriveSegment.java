@@ -7,7 +7,10 @@ public interface DriveSegment {
     Pose2d getEndPose();
     double getArcLength();
 
-    LookaheadReport getLookaheadReport(Pose2d currentPose, double lookaheadDistance);
+    double getStartSpeed();
+    double getTravelSpeed();
+    double getEndSpeed();
 
+    LookaheadReport getLookaheadReport(Pose2d currentPose, double lookaheadDistance);
     Pose2d getLookAhead(Pose2d nearestPoint, double lookahead);
 }

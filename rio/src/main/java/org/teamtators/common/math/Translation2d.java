@@ -33,6 +33,10 @@ public class Translation2d {
         return y;
     }
 
+    public boolean isNaN() {
+        return Double.isNaN(x) || Double.isNaN(y);
+    }
+
     public Translation2d rotateBy(Rotation rotation) {
         return new Translation2d(this.x * rotation.cos() - this.y * rotation.sin(),
                 this.x * rotation.sin() + this.y * rotation.cos());
