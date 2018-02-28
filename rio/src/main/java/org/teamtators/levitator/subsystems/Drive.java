@@ -261,7 +261,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     public List<Updatable> getUpdatables() {
         return Arrays.asList(
                 gyro, poseEstimator, rotationController, yawAngleController,
-                straightMotionFollower, yawAngleController, outputController, rotationMotionFollower
+                straightMotionFollower, yawAngleController, outputController, rotationMotionFollower,
+                driveSegmentsFollower
         );
     }
 
@@ -289,11 +290,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     public void onEnterRobotState(RobotState state) {
         if (state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
             gyro.finishCalibration();
-            if (state == RobotState.AUTONOMOUS) {
-                gyro.resetAngle();
-            }
-        } else {
-            gyro.startCalibration();
+        }
+        if (state == RobotState.AUTONOMOUS || state == RobotState.TELEOP) {
+            gyro.resetAngle();
+            poseEstimator.setPose(Pose2d.zero());
         }
     }
 
@@ -358,6 +358,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         private double straightOutput;
         private double rotationOutput;
         private OutputMode mode = OutputMode.StraightOnly;
+
+        public OutputController() {
+            super("Drive.OutputController");
+        }
 
         public OutputMode getMode() {
             return mode;

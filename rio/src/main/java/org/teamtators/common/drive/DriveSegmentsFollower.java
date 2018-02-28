@@ -13,7 +13,7 @@ import java.util.function.DoubleUnaryOperator;
 public class DriveSegmentsFollower extends AbstractUpdatable
         implements Configurable<DriveSegmentsFollower.Config> {
     private final TankDrive drive;
-    private DoubleUnaryOperator lookaheadFunction;
+    private DoubleUnaryOperator lookAheadFunction;
 
     private TrapezoidalProfileFollower speedFollower;
     private DriveSegments segments = new DriveSegments();
@@ -58,12 +58,12 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         reset();
     }
 
-    public DoubleUnaryOperator getLookaheadFunction() {
-        return lookaheadFunction;
+    public DoubleUnaryOperator getLookAheadFunction() {
+        return lookAheadFunction;
     }
 
-    public void setLookaheadFunction(DoubleUnaryOperator lookaheadFunction) {
-        this.lookaheadFunction = lookaheadFunction;
+    public void setLookAheadFunction(DoubleUnaryOperator lookAheadFunction) {
+        this.lookAheadFunction = lookAheadFunction;
     }
 
     public TrapezoidalProfileFollower getSpeedFollower() {
@@ -80,6 +80,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
     private void updateProfile() {
         DriveSegment seg = getCurrentSegment();
+        logger.debug("driving segment {}", seg);
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());
         speedFollower.moveDistance(seg.getArcLength());
@@ -96,7 +97,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             return report;
         }
         DriveSegment currentSegment = getCurrentSegment();
-        double lookahead = lookaheadFunction.applyAsDouble(centerWheelRate);
+        double lookahead = lookAheadFunction.applyAsDouble(Math.abs(centerWheelRate));
         LookaheadReport lookaheadReport = currentSegment.getLookaheadReport(currentPose, lookahead);
         if (Epsilon.isEpsilonNegative(lookaheadReport.remainingDistance)) {
             currentSegmentIdx++;
@@ -150,7 +151,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     static Twist2d getTwist(Pose2d currentPose, Translation2d lookaheadPoint) {
         Translation2d diff = lookaheadPoint.sub(currentPose.getTranslation());
         Translation2d halfDiff = diff.scale(0.5);
-        Pose2d perpBisector = new Pose2d(halfDiff, diff.getDirection().ccwNormal());
+        Pose2d perpBisector = new Pose2d(currentPose.getTranslation().add(halfDiff), diff.getDirection().ccwNormal());
         Rotation startHeading = currentPose.getYaw();
         Rotation startNormal = startHeading.ccwNormal();
         Pose2d startNormalLine = new Pose2d(currentPose.getTranslation(), startNormal);
@@ -167,7 +168,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             Rotation deltaHeading = endHeading.sub(startHeading);
             double arcLength = deltaHeading.toRadians() * radius;
             twist.setDeltaYaw(deltaHeading);
-            twist.setDeltaX(arcLength);
+            twist.setDeltaX(Math.abs(arcLength));
         }
         return twist;
     }
@@ -177,11 +178,18 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (!running) {
             running = true;
             reset();
+            speedFollower.start();
         }
     }
 
+    @Override
+    public synchronized void stop() {
+        super.stop();
+        speedFollower.stop();
+    }
+
     public boolean isFinished() {
-        return report.isFinished && speedFollower.isFinished();
+        return report.isFinished/* && speedFollower.isFinished()*/;
     }
 
     @Override
@@ -192,23 +200,26 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         }
         Pose2d currentPose = drive.getPose();
         double centerWheelRate = drive.getCenterRate();
-        report = getPursuitReport(currentPose, centerWheelRate);
+        if (!report.isFinished) {
+            report = getPursuitReport(currentPose, centerWheelRate);
+        }
+//        logger.debug("currentPose: {}, report: {}", currentPose, report);
         Twist2d twist = getTwist(currentPose, report.lookaheadPoint.getTranslation());
         speedFollower.update(delta);
+        speedPower = .25;
         DriveOutputs driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
+//        logger.debug("driving with {}, power {}, outputs {}", twist, speedPower, driveOutputs);
         drive.setPowers(driveOutputs);
     }
 
     @Override
     public void configure(Config config) {
-        setMaxAcceleration(config.maxAcceleration);
-        setLookaheadFunction(config.lookahead);
-        speedFollower.configure(config.speedController);
+        setLookAheadFunction(config.lookAhead);
+        speedFollower.configure(config.speedFollower);
     }
 
     public static class Config {
-        public double maxAcceleration;
-        public LinearInterpolationFunction lookahead;
-        public TrapezoidalProfileFollower.Config speedController;
+        public LinearInterpolationFunction lookAhead;
+        public TrapezoidalProfileFollower.Config speedFollower;
     }
 }

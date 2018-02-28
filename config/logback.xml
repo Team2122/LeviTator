@@ -39,7 +39,7 @@
         <appender-ref ref="Server"/>
     </appender>
 
-    <root level="trace">
+    <root level="debug">
         <appender-ref ref="Console"/>
         <appender-ref ref="AsyncFile"/>
         <appender-ref ref="AsyncServer"/>
@@ -50,4 +50,6 @@
     <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftHigh)" level="TRACE" />-->
     <!--<logger name="org.teamtators.limbo.commands.DriveTank(Drive.Tank)" level="TRACE" />-->
     <logger name="org.teamtators.common.drive.TankKinematics" level="TRACE" />
+    <logger name="org.teamtators.common.control.TrapezoidalProfileFollower" level="TRACE" />
+    <logger name="org.teamtators.common.control.DriveSegmentsFollower(DriveSegmentsFollower.speedFollower)" level="TRACE" />
 </configuration>

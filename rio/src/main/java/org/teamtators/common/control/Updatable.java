@@ -1,5 +1,7 @@
 package org.teamtators.common.control;
 
+import org.slf4j.profiler.Profiler;
+
 /**
  * Represents things that can be updated at a certain period
  *
@@ -16,5 +18,9 @@ public interface Updatable {
 
     default String getName() {
         return "Updatable";
+    }
+
+    default Profiler getProfiler() {
+        return null;
     }
 }

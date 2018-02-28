@@ -20,6 +20,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     public DrivePathCommand(TatorRobot robot) {
         super("DrivePath");
         this.drive = robot.getSubsystems().getDrive();
+        requires(drive);
     }
 
     @Override

@@ -17,6 +17,7 @@ public class PoseEstimator extends AbstractUpdatable {
     private TankKinematics kinematics;
 
     public PoseEstimator(TankDrive drive) {
+        super("PoseEstimator");
         this.drive = drive;
         setPose(Pose2d.zero());
     }

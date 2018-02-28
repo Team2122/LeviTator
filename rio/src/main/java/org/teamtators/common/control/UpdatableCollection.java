@@ -1,11 +1,14 @@
 package org.teamtators.common.control;
 
+import org.slf4j.profiler.Profiler;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
 public class UpdatableCollection extends ArrayList<Updatable> implements Updatable {
     private final String name;
+    private Profiler profiler;
 
     public UpdatableCollection(String name) {
         super();
@@ -40,6 +43,16 @@ public class UpdatableCollection extends ArrayList<Updatable> implements Updatab
 
     @Override
     public void update(double delta) {
-        this.forEach(updatable -> updatable.update(delta));
+        profiler = new Profiler(name);
+        this.forEach(updatable ->{
+            profiler.start(updatable.getName());
+            updatable.update(delta);
+        });
+        profiler.stop();
+    }
+
+    @Override
+    public Profiler getProfiler() {
+        return profiler;
     }
 }

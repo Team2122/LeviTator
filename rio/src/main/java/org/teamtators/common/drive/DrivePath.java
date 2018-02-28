@@ -1,5 +1,7 @@
 package org.teamtators.common.drive;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
@@ -15,6 +17,8 @@ import static org.teamtators.common.math.Epsilon.isEpsilonPositive;
 import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 
 public class DrivePath {
+    private static final Logger logger = LoggerFactory.getLogger(DrivePath.class);
+
     public static class Point {
         private Translation2d translation;
         private double radius = Double.NaN;
@@ -61,9 +65,6 @@ public class DrivePath {
         }
 
         public double getRadius() {
-            if (Double.isNaN(radius)) {
-                throw new ConfigException("radius on DrivePath.Point not set");
-            }
             return radius;
         }
 
@@ -72,9 +73,6 @@ public class DrivePath {
         }
 
         public double getSpeed() {
-            if (Double.isNaN(speed)) {
-                throw new ConfigException("speed on DrivePath.Point not set");
-            }
             return speed;
         }
 
@@ -83,14 +81,23 @@ public class DrivePath {
         }
 
         public double getArcSpeed() {
-            if (Double.isNaN(arcSpeed)) {
-                throw new ConfigException("arcSpeed on DrivePath.Point not set");
-            }
             return arcSpeed;
         }
 
         public void setArcSpeed(double arcSpeed) {
             this.arcSpeed = arcSpeed;
+        }
+
+        void check() {
+            if (Double.isNaN(radius)) {
+                throw new ConfigException("radius on DrivePath.Point not set");
+            }
+            if (Double.isNaN(arcSpeed)) {
+                throw new ConfigException("arcSpeed on DrivePath.Point not set");
+            }
+            if (Double.isNaN(speed)) {
+                throw new ConfigException("speed on DrivePath.Point not set");
+            }
         }
 
         @Override
@@ -119,6 +126,7 @@ public class DrivePath {
     }
 
     public void addPoint(Point point) {
+        point.check();
         this.points.add(point);
     }
 
@@ -176,7 +184,7 @@ public class DrivePath {
                 double availableTakeOffLength = Math.min(length - lastTakeOffLength, length2);
                 takeOffLength = Math.abs(radius / halfAngle.tan());
                 if (availableTakeOffLength < takeOffLength) {
-                    System.out.println("Warning: Decreasing radius on arc because distance between points is too small: " +
+                    logger.warn("Decreasing radius on arc because distance between points is too small: " +
                             availableTakeOffLength + " < " + takeOffLength);
                     radius = Math.abs(availableTakeOffLength * halfAngle.tan());
                     takeOffLength = Math.abs(radius / halfAngle.tan());

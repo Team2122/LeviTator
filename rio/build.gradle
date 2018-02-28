@@ -23,6 +23,7 @@ deploy {
             targets << 'roborio'
             filename = "LeviTator.jar"
             arguments = ["$robotDir/config"]
+//            debug= true
         }
         artifact('config', FileCollectionArtifact) {
             targets << 'roborio'

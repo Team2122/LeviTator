@@ -21,7 +21,7 @@ public class DriveSegmentsFollowerTest {
         DriveSegments segments = DrivePathTest.getTestPath().toSegments();
         DriveSegmentsFollower follower = new DriveSegmentsFollower(null);
         follower.setSegments(segments);
-        follower.setLookaheadFunction(operand -> 1);
+        follower.setLookAheadFunction(operand -> 1);
 
         Pose2d currentPose = new Pose2d(Translation2d.zero(), Rotation.fromDegrees(90));
         while (true) {
@@ -58,22 +58,27 @@ public class DriveSegmentsFollowerTest {
                 new TwistTestCase(
                         new Pose2d(Translation2d.zero(), Rotation.fromDegrees(0)),
                         new Translation2d(10, 10),
-                        new Twist2d(Rotation.fromDegrees(90), 15.707963267948966)
+                        new Twist2d(Rotation.fromDegrees(-90), 15.707963267948966)
                 ),
                 new TwistTestCase(
                         new Pose2d(Translation2d.zero(), Rotation.fromDegrees(0)),
                         new Translation2d(-10, 10),
-                        new Twist2d(Rotation.fromDegrees(-90), -15.707963267948966)
+                        new Twist2d(Rotation.fromDegrees(90), 15.707963267948966)
                 ),
+//                new TwistTestCase(
+//                        new Pose2d(Translation2d.zero(), Rotation.fromDegrees(124)),
+//                        new Translation2d(-10.134, 10.1345),
+//                        new Twist2d(Rotation.fromDegrees(-21.997173161334032), 14.42039418592253)
+//                ),
+//                new TwistTestCase(
+//                        new Pose2d(new Translation2d(10, -423), Rotation.fromDegrees(124)),
+//                        new Translation2d(-10.134, 10.1345),
+//                        new Twist2d(Rotation.fromDegrees(20.235074533011908), -378.15579443370166)
+//                ),
                 new TwistTestCase(
-                        new Pose2d(Translation2d.zero(), Rotation.fromDegrees(124)),
-                        new Translation2d(-10.134, 10.1345),
-                        new Twist2d(Rotation.fromDegrees(21.997173161334036), 14.42039418592253)
-                ),
-                new TwistTestCase(
-                        new Pose2d(new Translation2d(10, -423), Rotation.fromDegrees(124)),
-                        new Translation2d(-10.134, 10.1345),
-                        new Twist2d(Rotation.fromDegrees(-20.235074533011908), -378.15579443370166)
+                        new Pose2d(new Translation2d(1.01496032180358, 26.94195544013806), Rotation.fromDegrees(75.34119787607021)),
+                        new Translation2d(9.119180503066943, 27.65666136386981),
+                        new Twist2d(Rotation.fromDegrees(140.60271757847312), 10.602888466093074)
                 )
         );
 

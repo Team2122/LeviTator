@@ -2,6 +2,7 @@ package org.teamtators.common.control;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -71,6 +72,11 @@ public class Updater implements Runnable {
             double elapsed = getTime() - time;
             if (elapsed > period && elapsed > .1) {
                 logger.warn("Updatable " + updatable.getClass().getName() + " exceeded period ({} > {})", elapsed, period);
+                Profiler profiler = updatable.getProfiler();
+                if (profiler != null) {
+                    profiler.setLogger(logger);
+                    profiler.log();
+                }
             }
         } catch (Throwable t) {
             logger.error("Exception in updatable: ", t);

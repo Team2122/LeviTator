@@ -38,6 +38,6 @@ public class Twist2d {
     }
 
     public boolean epsilonEquals(Twist2d other) {
-        return Epsilon.isEpsilonEqual(deltaX, other.deltaX) && deltaYaw.equals(other.deltaYaw);
+        return Epsilon.isEpsilonEqual(deltaX, other.deltaX) && deltaYaw.epsilonEquals(other.deltaYaw);
     }
 }

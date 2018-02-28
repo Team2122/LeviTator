@@ -9,14 +9,14 @@ import org.teamtators.common.math.*;
  */
 public class TankKinematics {
     private static final Logger logger = LoggerFactory.getLogger(TankKinematics.class);
-    private double effectiveWheelBase = 0.0;
+    private double effectiveTrackWidth = 0.0;
 
-    public double getEffectiveWheelBase() {
-        return effectiveWheelBase;
+    public double getEffectiveTrackWidth() {
+        return effectiveTrackWidth;
     }
 
-    public void setEffectiveWheelBase(double effectiveWheelBase) {
-        this.effectiveWheelBase = effectiveWheelBase;
+    public void setEffectiveTrackWidth(double effectiveTrackWidth) {
+        this.effectiveTrackWidth = effectiveTrackWidth;
     }
 
     public Pose2d calculatePoseChange(Rotation deltaHeading, double deltaWheel) {
@@ -45,10 +45,10 @@ public class TankKinematics {
     }
 
     public DriveOutputs calculateOutputs(Twist2d curvature, double power) {
-        double yawDistance = effectiveWheelBase * curvature.getDeltaYaw().toRadians() / 2;
+        double yawDistance = effectiveTrackWidth * curvature.getDeltaYaw().toRadians() / 2;
         double deltaX = curvature.getDeltaX();
         DriveOutputs outputs = new DriveOutputs(deltaX - yawDistance, deltaX + yawDistance);
-        outputs = outputs.scale(power / deltaX);
+        outputs = outputs.scale(power / Math.abs(deltaX));
         return outputs;
     }
 }

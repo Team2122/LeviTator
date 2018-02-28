@@ -32,8 +32,17 @@ drive:
       maxIError: 2.0
   #    logData: true
   driveSegmentsFollower:
-
-  tankKinematics: { effectiveWheelBase: 33.0 }
+    lookAhead: { minX: 0, maxX: 60, minY: 3, maxY: 12 }
+    speedFollower:
+      kpP: 0.5
+      kiP: 0.0
+      kpV: 0.015
+      kfV: .0074
+      kMinOutput: .0461
+      kfA: 0.0025
+      maxIError: 10.0
+      maxAcceleration: 80.0
+  tankKinematics: { effectiveTrackWidth: 16.0 }
 picker:
   leftMotor: { type: TALON_SRX, config: { id: 1 } }
   rightMotor: { type: TALON_SRX, config: { id: 2, inverted: true } }

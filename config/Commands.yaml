@@ -67,7 +67,7 @@ $TestDrive:
   - class: DrivePath
     path:
       - { x: 0, y: 0 }
-      - { x: 0, y: 30 }
+      - { x: 0, y: 30, radius: 18 }
       - { x: 30, y: 30 }
 #  maxAcceleration: 84.0
 #TestDriveRotate:
