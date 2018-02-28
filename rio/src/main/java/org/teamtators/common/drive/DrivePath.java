@@ -1,5 +1,6 @@
 package org.teamtators.common.drive;
 
+import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
 import org.teamtators.common.math.Translation2d;
@@ -9,36 +10,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.teamtators.common.math.Epsilon.isEpsilonPositive;
+import static org.teamtators.common.math.Epsilon.isEpsilonZero;
+
 public class DrivePath {
-    private static final double EPSILON = 1E-9;
-
-    public static void main(String[] argv) {
-        DrivePath path = new DrivePath();
-        DrivePath.Point point = new DrivePath.Point();
-        point.setTranslation(new Translation2d(0, 0));
-        point.setRadius(12);
-        point.setSpeed(30);
-        point.setArcSpeed(20);
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(0, 10));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(30, 10));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(30, 40));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(-30, 40));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(-30, 10));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(0, 10));
-        path.addPoint(point.copy());
-        point.setTranslation(new Translation2d(0, 0));
-        path.addPoint(point.copy());
-
-        DriveSegments segments = path.toSegments();
-        System.out.println(segments.getSegments().stream().map(Object::toString).collect(Collectors.joining("\n")));
-    }
-
     public static class Point {
         private Translation2d translation;
         private double radius;
@@ -159,7 +134,7 @@ public class DrivePath {
             StraightSegment straight = new StraightSegment();
             ArcSegment arc = null;
             double radius = point2.getRadius();
-            boolean isRadius = radius > EPSILON && i < numPoints - 2;
+            boolean isRadius = isEpsilonPositive(radius) && i < numPoints - 2;
             straight.setStartSpeed(speed);
             straight.setTravelSpeed(point1.getSpeed());
             Pose2d startPose = new Pose2d(point1.getTranslation(), heading)
@@ -177,9 +152,9 @@ public class DrivePath {
                 nextHeading = trans2.getDirection();
                 deltaHeading = nextHeading.sub(heading);
                 angle = deltaHeading.complement();
-                if (Math.abs(trans.getMagnitude()) > EPSILON &&
-                        Math.abs(trans2.getMagnitude()) > EPSILON) {
-                    if (Math.abs(deltaHeading.toRadians()) < EPSILON) {
+                if (!isEpsilonZero(trans.getMagnitude()) &&
+                        !isEpsilonZero(trans2.getMagnitude())) {
+                    if (isEpsilonZero(deltaHeading.toRadians())) {
                         isStraight = true;
                     }
                 } else {
@@ -198,7 +173,7 @@ public class DrivePath {
                 }
 
                 double centerToPointLength = Math.abs(radius / halfAngle.sin());
-                Rotation halfHeading = heading.add(halfAngle).inverse();
+                Rotation halfHeading = heading.inverse().sub(halfAngle);
                 Translation2d arcCenter = new Pose2d(point2.getTranslation(), halfHeading)
                         .extend(centerToPointLength).getTranslation();
                 arc = new ArcSegment();
@@ -224,7 +199,7 @@ public class DrivePath {
                 throw new RuntimeException("Distance between path points is too short with arcs included: "
                         + length + " - " + lastTakeOffLength + " - " + takeOffLength + " = " + newLength);
             }
-            if (Math.abs(newLength) > EPSILON) {
+            if (!isEpsilonZero(newLength)) {
                 straight.setLength(newLength);
                 segments.addSegment(straight);
             } else {

@@ -1,5 +1,7 @@
 package org.teamtators.common.math;
 
+import com.google.common.base.Objects;
+
 /**
  * @author Alex Mikhalev
  */
@@ -92,8 +94,18 @@ public class Rotation {
         return Rotation.fromRadians(scaleNum * toRadians());
     }
 
-    public Rotation normal() {
+    /**
+     * @return the rotation plus 90 degrees (counter clockwise in mathematical coordinates)
+     */
+    public Rotation ccwNormal() {
         return new Rotation(this.cos, -this.sin);
+    }
+
+    /**
+     * @return the rotation minus 90 degrees (clockwise in mathematical coordinates)
+     */
+    public Rotation cwNormal() {
+        return new Rotation(-this.cos, this.sin);
     }
 
     public Rotation inverse() {
@@ -104,8 +116,34 @@ public class Rotation {
         return new Rotation(this.sin, -this.cos);
     }
 
+    /**
+     * @return a vector pointing in the direction of the rotation with length 1
+     */
     public Translation2d toTranslation() {
         return new Translation2d(this.cos, this.sin);
+    }
+
+    /**
+     * @param length the length of the resultant vector
+     * @return   a vector pointing in the direction of the rotation with the specified length
+     */
+    public Translation2d toTranslation(double length) {
+        return toTranslation().scale(length);
+    }
+
+    /**
+     * Checks if this rotation is between the smallest angle formed between start and end
+     * @param start
+     * @param end
+     * @return
+     */
+    public boolean isBetween(Rotation start, Rotation end) {
+        double a = end.sub(start).toRadians();
+        double b = this.sub(start).toRadians();
+        if (a * b > 0 && Math.abs(b) < Math.abs(a)) {
+            return true;
+        }
+        return false;
     }
 
     public void normalize() {
@@ -121,11 +159,24 @@ public class Rotation {
         return toDegrees() + "°";
     }
 
-    public boolean isParallel(Rotation yaw) {
-        return equalsEpsilon(yaw) || equalsEpsilon(yaw.inverse());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rotation rotation = (Rotation) o;
+        return Double.compare(rotation.toRadians(), toRadians()) == 0;
     }
 
-    public boolean equalsEpsilon(Rotation other) {
-        return Math.abs(toRadians() - other.toRadians()) <= 1E-9;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(toRadians());
+    }
+
+    public boolean isParallel(Rotation yaw) {
+        return epsilonEquals(yaw) || epsilonEquals(yaw.inverse());
+    }
+
+    public boolean epsilonEquals(Rotation other) {
+        return Epsilon.isEpsilonEqual(toRadians(), other.toRadians());
     }
 }

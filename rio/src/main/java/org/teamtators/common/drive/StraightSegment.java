@@ -1,40 +1,12 @@
 package org.teamtators.common.drive;
 
+import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Translation2d;
 
-public class StraightSegment implements DriveSegment {
-    private double startSpeed;
-    private double travelSpeed;
-    private double endSpeed;
-
+public class StraightSegment extends DriveSegmentBase {
     private Pose2d startPose;
     private double length;
-
-
-    public double getStartSpeed() {
-        return startSpeed;
-    }
-
-    public void setStartSpeed(double startSpeed) {
-        this.startSpeed = startSpeed;
-    }
-
-    public double getTravelSpeed() {
-        return travelSpeed;
-    }
-
-    public void setTravelSpeed(double travelSpeed) {
-        this.travelSpeed = travelSpeed;
-    }
-
-    public double getEndSpeed() {
-        return endSpeed;
-    }
-
-    public void setEndSpeed(double endSpeed) {
-        this.endSpeed = endSpeed;
-    }
 
     public double getLength() {
         return length;
@@ -61,38 +33,49 @@ public class StraightSegment implements DriveSegment {
         return startPose.extend(length);
     }
 
-    public Translation2d getNearestPoint(Translation2d point) {
+    @Override
+    protected Pose2d getNearestPoint(Translation2d point) {
         Translation2d nearestPoint = startPose.getNearestPoint(point);
         Translation2d diff = nearestPoint.sub(startPose.getTranslation());
-        if (Math.abs(diff.getMagnitude()) > 1E-9) {
-            if (diff.getDirection().equalsEpsilon(startPose.getYaw())) {
+        if (!Epsilon.isEpsilonZero(diff.getMagnitude())) {
+            if (diff.getDirection().epsilonEquals(startPose.getYaw())) {
                 if (diff.getMagnitude() > length) {
-                    return getEndPose().getTranslation();
+                    return getEndPose();
                 }
             } else {
-                return getStartPose().getTranslation();
+                return getStartPose();
             }
         }
-        return nearestPoint;
+        return new Pose2d(nearestPoint, startPose.getYaw());
     }
 
-    public Translation2d getLookAhead(Translation2d nearestPoint, double distance) {
-        return nearestPoint.add(startPose.getYaw().toTranslation().scale(distance));
+    @Override
+    public Pose2d getLookAhead(Pose2d nearestPoint, double distance) {
+        return new Pose2d(
+                nearestPoint.getTranslation()
+                        .add(startPose.getYaw().toTranslation(distance)),
+                startPose.getYaw());
     }
 
-    public double getRemainingDistance(Translation2d point) {
+    @Override
+    protected double getTraveledDistance(Translation2d point) {
+        return getStartPose().getDistanceAhead(point);
+    }
+
+    @Override
+    protected double getRemainingDistance(Translation2d point) {
         return -getEndPose().getDistanceAhead(point);
     }
 
     @Override
     public String toString() {
         return "StraightSegment{" +
-                "startSpeed=" + startSpeed +
-                ", travelSpeed=" + travelSpeed +
-                ", endSpeed=" + endSpeed +
-                ", startPose=" + startPose +
-                ", length=" + length +
+                "startPose=" + startPose +
                 ", endPose=" + getEndPose() +
+                ", length=" + length +
+                ", startSpeed=" + getStartSpeed() +
+                ", travelSpeed=" + getTravelSpeed() +
+                ", endSpeed=" + getEndSpeed() +
                 '}';
     }
 }

@@ -21,7 +21,7 @@ public class TankKinematics {
 
     public Pose2d calculatePoseChange(Rotation deltaHeading, double deltaWheel) {
         double deltaHeadingRads = deltaHeading.toRadians();
-        if (Math.abs(deltaHeadingRads) < 1E-4) {
+        if (Epsilon.isEpsilonZero(deltaHeadingRads)) {
             return new Pose2d(new Translation2d(deltaWheel, 0.0), deltaHeading);
         }
         double arcLength = deltaWheel;

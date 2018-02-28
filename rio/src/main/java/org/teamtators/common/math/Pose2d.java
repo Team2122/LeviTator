@@ -2,6 +2,9 @@ package org.teamtators.common.math;
 
 import com.google.common.base.Preconditions;
 
+import static org.teamtators.common.math.Epsilon.isEpsilonNegative;
+import static org.teamtators.common.math.Epsilon.isEpsilonZero;
+
 /**
  * @author Alex Mikhalev
  */
@@ -82,7 +85,7 @@ public class Pose2d {
     }
 
     public Pose2d extend(double distance) {
-        return new Pose2d(this.translation.add(yaw.toTranslation().scale(distance)), this.yaw);
+        return new Pose2d(this.translation.add(yaw.toTranslation(distance)), this.yaw);
     }
 
     public Translation2d getIntersection(Pose2d other) {
@@ -105,20 +108,23 @@ public class Pose2d {
         double tan_b = b_r.tan();
         double t = ((a_t.getX() - b_t.getX()) * tan_b + b_t.getY() - a_t.getY())
                 / (a_r.sin() - a_r.cos() * tan_b);
-        return a_t.add(a_r.toTranslation().scale(t));
+        return a_t.add(a_r.toTranslation(t));
     }
 
     public Translation2d getNearestPoint(Translation2d point) {
-        Pose2d normalPose = new Pose2d(point, yaw.normal());
+        Pose2d normalPose = new Pose2d(point, yaw.ccwNormal());
         return getIntersection(normalPose);
     }
 
     public double getDistanceAhead(Translation2d point) {
         Translation2d diff = point.sub(translation);
+        if (isEpsilonZero(diff.getMagnitude())) {
+            return 0.0;
+        }
         Rotation direction = diff.getDirection();
-        if (direction.isParallel(yaw)) {
+        if (direction.epsilonEquals(yaw)) {
             return diff.getMagnitude();
-        } else if (direction.inverse().isParallel(yaw)) {
+        } else if (direction.inverse().epsilonEquals(yaw)) {
             return -diff.getMagnitude();
         } else {
             return Double.NaN;
@@ -131,5 +137,10 @@ public class Pose2d {
                 "translation=" + translation +
                 ", yaw=" + yaw +
                 '}';
+    }
+
+    public boolean epsilonEquals(Pose2d other) {
+        return getTranslation().epsilonEquals(other.getTranslation()) &&
+                getYaw().epsilonEquals(other.getYaw());
     }
 }

@@ -74,4 +74,9 @@ public class Translation2d {
     public double cross(Translation2d other) {
         return this.x * other.y - this.y * other.x;
     }
+
+    public boolean epsilonEquals(Translation2d other) {
+        return Epsilon.isEpsilonEqual(getX(), other.getX()) &&
+                Epsilon.isEpsilonEqual(getY(), other.getY());
+    }
 }

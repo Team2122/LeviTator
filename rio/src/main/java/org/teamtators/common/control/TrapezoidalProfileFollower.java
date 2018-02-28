@@ -4,6 +4,7 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.DataLoggable;
 import org.teamtators.common.datalogging.LogDataProvider;
+import org.teamtators.common.math.Epsilon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TrapezoidalProfileFollower extends AbstractUpdatable implements DataLoggable,
         Configurable<TrapezoidalProfileFollower.Config> {
-    private static final double EPSILON = 1e-5;
     private final DataCollector dataCollector = DataCollector.getDataCollector();
     private final LogDataProvider logDataProvider = new TrapezoidalProfileFollower.ControllerLogDataProvider();
     private final TrapezoidalProfile baseProfile = new TrapezoidalProfile();
@@ -229,9 +229,9 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         double output = positionError * config.kpP + velocityError * config.kpV +
                 calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA + holdPower;
 
-        if (calculator.getVelocity() >= EPSILON) {
+        if (Epsilon.isEpsilonPositive(calculator.getVelocity())) {
             output += config.kMinOutput;
-        } else if (calculator.getVelocity() <= -EPSILON) {
+        } else if (Epsilon.isEpsilonNegative(calculator.getVelocity())) {
             output -= config.kMinOutput;
         }
 

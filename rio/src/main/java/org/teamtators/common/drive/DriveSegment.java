@@ -6,4 +6,8 @@ public interface DriveSegment {
     Pose2d getStartPose();
     Pose2d getEndPose();
     double getArcLength();
+
+    LookaheadReport getLookaheadReport(Pose2d currentPose, double lookaheadDistance);
+
+    Pose2d getLookAhead(Pose2d nearestPoint, double lookahead);
 }

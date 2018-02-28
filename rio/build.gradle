@@ -74,6 +74,8 @@ dependencies {
     compile ctre()
 //    compile navx()
     compile openrio.powerup.matchData()
+
+    testCompile group: 'org.testng', name: 'testng', version: '6.14.2'
 }
 
 jar {
@@ -85,4 +87,8 @@ jar {
                     "$robotDir/libs/${it.getName()}"
                 }.join(' ')
     }
+}
+
+test {
+    useTestNG()
 }
