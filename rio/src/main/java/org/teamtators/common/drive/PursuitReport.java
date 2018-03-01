@@ -11,6 +11,8 @@ public class PursuitReport {
     public Pose2d lookaheadPoint;
     public double trackError;
     public Rotation yawError;
+    public boolean updateProfile = false;
+    public boolean isReverse;
 
     @Override
     public String toString() {

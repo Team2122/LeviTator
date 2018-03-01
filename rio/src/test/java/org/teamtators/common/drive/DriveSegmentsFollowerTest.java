@@ -25,7 +25,7 @@ public class DriveSegmentsFollowerTest {
 
         Pose2d currentPose = new Pose2d(Translation2d.zero(), Rotation.fromDegrees(90));
         while (true) {
-            PursuitReport report = follower.getPursuitReport(currentPose, 0.0);
+            PursuitReport report = follower.updatePursuitReport(currentPose, 0.0);
             System.out.println(report);
             if (report.isFinished) {
                 break;

@@ -11,6 +11,8 @@ public interface DriveSegment {
     double getTravelSpeed();
     double getEndSpeed();
 
+    boolean isReverse();
+
     LookaheadReport getLookaheadReport(Pose2d currentPose, double lookaheadDistance);
     Pose2d getLookAhead(Pose2d nearestPoint, double lookahead);
 }

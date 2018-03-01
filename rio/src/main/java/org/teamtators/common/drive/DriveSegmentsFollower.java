@@ -22,6 +22,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private double previousTraveled;
     private double totalLength;
     private PursuitReport report;
+    private LookaheadReport lookaheadReport;
     private double speedPower;
 
     public DriveSegmentsFollower(TankDrive drive) {
@@ -30,7 +31,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
         speedFollower = new TrapezoidalProfileFollower("DriveSegmentsFollower.speedFollower");
         speedFollower.setPositionProvider(this::getTraveledDistance);
-        speedFollower.setVelocityProvider(drive::getCenterRate);
+        speedFollower.setVelocityProvider(() ->
+                report.isReverse ? -drive.getCenterRate() : drive.getCenterRate());
         speedFollower.setOutputConsumer(this::setSpeedPower);
         speedFollower.setOnTargetPredicate(t -> false);
 
@@ -83,31 +85,36 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         logger.debug("driving segment {}", seg);
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());
-        speedFollower.moveDistance(seg.getArcLength());
+        speedFollower.moveToPosition(previousTraveled + lookaheadReport.remainingDistance);
     }
 
-    PursuitReport getPursuitReport(Pose2d currentPose, double centerWheelRate) {
+    void updatePursuitReport(Pose2d currentPose, double centerWheelRate) {
+        if (report.isFinished) {
+            return;
+        }
         if (currentSegmentIdx < 0) {
             currentSegmentIdx++;
-            updateProfile();
+            report.updateProfile = true;
         }
-        PursuitReport report = new PursuitReport();
         if (!hasSegment()) {
             report.isFinished = true;
-            return report;
+            return;
         }
-        DriveSegment currentSegment = getCurrentSegment();
         double lookahead = lookAheadFunction.applyAsDouble(Math.abs(centerWheelRate));
-        LookaheadReport lookaheadReport = currentSegment.getLookaheadReport(currentPose, lookahead);
-        if (Epsilon.isEpsilonNegative(lookaheadReport.remainingDistance)) {
+        DriveSegment currentSegment = getCurrentSegment();
+        Pose2d pose = currentSegment.isReverse() ? currentPose.invertYaw() : currentPose;
+        lookaheadReport = currentSegment.getLookaheadReport(pose, lookahead);
+        while (Epsilon.isEpsilonNegative(lookaheadReport.remainingDistance)) {
             currentSegmentIdx++;
             if (!hasSegment()) {
                 report.isFinished = true;
+                break;
             } else {
                 previousTraveled += lookaheadReport.traveledDistance;
                 currentSegment = getCurrentSegment();
-                lookaheadReport = currentSegment.getLookaheadReport(currentPose, lookahead);
-                updateProfile();
+                pose = currentSegment.isReverse() ? currentPose.invertYaw() : currentPose;
+                lookaheadReport = currentSegment.getLookaheadReport(pose, lookahead);
+                report.updateProfile = true;
             }
         }
         report.traveledDistance = previousTraveled + lookaheadReport.traveledDistance;
@@ -116,13 +123,13 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         report.lookaheadPoint = lookaheadReport.lookaheadPoint;
         report.trackError = lookaheadReport.trackError;
         report.yawError = lookaheadReport.yawError;
+        report.isReverse = currentSegment.isReverse();
         if (lookaheadReport.lookaheadRemainingDistance < 0 && hasNextSegment()) {
             DriveSegment nextSegment = getNextSegment();
             double nextLookahead = -lookaheadReport.lookaheadRemainingDistance;
             report.lookaheadPoint = nextSegment
                     .getLookAhead(nextSegment.getStartPose(), nextLookahead);
         }
-        return report;
     }
 
     private DriveSegment getNextSegment() {
@@ -146,31 +153,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             return 0.0;
         }
         return report.traveledDistance;
-    }
-
-    static Twist2d getTwist(Pose2d currentPose, Translation2d lookaheadPoint) {
-        Translation2d diff = lookaheadPoint.sub(currentPose.getTranslation());
-        Translation2d halfDiff = diff.scale(0.5);
-        Pose2d perpBisector = new Pose2d(currentPose.getTranslation().add(halfDiff), diff.getDirection().ccwNormal());
-        Rotation startHeading = currentPose.getYaw();
-        Rotation startNormal = startHeading.ccwNormal();
-        Pose2d startNormalLine = new Pose2d(currentPose.getTranslation(), startNormal);
-        Translation2d center = perpBisector.getIntersection(startNormalLine);
-        Twist2d twist = new Twist2d();
-        if (center.isNaN()) { // if the radii don't intersect, it is a straight line
-            twist.setDeltaYaw(Rotation.identity());
-            twist.setDeltaX(diff.getMagnitude());
-        } else {
-            boolean isCcw = startNormalLine.getDistanceAhead(center) > 0;
-            double radius = lookaheadPoint.sub(center).getMagnitude();
-            Rotation endNormal = lookaheadPoint.sub(center).getDirection();
-            Rotation endHeading = isCcw ? endNormal.ccwNormal() : endNormal.cwNormal();
-            Rotation deltaHeading = endHeading.sub(startHeading);
-            double arcLength = deltaHeading.toRadians() * radius;
-            twist.setDeltaYaw(deltaHeading);
-            twist.setDeltaX(Math.abs(arcLength));
-        }
-        return twist;
     }
 
     @Override
@@ -200,13 +182,16 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         }
         Pose2d currentPose = drive.getPose();
         double centerWheelRate = drive.getCenterRate();
-        if (!report.isFinished) {
-            report = getPursuitReport(currentPose, centerWheelRate);
+        updatePursuitReport(currentPose, centerWheelRate);
+        if (report.updateProfile) {
+            updateProfile();
         }
 //        logger.debug("currentPose: {}, report: {}", currentPose, report);
-        Twist2d twist = getTwist(currentPose, report.lookaheadPoint.getTranslation());
+        Twist2d twist = Twist2d.fromTangentArc(currentPose, report.lookaheadPoint.getTranslation());
+        if (report.isReverse) {
+            twist = twist.invert();
+        }
         speedFollower.update(delta);
-        speedPower = .25;
         DriveOutputs driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
 //        logger.debug("driving with {}, power {}, outputs {}", twist, speedPower, driveOutputs);
         drive.setPowers(driveOutputs);

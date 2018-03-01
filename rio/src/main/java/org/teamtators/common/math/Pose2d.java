@@ -66,6 +66,10 @@ public class Pose2d {
         return new Pose2d(this.translation, this.yaw.add(yaw));
     }
 
+    public Pose2d invertYaw() {
+        return withYaw(yaw.inverse());
+    }
+
     public Pose2d sub(Pose2d other) {
         return new Pose2d(this.translation.sub(other.translation), this.yaw.sub(other.yaw));
     }
