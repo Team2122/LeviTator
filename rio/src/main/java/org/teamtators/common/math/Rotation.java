@@ -189,6 +189,6 @@ public class Rotation {
     }
 
     public boolean epsilonEquals(Rotation other) {
-        return Epsilon.isEpsilonEqual(toRadians(), other.toRadians());
+        return Epsilon.isEpsilonZero(sub(other).toRadians());
     }
 }
