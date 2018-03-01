@@ -70,9 +70,9 @@ $TestDrive:
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
   - class: DrivePath
-    speed: 100
-    radius: 36
+    speed: 140
     arcSpeed: 60
+    radius: 36
     path:
       - { x: 0, y: 0 }
       - { x: 0, y: 144 }
