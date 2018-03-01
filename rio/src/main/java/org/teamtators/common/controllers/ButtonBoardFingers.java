@@ -2,30 +2,30 @@ package org.teamtators.common.controllers;
 
 import org.teamtators.common.scheduler.TriggerSource;
 
-public class ButtonBoard
-        extends ControllerBase<org.teamtators.common.controllers.ButtonBoard.Button, org.teamtators.common.controllers.ButtonBoard.Axis, ControllerBase.Config> {
+public class ButtonBoardFingers
+        extends ControllerBase<org.teamtators.common.controllers.ButtonBoardFingers.Button, org.teamtators.common.controllers.ButtonBoardFingers.Axis, ControllerBase.Config> {
 
-    public ButtonBoard(String name) {
+    public ButtonBoardFingers(String name) {
         super(name);
     }
 
     @Override
-    public Class<org.teamtators.common.controllers.ButtonBoard.Button> getButtonClass() {
-        return org.teamtators.common.controllers.ButtonBoard.Button.class;
+    public Class<org.teamtators.common.controllers.ButtonBoardFingers.Button> getButtonClass() {
+        return org.teamtators.common.controllers.ButtonBoardFingers.Button.class;
     }
 
     @Override
-    public Class<ButtonBoard.Axis> getAxisClass() {
-        return null;
+    public Class<ButtonBoardFingers.Axis> getAxisClass() {
+        return Axis.class;
     }
 
     @Override
-    public double getAxisValue(org.teamtators.common.controllers.ButtonBoard.Axis axis) {
+    public double getAxisValue(org.teamtators.common.controllers.ButtonBoardFingers.Axis axis) {
         return 0;
     }
 
     @Override
-    public boolean isButtonDown(org.teamtators.common.controllers.ButtonBoard.Button button) {
+    public boolean isButtonDown(org.teamtators.common.controllers.ButtonBoardFingers.Button button) {
         switch (button) {
             default:
                 return super.isRawButtonDown(button.getButtonID());
@@ -33,17 +33,17 @@ public class ButtonBoard
     }
 
     @Override
-    public boolean isButtonPressed(org.teamtators.common.controllers.ButtonBoard.Button button) {
+    public boolean isButtonPressed(org.teamtators.common.controllers.ButtonBoardFingers.Button button) {
         return isRawButtonPressed(button.getButtonID());
     }
 
     @Override
-    public boolean isButtonReleased(org.teamtators.common.controllers.ButtonBoard.Button button) {
+    public boolean isButtonReleased(org.teamtators.common.controllers.ButtonBoardFingers.Button button) {
         return isRawButtonDown(button.getButtonID());
     }
 
     @Override
-    public TriggerSource getTriggerSource(org.teamtators.common.controllers.ButtonBoard.Button button) {
+    public TriggerSource getTriggerSource(org.teamtators.common.controllers.ButtonBoardFingers.Button button) {
         return () -> isButtonDown(button);
     }
 
