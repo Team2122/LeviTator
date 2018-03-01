@@ -40,10 +40,10 @@ public class StraightSegment extends DriveSegmentBase {
         if (!Epsilon.isEpsilonZero(diff.getMagnitude())) {
             if (diff.getDirection().epsilonEquals(startPose.getYaw())) {
                 if (diff.getMagnitude() > length) {
-                    return getEndPose();
+//                    return getEndPose();
                 }
             } else {
-                return getStartPose();
+//                return getStartPose();
             }
         }
         return new Pose2d(nearestPoint, startPose.getYaw());

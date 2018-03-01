@@ -3,8 +3,12 @@ package org.teamtators.common.drive;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.AbstractUpdatable;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
+import org.teamtators.common.datalogging.DataCollector;
+import org.teamtators.common.datalogging.LogDataProvider;
 import org.teamtators.common.math.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 /**
@@ -24,6 +28,10 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private PursuitReport report;
     private LookaheadReport lookaheadReport;
     private double speedPower;
+    private LogDataProvider logDataProvider = new LogDataProvder();
+    private Pose2d currentPose;
+    private Twist2d twist;
+    private DriveOutputs driveOutputs;
 
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
@@ -81,6 +89,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     }
 
     private void updateProfile() {
+        if (!hasSegment()) return;
         DriveSegment seg = getCurrentSegment();
         logger.debug("driving segment {}", seg);
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
@@ -92,6 +101,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (report.isFinished) {
             return;
         }
+        report = new PursuitReport();
         if (currentSegmentIdx < 0) {
             currentSegmentIdx++;
             report.updateProfile = true;
@@ -161,6 +171,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             running = true;
             reset();
             speedFollower.start();
+            DataCollector.getDataCollector().startProvider(logDataProvider);
         }
     }
 
@@ -168,10 +179,15 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public synchronized void stop() {
         super.stop();
         speedFollower.stop();
+        DataCollector.getDataCollector().stopProvider(logDataProvider);
     }
 
     public boolean isFinished() {
         return report.isFinished/* && speedFollower.isFinished()*/;
+    }
+
+    public boolean isOnTarget() {
+        return report.remainingDistance < 0.1;
     }
 
     @Override
@@ -179,22 +195,24 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (isFinished()) {
             drive.stop();
             stop();
+            return;
         }
-        Pose2d currentPose = drive.getPose();
+        currentPose = drive.getPose();
         double centerWheelRate = drive.getCenterRate();
         updatePursuitReport(currentPose, centerWheelRate);
-        if (report.updateProfile) {
+        if (!isFinished() && report.updateProfile) {
             updateProfile();
         }
-//        logger.debug("currentPose: {}, report: {}", currentPose, report);
-        Twist2d twist = Twist2d.fromTangentArc(currentPose, report.lookaheadPoint.getTranslation());
+        twist = Twist2d.fromTangentArc(currentPose, report.lookaheadPoint.getTranslation());
         if (report.isReverse) {
             twist = twist.invert();
         }
         speedFollower.update(delta);
-        DriveOutputs driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
-//        logger.debug("driving with {}, power {}, outputs {}", twist, speedPower, driveOutputs);
+        driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
         drive.setPowers(driveOutputs);
+        if (isOnTarget()) {
+            report.isFinished = true;
+        }
     }
 
     @Override
@@ -206,5 +224,24 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
+    }
+
+    private class LogDataProvder implements LogDataProvider {
+        @Override
+        public String getName() {
+            return DriveSegmentsFollower.this.getName();
+        }
+
+        @Override
+        public List<Object> getKeys() {
+            return Arrays.asList("traveledDistance", "remainingDistance", "currentPose", "nearestPoint", "lookaheadPoint",
+                    "twist", "speedPower", "driveOutputs");
+        }
+
+        @Override
+        public List<Object> getValues() {
+            return Arrays.asList(report.traveledDistance, report.remainingDistance, currentPose, report.nearestPoint, report.lookaheadPoint,
+                    twist, speedPower, driveOutputs);
+        }
     }
 }

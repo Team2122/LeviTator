@@ -25,7 +25,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
 
     @Override
     protected void initialize() {
-        super.initialize();
+        logger.info("Starting driving path at " + drive.getPose());
         drive.driveSegments(driveSegments);
     }
 
@@ -36,7 +36,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
 
     @Override
     protected void finish(boolean interrupted) {
-        super.finish(interrupted);
+        logger.info((interrupted ? "Interrupted" : "Finished") + " driving path at " + drive.getPose());
         drive.stop();
     }
 
@@ -56,6 +56,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
             drivePath.addPoint(point);
         }
         this.driveSegments = drivePath.toSegments();
+        logger.trace("segments: " + driveSegments);
     }
 
     public static class Config {

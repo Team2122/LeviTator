@@ -70,10 +70,15 @@ $TestDrive:
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
   - class: DrivePath
+    speed: 100
+    radius: 36
+    arcSpeed: 60
     path:
       - { x: 0, y: 0 }
-      - { x: 0, y: 30, radius: 18 }
-      - { x: 30, y: 30 }
+      - { x: 0, y: 144 }
+      - { x: 144, y: 144 }
+      - { x: 144, y: 0 }
+      - { x: 0, y: 0 }
 #  maxAcceleration: 84.0
 #TestDriveRotate:
 #  class: DriveRotate

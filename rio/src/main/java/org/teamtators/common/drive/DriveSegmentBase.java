@@ -11,6 +11,7 @@ public abstract class DriveSegmentBase implements DriveSegment {
     private double startSpeed;
     private double travelSpeed;
     private double endSpeed;
+    private boolean isReverse = false;
 
     @Override
     public double getStartSpeed() {
@@ -37,6 +38,15 @@ public abstract class DriveSegmentBase implements DriveSegment {
 
     public void setEndSpeed(double endSpeed) {
         this.endSpeed = endSpeed;
+    }
+
+    @Override
+    public boolean isReverse() {
+        return isReverse;
+    }
+
+    public void setReverse(boolean reverse) {
+        isReverse = reverse;
     }
 
     protected abstract Pose2d getNearestPoint(Translation2d point);
