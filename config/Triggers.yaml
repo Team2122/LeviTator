@@ -1,17 +1,30 @@
 defaults: [ DriveTank, LiftContinuous ]
 
 driver:
-  A: toggle whenPressed PickerPick
+  TRIGGER_RIGHT: toggle whenPressed PickerPick
+  TRIGGER_LEFT: start whenPressed $PickerReleaseTeleop
   B: start whenPressed $PickerReleaseTeleop
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight
   POV_DOWN: start whenPressed $LiftSwitchLow
-  X: start whenPressed $LiftHome
-  Y: start whenPressed $LiftSwitch
-  BUMPER_RIGHT: start whenPressed $LiftScaleLow
-  BUMPER_LEFT: start whenPressed $LiftScaleHigh
-  TRIGGER_LEFT: start whenPressed PickerExtend
-  TRIGGER_RIGHT: start whenPressed PickerRetract
-  START: start whenPressed $TestDrive
-  BACK: start whenPressed PrintPose
+  A: start whenPressed $LiftHome
+  B: start whenPressed $LiftSwitch
+  X: start whenPressed $LiftScaleLow
+  Y: start whenPressed $LiftScaleHigh
+gunner:
+  LEFT_PINKY: toggle whenPressed $PickerReleaseTeleop
+  LEFT_MIDDLE: start whenPressed PivotCenter
+  LEFT_RING: start whenPressed PivotLeft
+  LEFT_INDEX: start whenPressed PivotRight
+  LEFT_THUMB: toggle whenPressed PickerPick
+  RIGHT_THUMB: start whenPressed $LiftHome
+  RIGHT_INDEX: start whenPressed $LiftSwitchLow
+  RIGHT_MIDDLE: start whenPressed $LiftSwitch
+  RIGHT_RING: start whenPressed $LiftScaleLow
+  RIGHT_PINKY: start whenPressed $LiftScaleHigh
+gunnerSecondary:
+  1: start whenPressed $TestDrive
+  2: start whenPressed PrintPose
+  3: start whenPressed PickerExtend
+  4: start whenPressed PickerRetract

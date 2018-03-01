@@ -1,7 +1,7 @@
 operatorInterface:
   driverJoystick: { port: 0 }
-  gunnerJoystick: { port: 1 }
-  gunnerSecondary: { port: 2 }
+  gunnerJoystick: { port: 2 }
+  gunnerSecondary: { port: 1 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
@@ -45,8 +45,8 @@ drive:
       maxAcceleration: 80.0
   tankKinematics: { effectiveTrackWidth: 16.0 }
 picker:
-  leftMotor: { type: TALON_SRX, config: { id: 1 } }
-  rightMotor: { type: TALON_SRX, config: { id: 2, inverted: true } }
+  leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
+  rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
   extensionSolenoid: { channel: 0 }
   cubeDetectSensor: { channel: 14, type: PNP }
   upperCubeSensor: { channel: 13, type: NPN }

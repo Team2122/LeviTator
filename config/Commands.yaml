@@ -19,7 +19,7 @@ PickerRelease:
 
 $PickerReleaseTeleop:
   - PickerQuickDeploy
-#  - PivotCenter
+  - PivotCenter
 #  - WaitForCenter
 
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
