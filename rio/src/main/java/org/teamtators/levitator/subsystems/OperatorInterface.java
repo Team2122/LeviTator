@@ -33,10 +33,12 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         super.configure();
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
+        gunnerSecondary.configure(config.gunnerSecondary);
 
         controllers = Arrays.asList(
-                getDriverJoystick(),
-                getGunnerJoystick()
+                driverJoystick,
+                gunnerJoystick,
+                gunnerSecondary
         );
     }
 

@@ -79,8 +79,8 @@ lift:
     minOutput: -0.5
     minPosition: 0.0
     maxPosition: 85.0
-    maxAcceleration: 80.0
-    travelVelocity: 80.0
+    maxAcceleration: 140.0
+    travelVelocity: 100.0
     endVelocity: 0.0
 
   pivotController:
@@ -101,7 +101,7 @@ lift:
     target: { within: 10.0 }
     minSetpoint: -90.0
     maxSetpoint: 90.0
-    maxAcceleration: 0.4
+    maxAcceleration: 0.8
     movePower: 0.4
     endRamp: 20.0
     logData: true

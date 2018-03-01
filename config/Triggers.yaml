@@ -2,7 +2,7 @@ defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   TRIGGER_RIGHT: toggle whenPressed PickerPick
-  TRIGGER_LEFT: start whenPressed $PickerReleaseTeleop
+  TRIGGER_LEFT: start whenPressed $PickerReleaseHard
   B: start whenPressed $PickerReleaseTeleop
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
@@ -13,7 +13,7 @@ driver:
   X: start whenPressed $LiftScaleLow
   Y: start whenPressed $LiftScaleHigh
 gunner:
-  LEFT_PINKY: toggle whenPressed $PickerReleaseTeleop
+#  LEFT_PINKY: toggle whenPressed PickerSwitchDeploy
   LEFT_MIDDLE: start whenPressed PivotCenter
   LEFT_RING: start whenPressed PivotLeft
   LEFT_INDEX: start whenPressed PivotRight
@@ -24,7 +24,9 @@ gunner:
   RIGHT_RING: start whenPressed $LiftScaleLow
   RIGHT_PINKY: start whenPressed $LiftScaleHigh
 gunnerSecondary:
-  1: start whenPressed $TestDrive
-  2: start whenPressed PrintPose
-  3: start whenPressed PickerExtend
-  4: start whenPressed PickerRetract
+  1: start whenPressed $PickerReleaseSoft
+  2: start whenPressed $TestDrive
+  3: start whenPressed PrintPose
+  4: start whenPressed PickerExtend
+  5: start whenPressed PickerRetract
+  12: start whenPressed $PickerReleaseHard

@@ -17,8 +17,13 @@ PickerRegrip:
 PickerRelease:
   powers: { left: -0.7, right: -0.7 }
 
-$PickerReleaseTeleop:
-  - PickerQuickDeploy
+$PickerReleaseHard:
+  - { class: PickerQuickDeploy, kickPower: 0.8 }
+  - PivotCenter
+#  - WaitForCenter
+
+$PickerReleaseSoft:
+  - { class: PickerQuickDeploy, kickPower: 0.6 }
   - PivotCenter
 #  - WaitForCenter
 
