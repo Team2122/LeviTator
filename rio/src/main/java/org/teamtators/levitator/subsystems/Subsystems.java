@@ -36,7 +36,7 @@ public class Subsystems extends SubsystemsBase
         picker = new Picker();
         lift = new Lift();
         auto = new Auto(robot);
-        vision = new Vision(robot);
+        vision = new Vision(drive);
         //your subsystems here
         subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision /*, yourSubsystem */);
 

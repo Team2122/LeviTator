@@ -6,7 +6,7 @@ import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Vision;
-import org.teamtators.levitator.subsystems.VisionOutput;
+import org.teamtators.levitator.subsystems.DetectedObject;
 
 public class PickerAutoPick extends Command implements Configurable<PickerAutoPick.Config> {
     private final Vision vision;
@@ -33,9 +33,9 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
 
     @Override
     protected boolean step() {
-        VisionOutput output = vision.getLastOutput();
-        Double angle = vision.getNewRobotAngle(output);
-        Double distance = vision.getDistance(output);
+        DetectedObject detected = vision.getLastOutput();
+        Double angle = vision.getNewRobotAngle(detected);
+        Double distance = vision.getDistance(detected);
         logger.trace(String.format("Distance from cube %5.3f at angle %5.3f", distance, angle));
         if(angle != null && distance != null) {
             drive.driveHeading(angle, config.velocity);

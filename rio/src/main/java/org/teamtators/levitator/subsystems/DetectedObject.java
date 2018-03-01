@@ -1,13 +1,13 @@
 package org.teamtators.levitator.subsystems;
 
-public class VisionOutput {
+public class DetectedObject {
     public Double x;
     public Double y;
     public Double area;
     public Double width;
     public Double height;
 
-    public VisionOutput(Double x, Double y, Double area, Double width, Double height) {
+    public DetectedObject(Double x, Double y, Double area, Double width, Double height) {
         this.x = x;
         this.y = y;
         this.area = area;
@@ -15,5 +15,5 @@ public class VisionOutput {
         this.height = height;
     }
 
-    public VisionOutput() {}
+    public DetectedObject() {}
 }
