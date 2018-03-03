@@ -7,7 +7,11 @@ drive:
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
   rightMotor: { type: VICTOR_SP, channel: 1, inverted: true, powerChannels: [] }
   rightEncoder: { aChannel: 2, bChannel: 3, reverse: false, distancePerPulse: .0471238898}
-  rotationController: {}
+  rotationController:
+      P: 0.05
+      I: 0.0
+      D: 0.0
+      maxAbsoluteOutput: 0.5
   straightMotionFollower:
       kpP: 1.0
       kiP: 0.0
@@ -43,7 +47,7 @@ drive:
       kfA: 0.0025
       maxIError: 10.0
       maxAcceleration: 80.0
-  tankKinematics: { effectiveTrackWidth: 40.0 }
+  tankKinematics: { effectiveTrackWidth: 36.0 }
 picker:
   leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
   rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
@@ -109,7 +113,9 @@ lift:
   pivotHoldPower: 0.15
 
   anglePresetLeft: -90
+  anglePresetHalfLeft: -45
   anglePresetCenter: 0
+  anglePresetHalfRight: 45
   anglePresetRight: 90
   heightPresetPick: 2
   heightPresetLowSwitch: 12
@@ -129,14 +135,16 @@ auto:
 vision:
   width: 320
   height: 240
-  lowerThreshold: [00.0, 0.0, 0.0]
-  upperThreshold: [2550.0, 255.0, 255.0]
+  contrast: 80
+  saturation: 80
+#  exposure: 3
+  lowerThreshold: [16.0, 170.0, 215.0]
+  upperThreshold: [34.0, 255.0, 255.0]
+  minWidth: 0
+  maxWidth: 1000
+  minHeight: 0
+  maxHeight: 1000
+  distanceCalculator: { a: 137.87, b: 150.78, c: 71.129 }
+  fovX: 58
+  yawOffset: -4.0
 
-  minWidth:
-  maxWidth:
-
-  minHeight:
-  maxHeight:
-
-  saturation: 50
-  exposure: 3

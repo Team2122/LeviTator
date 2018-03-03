@@ -81,8 +81,8 @@ $TestDrive:
       - { x: 0, y: 0 }
 
 PickerAutoPick:
-  velocity: 48.0
-  maxDriveDistance: 24.0
+  velocity: 0.0
+  maxDriveDistance: 84.0
 
 $PickerAutoPick:
   - { parallel: true, name: PickerPick }

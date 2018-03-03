@@ -12,6 +12,7 @@ driver:
   B: start whenPressed $LiftSwitch
   X: start whenPressed $LiftScaleLow
   Y: start whenPressed $LiftScaleHigh
+  BACK: toggle whenPressed PickerAutoPick
 gunner:
 #  LEFT_PINKY: toggle whenPressed PickerSwitchDeploy
   LEFT_MIDDLE: start whenPressed PivotCenter

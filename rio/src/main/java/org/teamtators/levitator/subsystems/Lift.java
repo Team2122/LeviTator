@@ -164,7 +164,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private void disableLiftController() {
-        setTargetHeight(getCurrentHeight());
         liftController.stop();
     }
 

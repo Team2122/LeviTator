@@ -16,4 +16,15 @@ public class DetectedObject {
     }
 
     public DetectedObject() {}
+
+    @Override
+    public String toString() {
+        return "DetectedObject{" +
+                "x=" + x +
+                ", y=" + y +
+                ", area=" + area +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
+    }
 }

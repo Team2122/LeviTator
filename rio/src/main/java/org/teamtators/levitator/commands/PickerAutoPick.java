@@ -33,7 +33,7 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
 
     @Override
     protected boolean step() {
-        DetectedObject detected = vision.getLastOutput();
+        DetectedObject detected = vision.getLastDetectedObject();
         Double angle = vision.getNewRobotAngle(detected);
         Double distance = vision.getDistance(detected);
         logger.trace(String.format("Distance from cube %5.3f at angle %5.3f", distance, angle));
