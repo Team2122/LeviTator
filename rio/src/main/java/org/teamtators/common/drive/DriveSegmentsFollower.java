@@ -221,6 +221,10 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         speedFollower.configure(config.speedFollower);
     }
 
+    public PursuitReport getReport() {
+        return report;
+    }
+
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
