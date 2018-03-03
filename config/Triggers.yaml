@@ -29,4 +29,6 @@ gunnerSecondary:
   3: start whenPressed PrintPose
   4: start whenPressed PickerExtend
   5: start whenPressed PickerRetract
+  6: start whenPressed LiftEnable
+  7: start whenPressed LiftDisable
   12: start whenPressed $PickerReleaseHard
