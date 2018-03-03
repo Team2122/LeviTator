@@ -22,13 +22,18 @@ $PickerReleaseHard:
   - PivotCenter
 #  - WaitForCenter
 
-$PickerReleaseSoft:
+$PickerReleaseMedium:
   - { class: PickerQuickDeploy, kickPower: 0.6 }
   - PivotCenter
 #  - WaitForCenter
 
+$PickerReleaseSoft:
+  - { class: PickerQuickDeploy, kickPower: 0.4 }
+
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
+PivotHalfLeft: { class: PivotAnglePreset, preset: HALF_LEFT }
 PivotCenter: { class: PivotAnglePreset, preset: CENTER }
+PivotHalfRight: { class: PivotAnglePreset, preset: HALF_RIGHT }
 PivotRight: { class: PivotAnglePreset, preset: RIGHT }
 ^WaitForAngle: { tolerance: 5.0 }
 WaitForAngle: {}
@@ -308,16 +313,19 @@ $AutoStartLeftScaleRightScaleRight:
 
 $AutoStartRightScaleLeftSwitchLeft:
   - $StartRightScaleLeft
+  - { class: DriveStraight, angle: -38, distance: -8 }
   - { class: WaitFor, command: PickerPick }
   - { class: Wait, period: 1 }
-  - { class: DriveStraight, angle: -38, distance: 12 }
+  - { class: DriveStraight, angle: -38, distance: 18 }
   - PickerSwitchDeploy
 
 $AutoStartLeftScaleRightSwitchRight:
   - $StartLeftScaleRight
+  - { class: DriveStraight, angle: -38, distance: -8 }
   - { class: WaitFor, command: PickerPick }
   - { class: Wait, period: 1 }
   - { class: DriveStraight, angle: 38, distance: 12 }
+  - { class: DriveStraight, angle: -38, distance: 18 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleLeftSwitchRight:

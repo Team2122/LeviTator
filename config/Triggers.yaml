@@ -14,7 +14,7 @@ driver:
   Y: start whenPressed $LiftScaleHigh
   BACK: toggle whenPressed PickerAutoPick
 gunner:
-#  LEFT_PINKY: toggle whenPressed PickerSwitchDeploy
+  LEFT_PINKY: start whenPressed $PickerReleaseSoft
   LEFT_MIDDLE: start whenPressed PivotCenter
   LEFT_RING: start whenPressed PivotLeft
   LEFT_INDEX: start whenPressed PivotRight
@@ -25,9 +25,13 @@ gunner:
   RIGHT_RING: start whenPressed $LiftScaleLow
   RIGHT_PINKY: start whenPressed $LiftScaleHigh
 gunnerSecondary:
-  1: start whenPressed $PickerReleaseSoft
+  1: start whenPressed $PickerReleaseMedium
   2: start whenPressed $TestDrive
   3: start whenPressed PrintPose
   4: start whenPressed PickerExtend
   5: start whenPressed PickerRetract
+  6: start whenPressed BumpPivotLeft
+  7: start whenPressed BumpPivotRight
+  8: start whenPressed BumpLiftUp
+  9: start whenPressed BumpLiftDown
   12: start whenPressed $PickerReleaseHard

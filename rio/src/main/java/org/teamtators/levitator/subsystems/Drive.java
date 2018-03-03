@@ -29,14 +29,14 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     private Encoder rightEncoder;
     private Encoder leftEncoder;
     private ADXRS453 gyro;
-    private PidController rotationController = new PidController("RotationController");
+    private PidController rotationController = new PidController("Drive.rotationController");
 
-    private TrapezoidalProfileFollower straightMotionFollower = new TrapezoidalProfileFollower("DriveMotionFollower");
-    private PidController yawAngleController = new PidController("DriveYawAngleController");
+    private TrapezoidalProfileFollower straightMotionFollower = new TrapezoidalProfileFollower("Drive.straightMotionFollower");
+    private PidController yawAngleController = new PidController("Drive.yawAngleController");
     private OutputController outputController = new OutputController();
 
     private TrapezoidalProfileFollower rotationMotionFollower =
-            new TrapezoidalProfileFollower("DriveRotationMotionFollower");
+            new TrapezoidalProfileFollower("Drive.rotationMotionFollower");
 
     private TankKinematics tankKinematics;
     private PoseEstimator poseEstimator = new PoseEstimator(this);

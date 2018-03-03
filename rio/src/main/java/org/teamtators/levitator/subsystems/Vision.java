@@ -84,6 +84,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             }
         }
 
+        return;
+        /*
         VideoProperty displayModeProp = outputStream.createProperty("displayMode", VideoProperty.Kind.kEnum, 0, 4, 1, 0, 0);
         DisplayMode[] displayModeValues = DisplayMode.values();
         String[] displayModeOpts = new String[displayModeValues.length];
@@ -192,7 +194,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         hsv.release();
         threshold.release();
         hierarchy.release();
-        output.release();
+        output.release();*/
     }
 
     private UsbCameraInfo[] getCameras() {

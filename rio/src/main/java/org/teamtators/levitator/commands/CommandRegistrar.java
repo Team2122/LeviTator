@@ -47,7 +47,7 @@ public class CommandRegistrar {
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
         commandStore.putCommand("BumpPivotRight", Commands.instant(lift::bumpPivotRight));
-        commandStore.putCommand("BumpPivotLeft", Commands.instant(lift::bumpPivotRight));
+        commandStore.putCommand("BumpPivotLeft", Commands.instant(lift::bumpPivotLeft));
 
         commandStore.registerCommand("AutoSelector", () -> new AutoSelector(robot));
 

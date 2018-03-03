@@ -19,6 +19,7 @@ import org.teamtators.common.tester.components.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
@@ -189,19 +190,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public double getAnglePreset(AnglePreset anglePreset) {
-        double angleValue = 0.0;
-        switch (anglePreset) {
-            case LEFT:
-                angleValue = config.anglePresetLeft;
-                break;
-            case RIGHT:
-                angleValue = config.anglePresetRight;
-                break;
-            case CENTER:
-                angleValue = config.anglePresetCenter;
-                break;
-        }
-        return angleValue;
+        return config.anglePresets.get(anglePreset);
     }
 
     public double getTargetAngle() {
@@ -382,7 +371,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private double getSafePivotAngle(double desiredAngle) {
         if (getCurrentHeight() < config.heightPresetSwitch - config.heightTolerance) {
-            return config.anglePresetCenter;
+            return config.anglePresets.get(AnglePreset.CENTER);
         }
         return desiredAngle;
     }
@@ -390,8 +379,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     public double getSafeLiftHeight(double desiredHeight) {
         double currentPivotAngle = getCurrentPivotAngle();
         double currentLiftHeight = getCurrentHeight();
-        if (currentPivotAngle < (config.anglePresetCenter - config.angleTolerance) ||
-                currentPivotAngle > (config.anglePresetCenter + config.angleTolerance) ||
+        if (currentPivotAngle < (config.anglePresets.get(AnglePreset.CENTER) - config.angleTolerance) ||
+                currentPivotAngle > (config.anglePresets.get(AnglePreset.CENTER) + config.angleTolerance) ||
                 !isPivotLocked()) { // if the picker is out far enough that we can't go below level of elevators
             if (currentLiftHeight < config.heightPresetSwitch) { // if we are not above the elevators
                 return getCurrentHeight(); // don't move
@@ -422,7 +411,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public enum AnglePreset {
         LEFT,
+        HALF_LEFT,
         CENTER,
+        HALF_RIGHT,
         RIGHT;
     }
 
@@ -440,9 +431,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public /*TrapezoidalProfileFollower*/StupidController.Config pivotController;
         public double pivotHoldPower;
 
-        public double anglePresetLeft;
-        public double anglePresetCenter;
-        public double anglePresetRight;
+        public Map<AnglePreset, Double> anglePresets;
 
         public double heightPresetPick;
         public double heightPresetSwitch;

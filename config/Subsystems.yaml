@@ -20,7 +20,7 @@ drive:
       kMinOutput: .0461
       kfA: 0.0025
       maxIError: 10.0
-      logData: true
+#      logData: true
   yawAngleController:
       P: 0.1
       I: 0.0
@@ -112,11 +112,12 @@ lift:
 
   pivotHoldPower: 0.15
 
-  anglePresetLeft: -90
-  anglePresetHalfLeft: -45
-  anglePresetCenter: 0
-  anglePresetHalfRight: 45
-  anglePresetRight: 90
+  anglePresets:
+    LEFT: -90
+    HALF_LEFT: -45
+    CENTER: 0
+    HALF_RIGHT: 45
+    RIGHT: 90
   heightPresetPick: 2
   heightPresetLowSwitch: 12
   heightPresetSwitch: 46
@@ -124,8 +125,8 @@ lift:
   heightPresetScaleHigh: 70
   heightPresetHome: 0
 
-  bumpHeightValue: 1
-  bumpPivotValue: 5
+  bumpHeightValue: 5
+  bumpPivotValue: 15
 
   heightTolerance: 2.0
   angleTolerance: 3.0
