@@ -43,6 +43,9 @@ public class CommandRegistrar {
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
         commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
 
+        commandStore.putCommand("LiftEnabled", Commands.instant(() -> lift.setSubsystemEnabled(true)));
+        commandStore.putCommand("LiftDisabled", Commands.instant(() ->lift.setSubsystemEnabled(false)));
+
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
         commandStore.putCommand("BumpPivotRight", Commands.instant(lift::bumpPivotRight));
