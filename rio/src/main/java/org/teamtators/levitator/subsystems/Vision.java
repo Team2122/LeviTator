@@ -3,6 +3,7 @@ package org.teamtators.levitator.subsystems;
 import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -28,35 +29,49 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     private SendableChooser<DisplayMode> displayModeChooser;
     private AtomicReference<DetectedObject> lastOutput = new AtomicReference<>(new DetectedObject());
     private Thread processing;
+    private MjpegServer server;
+    private CameraServer cs;
+    private UsbCamera usbCamera;
+    private CvSink cvSink;
+    private CvSource outputStream;
 
     public Vision(Drive drive) {
         super("Vision");
+        cs = CameraServer.getInstance();
         this.drive = drive;
         displayModeChooser = new SendableChooser<>();
-        displayModeChooser.addDefault("Source", DisplayMode.Source);
+        displayModeChooser.addObject("Source", DisplayMode.Source);
         displayModeChooser.addObject("HSV", DisplayMode.HSV);
         displayModeChooser.addObject("Threshold", DisplayMode.Threshold);
-        displayModeChooser.addObject("AllContours", DisplayMode.AllContours);
+        displayModeChooser.addDefault("AllContours", DisplayMode.AllContours);
         displayModeChooser.addObject("FilteredContours", DisplayMode.FilteredContours);
-        setupCameraThread();
+        displayModeChooser.setName("Vision", "displayMode");
+        SmartDashboard.putData(displayModeChooser);
     }
 
     public void setupCameraThread() {
+        server = cs.addServer("CameraServer2122");
         killThread();
         processing = new Thread(this::processingThread, "TatorVision2Processing");
         processing.start();
     }
 
     private void processingThread() {
-        UsbCameraInfo[] usbCameras = getCameras();
-        if (usbCameras.length <= 1) {
-            logger.warn("No USB webcam!");
-            return;
+        if (usbCamera == null) {
+            UsbCameraInfo[] usbCameras = getCameras();
+            if (usbCameras.length == 0) {
+                logger.warn("No USB webcam!");
+                return;
+            }
+            logger.debug("Starting vision thread with source: " + usbCameras[0].name);
+            usbCamera = cs.startAutomaticCapture("USBWebCam_Pick", usbCameras[0].path);
+            cvSink = cs.getVideo();
+            outputStream = cs.putVideo("Vision_Pick", config.width, config.height);
+        } else {
+            logger.debug("Starting vision thread with existing source");
         }
-        logger.info("Using camera source: " + usbCameras[0].name);
-        UsbCamera usbCamera = CameraServer.getInstance().startAutomaticCapture("USBWebCam_Pick", usbCameras[0].dev);
-        MjpegServer server = CameraServer.getInstance().addServer("CameraServer2122");
-        usbCamera.setResolution(320, 240);
+
+        usbCamera.setResolution(config.width, config.height);
         usbCamera.setExposureManual(config.exposure);
 
         for (VideoProperty property : usbCamera.enumerateProperties()) {
@@ -65,21 +80,23 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             }
         }
 
-        CvSink cvSink = CameraServer.getInstance().getVideo();
-        CvSource outputStream = CameraServer.getInstance().putVideo("Debug", 320, 240);
-
-        Mat source = new Mat();
-        Mat hsv = new Mat();
-        Mat threshold = new Mat();
+        Mat source = Mat.zeros(config.width, config.height, CvType.CV_8UC3);
+        Mat hsv = Mat.zeros(config.width, config.height, CvType.CV_8UC3);
+        Mat threshold = Mat.zeros(config.width, config.height, CvType.CV_8UC1);
         Mat hierarchy = new Mat();
         Mat output = new Mat();
-        ArrayList<MatOfPoint> points = new ArrayList<>();
-        List<MatOfPoint> filteredPoints;
+        ArrayList<MatOfPoint> contours = new ArrayList<>();
+        List<ContourInfo> filteredContours;
         while (!Thread.interrupted()) {
-            points.clear();
-            cvSink.grabFrame(source);
+            contours.clear();
+            long ret = cvSink.grabFrame(source);
+            if (ret == 0) {
+                logger.warn("frame not grabbed: " + cvSink.getError());
+                continue;
+            }
             DisplayMode displayMode = displayModeChooser.getSelected();
-            if (displayMode == DisplayMode.Source) {
+            if (displayMode == DisplayMode.Source || displayMode == DisplayMode.AllContours
+                    || displayMode == DisplayMode.FilteredContours) {
                 source.copyTo(output);
             }
             Imgproc.cvtColor(source, hsv, Imgproc.COLOR_BGR2HSV);
@@ -92,52 +109,52 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             if (displayMode == DisplayMode.Threshold) {
                 threshold.copyTo(output);
             }
-            Imgproc.findContours(threshold, points, hierarchy, Imgproc.RETR_LIST,
+            Imgproc.findContours(threshold, contours, hierarchy, Imgproc.RETR_LIST,
                     Imgproc.CHAIN_APPROX_TC89_L1);
             if (displayMode == DisplayMode.AllContours) {
                 threshold.copyTo(output);
-                Imgproc.drawContours(output, points, -1, REJECTED_CONTOUR_COLOR);
+                Imgproc.drawContours(output, contours, -1, REJECTED_CONTOUR_COLOR);
             }
-            filteredPoints = points.stream().filter(contour -> {
-                Size size = getSize(contour);
-                double width = size.width;
-                double height = size.height;
+            filteredContours = contours.stream()
+                    .map(ContourInfo::new)
+                    .filter(contour -> {
+                double width = contour.size.width;
+                double height = contour.size.height;
                 return (width >= config.minWidth && width <= config.maxWidth)
                         && (height >= config.minHeight && height <= config.maxHeight);
-            }).sorted(Comparator.comparingDouble(a -> getSize(a).area()))
+            }).sorted(Comparator.comparingDouble(a -> a.size.area()))
                     .collect(Collectors.toList());
             if (displayMode == DisplayMode.FilteredContours || displayMode == DisplayMode.AllContours) {
                 threshold.copyTo(output);
-                Imgproc.drawContours(output, filteredPoints, -1, FILTERED_CONTOUR_COLOR);
+                List<MatOfPoint> filteredRawContours = filteredContours.stream().map(ContourInfo::getContour).collect(Collectors.toList());
+                Imgproc.drawContours(output, filteredRawContours, -1, FILTERED_CONTOUR_COLOR);
             }
-            if (filteredPoints.size() == 0) {
+            if (filteredContours.size() == 0) {
                 lastOutput.set(new DetectedObject()); //null output, essentially
             } else {
-                MatOfPoint selectedContour = filteredPoints.get(0);
+                ContourInfo info = filteredContours.get(0);
                 if (displayMode == DisplayMode.FilteredContours || displayMode == DisplayMode.AllContours) {
-                    Imgproc.drawContours(output, Collections.singletonList(selectedContour),
+                    Imgproc.drawContours(output, Collections.singletonList(info.contour),
                             -1, FILTERED_CONTOUR_COLOR, 2);
                 }
-                Rect rect = getRect(selectedContour);
-                Moments moments = getMoments(selectedContour);
-                double x = moments.m10 / moments.m00;
-                double y = moments.m01 / moments.m00;
-                double width = rect.width;
-                double height = rect.height;
-                double area = Imgproc.contourArea(selectedContour);
+                double x = info.moments.m10 / info.moments.m00;
+                double y = info.moments.m01 / info.moments.m00;
+                double width = info.boundingRect.width;
+                double height = info.boundingRect.height;
+                double area = info.area;
                 lastOutput.set(new DetectedObject(x, y, area, width, height));
             }
             outputStream.putFrame(output);
         }
-        cvSink.free();
-        outputStream.free();
-        server.free();
+//        cvSink.free();
+//        outputStream.free();
+//        server.free();
         source.release();
         hsv.release();
         threshold.release();
         hierarchy.release();
         output.release();
-        usbCamera.free();
+//        usbCamera.free();
     }
 
     private UsbCameraInfo[] getCameras() {
@@ -146,29 +163,9 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         return usbCameras;
     }
 
-    private Size getSize(MatOfPoint contour) {
-        return getSize(getRect(contour));
-    }
-
-    private Size getSize(Rect rect) {
-        return new Size(rect.width, rect.height);
-    }
-
-    private Rect getRect(MatOfPoint contour) {
-//        MatOfPoint2f contour2f = new MatOfPoint2f();
-//        contour.convertTo(contour2f, CvType.CV_32FC2);
-//        double epsilon = Imgproc.arcLength(contour2f, true)
-//                * config.arcLengthPercentage;
-//        Imgproc.approxPolyDP(contour2f, contour2f, epsilon, true);
-        return Imgproc.boundingRect(contour);
-    }
-
-    private Moments getMoments(MatOfPoint contour) {
-        return Imgproc.moments(contour);
-    }
-
     public void configure(Config config) {
         this.config = config;
+        setupCameraThread();
     }
 
     public void deconfigure() {
@@ -205,8 +202,15 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     }
 
     public void killThread() {
-        if (processing != null)
-            processing.interrupt();
+        if (processing != null) {
+            if (!processing.isInterrupted()) {
+                processing.interrupt();
+            }
+            try {
+                processing.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 
     public enum DisplayMode {
@@ -216,6 +220,9 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     public static class Config {
         //todo
         public boolean deferConfigToDashboard;
+
+        public int width;
+        public int height;
 
         public double[] lowerThreshold;
         public double[] upperThreshold;
@@ -236,5 +243,24 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         public double yawOffset;
 
         public Polynomial3 distanceCalculator;
+    }
+
+    private class ContourInfo {
+        public MatOfPoint contour;
+        public Rect boundingRect;
+        public Size size;
+        public double area;
+        public Moments moments;
+        public ContourInfo(MatOfPoint contour) {
+            this.contour = contour;
+            this.boundingRect = Imgproc.boundingRect(contour);
+            this.size = new Size(this.boundingRect.width, this.boundingRect.height);
+            this.area = Imgproc.contourArea(contour);
+            this.moments = Imgproc.moments(contour);
+        }
+
+        public MatOfPoint getContour() {
+            return contour;
+        }
     }
 }

@@ -28,7 +28,7 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
     @Override
     protected void initialize() {
         logger.info("Driving to cube");
-        startDistance = drive.getAverageDistance();
+        startDistance = drive.getCenterDistance();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
         if(angle != null && distance != null) {
             drive.driveHeading(angle, config.velocity);
         }
-        return drive.getAverageDistance() - startDistance >= config.maxDriveDistance || picker.isCubeDetectedAny();
+        return drive.getCenterDistance() - startDistance >= config.maxDriveDistance || picker.isCubeDetectedAny();
     }
 
     @Override

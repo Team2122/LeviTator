@@ -127,8 +127,10 @@ auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "$ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"
 vision:
-  lowerThreshold: [60.0, 60.0, 60.0]
-  upperThreshold: [120.0, 120.0, 120.0]
+  width: 320
+  height: 240
+  lowerThreshold: [00.0, 0.0, 0.0]
+  upperThreshold: [2550.0, 255.0, 255.0]
 
   minWidth:
   maxWidth:
@@ -137,4 +139,4 @@ vision:
   maxHeight:
 
   saturation: 50
-  exposure: 50
+  exposure: 3
