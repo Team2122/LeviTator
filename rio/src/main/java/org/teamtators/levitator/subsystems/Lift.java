@@ -38,6 +38,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private double targetAngle;
     private double lastAttemptedAngle;
 
+    private boolean liftEnabled = true;
+
     private TrapezoidalProfileFollower liftController;
     private /*TrapezoidalProfileFollower*/ StupidController pivotController;
     private InputDerivative pivotVelocity;
@@ -106,6 +108,16 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
         setDesiredHeight(getHeightPreset(desiredHeight));
+    }
+
+    public void setSubsystemEnabled (boolean enabled){
+        if (enabled) {
+               liftEnabled = true;
+    } else {
+                liftMotor.set(0);
+                pivotMotor.set(0);
+                liftEnabled = false;
+        }
     }
 
     public double getHeightPreset(HeightPreset heightPreset) {
@@ -256,7 +268,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         if (isAtBottomLimit() && liftPower < 0.0) {
             liftPower = 0.0;
         }
-        liftMotor.set(liftPower);
+        if (!liftEnabled){
+            liftMotor.set(0);
+        } else {
+            liftMotor.set(liftPower);
+        }
     }
 
     public void bumpLiftUp() {
@@ -276,7 +292,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setPivotPower(double pivotPower) {
-        if(!isPivotLocked()) {
+        if(!isPivotLocked() && liftEnabled) {
             pivotMotor.set(pivotPower);
         } else {
             pivotMotor.set(0);
