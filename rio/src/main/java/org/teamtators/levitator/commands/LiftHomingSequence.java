@@ -22,15 +22,17 @@ public class LiftHomingSequence extends Command implements Configurable<LiftHomi
     protected boolean step() {
         lift.setDesiredAnglePreset(Lift.AnglePreset.CENTER);
 
-        if(lift.isPivotLocked() == true && lift.isAtBottomLimit() == true) {
-            lift.setLiftPower(0);
-            lift.resetHeightEncoder();
-            return true;
+        if(lift.isPivotLocked() == true) {
+            if (lift.isAtBottomLimit() == false) {
+                lift.setLiftPower(config.homingPower);
+                return false;
+            } else {
+                lift.setLiftPower(0);
+                lift.resetHeightEncoder();
+                return true;
+            }
         }
-        else{
-            lift.setLiftPower(config.homingPower);
-            return false;
-        }
+        return false;
     }
 
     @Override
