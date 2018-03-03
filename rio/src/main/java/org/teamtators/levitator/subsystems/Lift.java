@@ -62,6 +62,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 //        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
     }
 
+    public void resetHeightEncoder() {
+        liftEncoder.reset();
+    }
+
     /**
      * @return height in inches
      */
