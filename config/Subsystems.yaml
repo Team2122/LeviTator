@@ -108,16 +108,16 @@ lift:
     maxAcceleration: 0.8
     movePower: 0.4
     endRamp: 20.0
-    logData: true
+#    logData: true
 
   pivotHoldPower: 0.15
 
   anglePresets:
-    LEFT: -90
+    LEFT: -88
     HALF_LEFT: -45
     CENTER: 0
     HALF_RIGHT: 45
-    RIGHT: 90
+    RIGHT: 85
   heightPresetPick: 2
   heightPresetLowSwitch: 12
   heightPresetSwitch: 46
@@ -148,4 +148,9 @@ vision:
   distanceCalculator: { a: 137.87, b: 150.78, c: 71.129 }
   fovX: 58
   yawOffset: -4.0
-
+elevators:
+    rightElevatorSolenoid: { channel: 4 }
+    releaser: { channel: 2 }
+    elevatorSlideSolenoid: { channel: 3 }
+    leftFlap: { type: VICTOR_SPX, config: { id: 6 } }
+    leftFlapSensor: { channel: 15, type: NPN }

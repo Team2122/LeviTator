@@ -17,6 +17,21 @@ PickerRegrip:
 PickerRelease:
   powers: { left: -0.7, right: -0.7 }
 
+^PickerQuickDeploy:
+  kickPower: 1
+  timeBeforeKick: 0.1
+  timeBeforeRetract: 0.4
+  timeToKick: 0.6
+
+PickerQuickDeploy:
+  kickPower: 0.8
+  timeBeforeKick: 0.1
+  timeBeforeRetract: 0.4
+  timeToKick: 0.6
+
+PickerSwitchDeploy:
+  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
+
 $PickerReleaseHard:
   - { class: PickerQuickDeploy, kickPower: 0.8 }
   - PivotCenter
@@ -106,22 +121,6 @@ $PickerAutoPick:
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
 ^DrivePath: { speed: 40, arcSpeed: 40, radius: 36 }
-
-^PickerQuickDeploy:
-  kickPower: 1
-  timeBeforeKick: 0.1
-  timeBeforeRetract: 0.4
-  timeToKick: 0.6
-
-PickerQuickDeploy:
-  kickPower: 0.8
-  timeBeforeKick: 0.1
-  timeBeforeRetract: 0.4
-  timeToKick: 0.6
-
-PickerSwitchDeploy:
-  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
-
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #
@@ -131,9 +130,13 @@ NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
 DebugChooserAuto: { class: Log, level: INFO, message: "Woohoo! The autochooser works!"}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
 
+$CommonLiftSequence:
+  - PickerRegrip
+  - { class: Wait, period: 0.25 }
+  - $LiftSwitch
+
 $CommonDriveSequence:
-  - { parallel: true, name: PickerRegrip }
-  - { parallel: true, name: $LiftSwitch }
+  - { parallel: true, name: $CommonLiftSequence }
   - { class: DriveStraight, distance: -138, endSpeed: 100.0 }
 
 
@@ -218,10 +221,10 @@ $StartRightScaleLeft:
   - { class: DriveStraight, angle: -25, distance: 72 }
 
 $StartLeftScaleRight:
-  - { class: DriveStraight, distance: -30, endSpeed: 60.0 }
+  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
   - { class: DriveArc, angle: 90, radius: -48, speed: 50, endSpeed: 50 }
   - { parallel: true, name: $LiftSequenceScaleLowRight }
-  - { class: DriveStraight, distance: -100, angle: 90, endSpeed: 50 }
+  - { class: DriveStraight, distance: -112, angle: 90, endSpeed: 50 }
   - { class: DriveArc, radius: -72, angle: 30, speed: 50.0, endSpeed: 50.0 }
   - { class: DriveStraight, angle: 30, distance: -24, speed: 60 }
   - WaitForRight
@@ -281,6 +284,13 @@ $AutoStartLeftScaleLeftSwitchLeft:
   - { class: DriveStraight, angle: -38, distance: 12 }
   - PickerSwitchDeploy
 
+$AutoStartRightScaleRightSwitchRight:
+  - $StartRightScaleRight
+  - { class: WaitFor, command: PickerPick }
+  - { class: Wait, period: 1 }
+  - { class: DriveStraight, angle: 38, distance: 12 }
+  - PickerSwitchDeploy
+
 $AutoStartRightScaleLeftScaleLeft:
   - $StartRightScaleLeft
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
@@ -321,11 +331,10 @@ $AutoStartRightScaleLeftSwitchLeft:
 
 $AutoStartLeftScaleRightSwitchRight:
   - $StartLeftScaleRight
-  - { class: DriveStraight, angle: -38, distance: -8 }
+  - { class: DriveStraight, angle: 30, distance: -8 }
   - { class: WaitFor, command: PickerPick }
-  - { class: Wait, period: 1 }
-  - { class: DriveStraight, angle: 38, distance: 12 }
-  - { class: DriveStraight, angle: -38, distance: 18 }
+  - { class: Wait, period: 0.5 }
+  - { class: DriveStraight, angle: 30, distance: 23 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleLeftSwitchRight:
