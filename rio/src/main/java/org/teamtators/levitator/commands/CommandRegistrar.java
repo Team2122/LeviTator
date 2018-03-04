@@ -56,5 +56,7 @@ public class CommandRegistrar {
 
         commandStore.putCommand("PrintPose", Commands.instant(() ->
                 TatorRobotBase.logger.info("Pose: " + drive.getPose())));
+
+        commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
     }
 }
