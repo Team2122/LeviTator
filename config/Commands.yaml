@@ -122,6 +122,11 @@ PickerQuickDeploy:
 PickerSwitchDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
 
+ElevatorsDeploy:
+  retractTime: .2
+ElevatorsLeftLift:
+  flapPower: .5
+
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #
