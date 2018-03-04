@@ -84,8 +84,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             }
         }
 
-        return;
-        /*
+        //return;
+
         VideoProperty displayModeProp = outputStream.createProperty("displayMode", VideoProperty.Kind.kEnum, 0, 4, 1, 0, 0);
         DisplayMode[] displayModeValues = DisplayMode.values();
         String[] displayModeOpts = new String[displayModeValues.length];
@@ -153,6 +153,12 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             }
             Imgproc.findContours(threshold, contours, hierarchy, Imgproc.RETR_LIST,
                     Imgproc.CHAIN_APPROX_TC89_L1);
+    /*        List<MatOfPoint> hulls = new ArrayList<>(contours.size());
+            for (int idx = 0; idx < contours.size(); idx++) {
+                MatOfInt convexHull = new MatOfInt();
+                Imgproc.convexHull(contours.get(i), convexHull, false);
+                hulls.set(i, convexHull);
+            }*/
             if (displayMode == DisplayMode.AllContours) {
                 Imgproc.drawContours(output, contours, -1, REJECTED_CONTOUR_COLOR);
             }
@@ -163,7 +169,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
                         double height = contour.size.height;
                         return (width >= minWidth.get() && width <= maxWidth.get())
                                 && (height >= minHeight.get() && height <= maxHeight.get());
-                    }).sorted(Comparator.comparingDouble(a -> a.size.area()))
+                    })
+                    .sorted(Comparator.comparingDouble((ContourInfo a) -> Math.abs(a.x)))
                     .collect(Collectors.toList());
             if (displayMode == DisplayMode.FilteredContours || displayMode == DisplayMode.AllContours) {
                 List<MatOfPoint> filteredRawContours = filteredContours.stream().map(ContourInfo::getContour).collect(Collectors.toList());
@@ -172,16 +179,17 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             if (filteredContours.size() == 0) {
                 lastDetectedObject.set(new DetectedObject()); //null output, essentially
             } else {
-                ContourInfo info = filteredContours.get(filteredContours.size() - 1);
-                if (displayMode == DisplayMode.FilteredContours || displayMode == DisplayMode.AllContours) {
-                    Imgproc.drawContours(output, Collections.singletonList(info.contour),
-                            -1, FILTERED_CONTOUR_COLOR, 2);
-                }
+                ContourInfo info = filteredContours.get(0);
                 double x = ((info.moments.m10 / info.moments.m00) * 2.0 / config.width) - 1.0;
                 double y = ((info.moments.m01 / info.moments.m00) * 2.0 / config.height) - 1.0;
                 double width = info.boundingRect.width / config.width;
                 double height = info.boundingRect.height / config.height;
                 double area = info.area;
+                if (displayMode == DisplayMode.FilteredContours || displayMode == DisplayMode.AllContours) {
+                    Imgproc.drawContours(output, Collections.singletonList(info.contour),
+                            -1, FILTERED_CONTOUR_COLOR, 2);
+                    Imgproc.drawMarker(output, new Point(x, y), FILTERED_CONTOUR_COLOR);
+                }
                 lastDetectedObject.set(new DetectedObject(x, y, area, width, height));
             }
             outputStream.putFrame(output);
@@ -194,7 +202,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         hsv.release();
         threshold.release();
         hierarchy.release();
-        output.release();*/
+        output.release();
     }
 
     private UsbCameraInfo[] getCameras() {
@@ -290,6 +298,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         public Size size;
         public double area;
         public Moments moments;
+        public double x;
+        public double y;
 
         public ContourInfo(MatOfPoint contour) {
             this.contour = contour;
@@ -297,6 +307,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             this.size = new Size(this.boundingRect.width, this.boundingRect.height);
             this.area = Imgproc.contourArea(contour);
             this.moments = Imgproc.moments(contour);
+            x = ((moments.m10 / moments.m00) * 2.0 / config.width) - 1.0;
+            y = ((moments.m01 / moments.m00) * 2.0 / config.height) - 1.0;
         }
 
         public MatOfPoint getContour() {

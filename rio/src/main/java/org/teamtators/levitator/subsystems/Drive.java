@@ -50,8 +50,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
         rotationController.setInputProvider(this::getYawAngle);
         rotationController.setOutputConsumer((double output) -> {
-            setRightMotorPower(speed + output);
-            setLeftMotorPower(speed - output);
+            setLeftMotorPower(speed + output);
+            setRightMotorPower(speed - output);
         });
 
 

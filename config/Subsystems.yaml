@@ -136,17 +136,17 @@ auto:
 vision:
   width: 320
   height: 240
-  contrast: 80
-  saturation: 80
+  contrast: 20
+  saturation: 50
 #  exposure: 3
-  lowerThreshold: [16.0, 170.0, 215.0]
+  lowerThreshold: [18.0, 210.0, 170.0]
   upperThreshold: [34.0, 255.0, 255.0]
-  minWidth: 0
-  maxWidth: 1000
-  minHeight: 0
-  maxHeight: 1000
+  minWidth: 41
+  maxWidth: 130
+  minHeight: 29
+  maxHeight: 115
   distanceCalculator: { a: 137.87, b: 150.78, c: 71.129 }
-  fovX: 58
+  fovX: 30
   yawOffset: -4.0
 elevators:
     rightElevatorSolenoid: { channel: 4 }

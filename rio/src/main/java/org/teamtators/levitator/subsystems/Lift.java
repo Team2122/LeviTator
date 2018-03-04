@@ -42,6 +42,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private TrapezoidalProfileFollower liftController;
     private /*TrapezoidalProfileFollower*/ StupidController pivotController;
     private InputDerivative pivotVelocity;
+    private Updatable holdPowerApplier;
 
     private Config config;
 
@@ -61,6 +62,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotController.setInputProvider(this::getCurrentPivotAngle);
         pivotController.setOutputConsumer(this::setPivotPower);
 //        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
+        holdPowerApplier = delta -> {
+                  if(getCurrentHeight() < 1) {
+                      Lift.this.liftController.setHoldPower(-0.1);
+                  } else {
+                      Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
+                  }
+        };
     }
 
     /**
@@ -281,7 +289,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(pivotVelocity, pivotController, liftController);
+        return Arrays.asList(holdPowerApplier, pivotVelocity, pivotController, liftController);
     }
 
     public boolean isPivotLocked() {

@@ -36,7 +36,8 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
         DetectedObject detected = vision.getLastDetectedObject();
         Double angle = vision.getNewRobotAngle(detected);
         Double distance = vision.getDistance(detected);
-        logger.trace(String.format("Distance from cube %5.3f at angle %5.3f", distance, angle));
+        double currentAngle = drive.getYawAngle();
+        logger.trace(String.format("Distance from cube %5.3f, target angle %5.3f, drive angle %5.3f", distance, angle, currentAngle));
         if(angle != null && distance != null) {
             drive.driveHeading(angle, config.velocity);
         }
