@@ -91,10 +91,10 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private void updateProfile() {
         if (!hasSegment()) return;
         DriveSegment seg = getCurrentSegment();
-        logger.debug("driving segment {}", seg);
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());
         speedFollower.moveToPosition(previousTraveled + lookaheadReport.remainingDistance);
+        logger.debug("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
     }
 
     void updatePursuitReport(Pose2d currentPose, double centerWheelRate) {
@@ -170,6 +170,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (!running) {
             running = true;
             reset();
+            speedFollower.reset();
             speedFollower.start();
             DataCollector.getDataCollector().startProvider(logDataProvider);
         }
@@ -205,7 +206,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         }
         twist = Twist2d.fromTangentArc(currentPose, report.lookaheadPoint.getTranslation());
         if (report.isReverse) {
-            twist = twist.invert();
+            twist = new Twist2d(twist.getDeltaYaw(), -twist.getDeltaX());
         }
         speedFollower.update(delta);
         driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);

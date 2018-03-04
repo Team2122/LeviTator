@@ -1,6 +1,7 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
+import org.teamtators.common.control.BooleanSampler;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
@@ -16,6 +17,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private double sweepTarget;
     private Timer sweepTimer = new Timer();
     private Config config;
+    private BooleanSampler locked = new BooleanSampler(() -> lift.isPivotLocked());
 
     public LiftContinuous(TatorRobot robot) {
         super("LiftContinuous");
@@ -50,7 +52,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 //If our solenoid is locked in or the timer ran out
             }
             if (sweepTarget != 0) {
-                if (lift.isPivotLocked()) {
+                if (locked.get()) {
                     //Reset sweep target
                     logger.debug("Pivot locked");
                     sweepTarget = 0;
@@ -58,6 +60,10 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                     //Reset sweep target
                     logger.warn("Pivot could not lock, timeout elapsed");
                     sweepTarget = 0;
+                }
+            } else {
+                if (!lift.isPivotLocked()) {
+                    sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
                 }
             }
         } else {
@@ -76,7 +82,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                     sweepTimer.restart();
                 } else {
                     lift.setPivotControllerEnabled(true);
-                    lift.setTargetAngle(Math.signum(currentAngle) * config.startSweepAngle);
+                    lift.setTargetAngle(0);
                 }
             }
             //If we want to go somewhere other than the center
@@ -95,11 +101,13 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     @Override
     public void configure(Config config) {
         this.config = config;
+        locked.setPeriod(config.lockedPeriod);
     }
 
     public static class Config {
         public double pivotSweepPower;
         public double startSweepAngle;
         public double sweepTimeoutSeconds;
+        public double lockedPeriod;
     }
 }

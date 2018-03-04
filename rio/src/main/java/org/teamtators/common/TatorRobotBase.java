@@ -120,6 +120,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         deconfigureCommands();
         deconfigureSubsystems();
         removeReinitializeListener();
+        System.gc();
     }
 
     protected void reinitialize() {

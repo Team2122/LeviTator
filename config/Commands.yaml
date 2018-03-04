@@ -82,22 +82,28 @@ $PrepareLiftMovement:
   - WaitForCenter
 
 LiftContinuous:
-  pivotSweepPower: 0.15
+  pivotSweepPower: 0.2
   startSweepAngle: 5.0
   sweepTimeoutSeconds: 5.0
+  lockedPeriod: 0.1
 $TestDrive:
 #  - { class: DriveStraight, angle: 0.0, distance: -144.0, endSpeed: 60.0 }
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
+  - class: SetPose
+    x: 0.0
+    y: 0.0
+    yaw: -90
   - class: DrivePath
     speed: 140
     arcSpeed: 60
     radius: 36
+    reverse: true
     path:
       - { x: 0, y: 0 }
-      - { x: 0, y: 144 }
-      - { x: 144, y: 144 }
-      - { x: 144, y: 0 }
+      - { x: 0, y: 78 }
+      - { x: 78, y: 78 }
+      - { x: 78, y: 0 }
       - { x: 0, y: 0 }
 
 PickerAutoPick:
@@ -163,17 +169,15 @@ $CommonLiftSequence:
 
 $CommonDriveSequence:
   - { parallel: true, name: $CommonLiftSequence }
-  - { class: DriveStraight, distance: -138, endSpeed: 100.0 }
+  - { class: DriveStraight, distance: -138, endSpeed: 80.0, speed: 80 } # 100
 
 $Scale:
   - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
   - $CommonDriveSequence
   - { class: AutoSelector, type: STARTING_POSITION, left: ScaleLeftChooser, center: $CenterAuto, right: ScaleRightChooser}
 
-$ScaleSwitch:
-  - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
-  - $CommonDriveSequence
-  - { class: AutoSelector, type: STARTING_POSITION, left: ScaleSwitchStartLeftChooser, center: $CenterAuto, right: ScaleSwitchStartRightChooser}
+ScaleSwitch:
+  { class: AutoSelector, type: STARTING_POSITION, left: $ScaleSwitchLeft, right: $ScaleSwitchRight}
 
 $SmartScale:
   - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
@@ -181,6 +185,16 @@ $SmartScale:
 
 ScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: $AutoStartLeftScaleLeftScaleLeft, R: $AutoStartLeftScaleRightScaleRight }
 ScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: $AutoStartRightScaleLeftScaleLeft, R: $AutoStartRightScaleRightScaleLeft }
+
+$ScaleSwitchLeft:
+  - SetPoseLeft
+  - $CommonDriveSequence
+  - ScaleSwitchStartLeftChooser
+
+$ScaleSwitchRight:
+  - SetPoseRight
+  - $CommonDriveSequence
+  - ScaleSwitchStartRightChooser
 
 ScaleSwitchStartLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: StartLeftScaleLeftChooser, R: StartLeftScaleRightChooser }
 ScaleSwitchStartRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: StartRightScaleLeftChooser, R: StartRightScaleRightChooser }
@@ -227,6 +241,7 @@ $LiftSequenceScaleLowLeft:
   - PivotLeft
 
 $LiftSequenceScaleLowRight:
+  - { class: Wait, period: 3.0 }
   - { class: WaitFor, command: PickerPick }
   - $LiftScaleLow
   - WaitForHeight
@@ -250,20 +265,21 @@ $StartRightScaleLeft:
   - { class: DriveStraight, angle: -25, distance: 72 }
 
 $StartLeftScaleRight:
+  - { parallel: true, name: $LiftSequenceScaleLowRight }
 #  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
 #  - { class: DriveArc, angle: 90, radius: -48, speed: 50, endSpeed: 50 }
-  - { parallel: true, name: $LiftSequenceScaleLowRight }
 #  - { class: DriveStraight, distance: -112, angle: 90, endSpeed: 50 }
 #  - { class: DriveArc, radius: -72, angle: 30, speed: 50.0, endSpeed: 50.0 }
 #  - { class: DriveStraight, angle: 30, distance: -24, speed: 60 } 96
   - class: DrivePath
     reverse: true
-    points:
+    speed: 140
+    path:
 #      - { x: -115, y: 19 }
       - { x: -115, y: 157 }
-      - { x: -115, y: 229, radius: 48 }
-      - { x: 117, y: 229, radius: 72 }
-      - { x: 200, y: 277 } # +83, +48
+      - { x: -115, y: 240, radius: 48 }
+      - { x: 45, y: 240, radius: 48 }
+      - { x: 108, y: 296 }
   - WaitForRight
   - PickerQuickDeploy
   - PivotCenter
@@ -272,7 +288,12 @@ $StartLeftScaleRight:
   - { parallel: true, name: PickerPick }
   - { class: Wait, period: 0.5 }
 #  - { class: DriveArc, arcLength: 60, angle: 0 }
-  - { class: DriveStraight, angle: 30, distance: 72 }
+#  - { class: DriveStraight, angle: 30, distance: 48 } #72
+  - class: DrivePath
+    path:
+      - { x: 108, y: 296, speed: 40 }
+      - { x: 78, y: 254, radius: 36, speed: 30.0 }
+      - { x: 78, y: 244 }
 
 $StartLeftScaleLeft:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }

@@ -8,6 +8,8 @@ import org.teamtators.common.control.*;
 import org.teamtators.common.drive.*;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.math.Pose2d;
+import org.teamtators.common.math.Rotation;
+import org.teamtators.common.math.Translation2d;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -293,7 +295,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         }
         if (state == RobotState.AUTONOMOUS || state == RobotState.TELEOP) {
             gyro.resetAngle();
-            poseEstimator.setPose(Pose2d.zero());
+            poseEstimator.setPose(new Pose2d(Translation2d.zero(), Rotation.fromDegrees(90)));
         }
     }
 

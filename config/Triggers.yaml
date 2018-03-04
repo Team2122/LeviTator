@@ -9,6 +9,8 @@ driver:
   POV_RIGHT: start whenPressed PivotRight
   POV_DOWN: start whenPressed $LiftSwitchLow
   A: start whenPressed $LiftHome
+  START: start whenPressed PrintPose
+  BACK: toggle whenPressed $TestDrive
 gunner:
   LEFT_PINKY: start whenPressed $PickerReleaseSoft
   LEFT_MIDDLE: start whenPressed PickerSwitchDeploy

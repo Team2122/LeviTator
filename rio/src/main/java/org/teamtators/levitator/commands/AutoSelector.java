@@ -23,25 +23,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
 
     @Override
     protected void initialize() {
-        super.initialize();
-        selected = null;
         hasStarted = false;
-    }
-
-    @Override
-    public void configure(Config config) {
-        this.type = config.type;
-        this.config = config;
-    }
-
-    @Override
-    protected boolean step() {
-        if (selected != null) {
-            if (selected.isRunning()) {
-                hasStarted = true;
-            }
-            return hasStarted && !selected.isRunning();
-        }
 
         String toStart = "$NoAuto";
         if (type == SelectorType.FIELD_CONFIGURATION) {
@@ -72,9 +54,25 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
             startWithContext(selected, this);
         } catch (IllegalArgumentException e) {
             logger.warn("Chosen command not found", e);
-            return true;
+            selected = null;
         }
-        return false;
+    }
+
+    @Override
+    protected boolean step() {
+        if (selected != null) {
+            if (selected.isRunning()) {
+                hasStarted = true;
+            }
+            return hasStarted && !selected.isRunning();
+        }
+        return true;
+    }
+
+    @Override
+    public void configure(Config config) {
+        this.type = config.type;
+        this.config = config;
     }
 
     public enum SelectorType {
@@ -93,6 +91,5 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
         public int object;
         public String L;
         public String R;
-
     }
 }
