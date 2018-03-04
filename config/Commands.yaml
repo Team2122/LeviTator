@@ -125,6 +125,27 @@ $PickerAutoPick:
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
 ^DrivePath: { speed: 40, arcSpeed: 40, radius: 36 }
+
+^PickerQuickDeploy:
+  kickPower: 1
+  timeBeforeKick: 0.1
+  timeBeforeRetract: 0.4
+  timeToKick: 0.6
+
+PickerQuickDeploy:
+  kickPower: 0.8
+  timeBeforeKick: 0.1
+  timeBeforeRetract: 0.4
+  timeToKick: 0.6
+
+PickerSwitchDeploy:
+  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
+
+ElevatorsDeploy:
+  retractTime: .2
+ElevatorsLeftLift:
+  flapPower: .5
+
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #

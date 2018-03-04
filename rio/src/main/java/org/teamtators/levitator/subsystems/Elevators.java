@@ -1,9 +1,11 @@
 package org.teamtators.levitator.subsystems;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.DoubleSolenoidConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.hw.DigitalSensor;
@@ -11,13 +13,14 @@ import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.DoubleSolenoidTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
 public class Elevators extends Subsystem implements Configurable<Elevators.Config> {
     private Solenoid rightElevatorSolenoid;
     private Solenoid releaser;
-    private Solenoid elevatorSlideSolenoid;
+    private DoubleSolenoid elevatorSlideSolenoid;
     private SpeedController leftFlap;
     private DigitalSensor leftFlapSensor;
 
@@ -31,7 +34,7 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
 
     public void reset() {
         rightElevatorSolenoid.set(false);
-        elevatorSlideSolenoid.set(false);
+        elevatorSlideSolenoid.set(DoubleSolenoid.Value.kOff);
         releaser.set(false);
         leftFlap.set(0.0);
         isDeployed = false;
@@ -45,7 +48,7 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
 
     public void deployElevators() {
         releaser.set(true);
-        elevatorSlideSolenoid.set(true);
+        elevatorSlideSolenoid.set(DoubleSolenoid.Value.kForward);
         isDeployed = true;
     }
 
@@ -53,8 +56,8 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         return isDeployed;
     }
 
-    public void slide(boolean out) {
-        elevatorSlideSolenoid.set(out);
+    public void slide(DoubleSolenoid.Value value) {
+        elevatorSlideSolenoid.set(value);
     }
 
     public void setFlapPower(double power) {
@@ -70,11 +73,11 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         switch (state) {
             case TELEOP:
             case AUTONOMOUS:
-                elevatorSlideSolenoid.set(true);
+                elevatorSlideSolenoid.set(DoubleSolenoid.Value.kForward);
                 break;
             case DISABLED:
             case TEST:
-                elevatorSlideSolenoid.set(false);
+                elevatorSlideSolenoid.set(DoubleSolenoid.Value.kOff);
                 break;
         }
     }
@@ -86,7 +89,7 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         tests.addTest(new SolenoidTest("releaser", releaser));
         tests.addTest(new SpeedControllerTest("leftFlap", leftFlap));
         tests.addTest(new DigitalSensorTest("leftFlapSensor", leftFlapSensor));
-        tests.addTest(new SolenoidTest("elevatorSlideSolenoid", elevatorSlideSolenoid));
+        tests.addTest(new DoubleSolenoidTest("elevatorSlideSolenoid", elevatorSlideSolenoid));
         return tests;
     }
 
@@ -111,7 +114,7 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
     public static class Config {
         public SolenoidConfig rightElevatorSolenoid;
         public SolenoidConfig releaser;
-        public SolenoidConfig elevatorSlideSolenoid;
+        public DoubleSolenoidConfig elevatorSlideSolenoid;
         public SpeedControllerConfig leftFlap;
         public DigitalSensorConfig leftFlapSensor;
     }

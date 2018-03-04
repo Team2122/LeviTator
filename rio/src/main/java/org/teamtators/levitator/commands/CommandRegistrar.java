@@ -5,6 +5,7 @@ import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
+import org.teamtators.levitator.subsystems.Elevators;
 import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Lift;
 
@@ -56,5 +57,11 @@ public class CommandRegistrar {
 
         commandStore.putCommand("PrintPose", Commands.instant(() ->
                 TatorRobotBase.logger.info("Pose: " + drive.getPose())));
+
+        //Elevators commands
+        Elevators elevators = robot.getSubsystems().getElevators();
+        commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
+        commandStore.registerCommand("ElevatorsLeftLift", () -> new ElevatorsLiftLeft(robot));
+        commandStore.putCommand("ElevatorsLiftRight", Commands.instant(elevators::liftRightElevator));
     }
 }
