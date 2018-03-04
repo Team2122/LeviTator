@@ -15,6 +15,7 @@ public class PoseEstimator extends AbstractUpdatable {
     private Pose2d lastPose;
     private double lastCenterDistance;
     private TankKinematics kinematics;
+    private double initialYaw = 90;
 
     public PoseEstimator(TankDrive drive) {
         super("PoseEstimator");
@@ -29,8 +30,21 @@ public class PoseEstimator extends AbstractUpdatable {
         lastCenterDistance = drive.getCenterDistance();
     }
 
+    private Rotation gyroToPoseAngle(double gyroAngle) {
+        return Rotation.fromDegrees(initialYaw - gyroAngle);
+    }
+
+    private double poseToGyroAngle(Rotation poseAngle) {
+        return initialYaw - poseAngle.toDegrees();
+    }
+
     private Rotation getYawRotation() {
-        return Rotation.fromDegrees(90 - drive.getYawAngle());
+        return gyroToPoseAngle(drive.getYawAngle());
+    }
+
+    private void setYawRotation(Rotation poseRotation) {
+//        drive.setYawAngle(poseToGyroAngle(poseRotation));
+        initialYaw = poseRotation.toDegrees();
     }
 
     public Pose2d getPose() {
@@ -39,6 +53,7 @@ public class PoseEstimator extends AbstractUpdatable {
 
     public void setPose(Pose2d pose) {
         this.lastPose = this.pose = pose;
+        setYawRotation(pose.getYaw());
     }
 
     public Pose2d getLastPose() {

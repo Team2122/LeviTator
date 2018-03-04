@@ -53,6 +53,9 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
             if (Double.isNaN(point.getArcSpeed())) {
                 point.setArcSpeed(config.arcSpeed);
             }
+            if (point.isReverse() == null) {
+                point.setReverse(config.reverse);
+            }
             drivePath.addPoint(point);
         }
         this.driveSegments = drivePath.toSegments();
@@ -63,6 +66,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
         public double speed;
         public double arcSpeed;
         public double radius;
+        public boolean reverse = false;
         public List<DrivePath.Point> path;
     }
 }

@@ -24,6 +24,7 @@ public class DrivePath {
         private double radius = Double.NaN;
         private double speed = Double.NaN;
         private double arcSpeed = Double.NaN;
+        private Boolean reverse = null;
 
         public Point(Translation2d translation) {
             this.translation = translation;
@@ -38,6 +39,7 @@ public class DrivePath {
             this.radius = point.radius;
             this.speed = point.speed;
             this.arcSpeed = point.arcSpeed;
+            this.reverse = point.reverse;
         }
 
         public void setTranslation(Translation2d translation) {
@@ -88,6 +90,14 @@ public class DrivePath {
             this.arcSpeed = arcSpeed;
         }
 
+        public Boolean isReverse() {
+            return reverse;
+        }
+
+        public void setReverse(boolean reverse) {
+            this.reverse = reverse;
+        }
+
         void check() {
             if (Double.isNaN(radius)) {
                 throw new ConfigException("radius on DrivePath.Point not set");
@@ -98,6 +108,9 @@ public class DrivePath {
             if (Double.isNaN(speed)) {
                 throw new ConfigException("speed on DrivePath.Point not set");
             }
+            if (reverse == null) {
+                throw new ConfigException("reverse on DrivePath.Point not set");
+            }
         }
 
         @Override
@@ -107,6 +120,7 @@ public class DrivePath {
                     ", radius=" + radius +
                     ", speed=" + speed +
                     ", arcSpeed=" + arcSpeed +
+                    ", reverse=" + reverse +
                     '}';
         }
 
@@ -159,6 +173,7 @@ public class DrivePath {
                     .extend(lastTakeOffLength);
             straight.setStartPose(startPose);
             straight.setEndSpeed(point2.getArcSpeed());
+            straight.setReverse(point1.reverse);
             Rotation deltaHeading = null, angle = null;
             Translation2d trans2 = null;
             double length2 = 0;
@@ -202,6 +217,7 @@ public class DrivePath {
                 arc.setRadius(radius);
                 arc.setStartAngle(heading);
                 arc.setEndAngle(nextHeading);
+                arc.setReverse(point1.reverse);
                 speed = point2.getArcSpeed();
             } else {
                 if (isStraight) {

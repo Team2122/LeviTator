@@ -120,32 +120,15 @@ $PickerAutoPick:
 #  rotationSpeed: 30
 #  maxAcceleration: 30
 
-
-^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
-^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
-^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
-^DrivePath: { speed: 40, arcSpeed: 40, radius: 36 }
-
-^PickerQuickDeploy:
-  kickPower: 1
-  timeBeforeKick: 0.1
-  timeBeforeRetract: 0.4
-  timeToKick: 0.6
-
-PickerQuickDeploy:
-  kickPower: 0.8
-  timeBeforeKick: 0.1
-  timeBeforeRetract: 0.4
-  timeToKick: 0.6
-
-PickerSwitchDeploy:
-  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
-
 ElevatorsDeploy:
   retractTime: .2
 ElevatorsLiftLeft:
   flapPower: .5
 
+^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
+^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
+^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
+^DrivePath: { speed: 140, arcSpeed: 60, radius: 30 }
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #
@@ -154,6 +137,24 @@ ElevatorsLiftLeft:
 NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
 DebugChooserAuto: { class: Log, level: INFO, message: "Woohoo! The autochooser works!"}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
+
+SetPoseLeft:
+  class: SetPose
+  x: -115
+  y: 19
+  yaw: -90
+
+SetPoseRight:
+  class: SetPose
+  x: 115
+  y: 19
+  yaw: -90
+
+SetPoseCenter:
+  class: SetPose
+  x: 0
+  y: 19
+  yaw: 90
 
 $CommonLiftSequence:
   - PickerRegrip
@@ -164,16 +165,18 @@ $CommonDriveSequence:
   - { parallel: true, name: $CommonLiftSequence }
   - { class: DriveStraight, distance: -138, endSpeed: 100.0 }
 
-
 $Scale:
+  - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
   - $CommonDriveSequence
   - { class: AutoSelector, type: STARTING_POSITION, left: ScaleLeftChooser, center: $CenterAuto, right: ScaleRightChooser}
 
 $ScaleSwitch:
+  - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
   - $CommonDriveSequence
   - { class: AutoSelector, type: STARTING_POSITION, left: ScaleSwitchStartLeftChooser, center: $CenterAuto, right: ScaleSwitchStartRightChooser}
 
 $SmartScale:
+  - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
   - $CommonDriveSequence
 
 ScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: $AutoStartLeftScaleLeftScaleLeft, R: $AutoStartLeftScaleRightScaleRight }
@@ -188,6 +191,7 @@ StartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, ob
 StartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightSwitchLeft, R: $ AutoStartRightScaleRightSwitchRight }
 
 $CenterAuto:
+  - SetPoseCenter
   - { class: DriveStraight, distance: 12, speed: 40, endSpeed: 40.0 }
 #  - { parallel: true, name: $LiftSwitchLow }
   - { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $CenterAutoLSwitch, R: $CenterAutoRSwitch }
@@ -246,12 +250,20 @@ $StartRightScaleLeft:
   - { class: DriveStraight, angle: -25, distance: 72 }
 
 $StartLeftScaleRight:
-  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
-  - { class: DriveArc, angle: 90, radius: -48, speed: 50, endSpeed: 50 }
+#  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
+#  - { class: DriveArc, angle: 90, radius: -48, speed: 50, endSpeed: 50 }
   - { parallel: true, name: $LiftSequenceScaleLowRight }
-  - { class: DriveStraight, distance: -112, angle: 90, endSpeed: 50 }
-  - { class: DriveArc, radius: -72, angle: 30, speed: 50.0, endSpeed: 50.0 }
-  - { class: DriveStraight, angle: 30, distance: -24, speed: 60 }
+#  - { class: DriveStraight, distance: -112, angle: 90, endSpeed: 50 }
+#  - { class: DriveArc, radius: -72, angle: 30, speed: 50.0, endSpeed: 50.0 }
+#  - { class: DriveStraight, angle: 30, distance: -24, speed: 60 } 96
+  - class: DrivePath
+    reverse: true
+    points:
+#      - { x: -115, y: 19 }
+      - { x: -115, y: 157 }
+      - { x: -115, y: 229, radius: 48 }
+      - { x: 117, y: 229, radius: 72 }
+      - { x: 200, y: 277 } # +83, +48
   - WaitForRight
   - PickerQuickDeploy
   - PivotCenter

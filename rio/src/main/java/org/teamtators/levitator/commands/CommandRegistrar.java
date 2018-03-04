@@ -55,13 +55,15 @@ public class CommandRegistrar {
         // FMS Data commands
         commandStore.putCommand("WaitForData", new WaitForData(robot));
 
-        commandStore.putCommand("PrintPose", Commands.instant(() ->
-                TatorRobotBase.logger.info("Pose: " + drive.getPose())));
-
         //Elevators commands
         Elevators elevators = robot.getSubsystems().getElevators();
         commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
         commandStore.registerCommand("ElevatorsLiftLeft", () -> new ElevatorsLiftLeft(robot));
         commandStore.putCommand("ElevatorsLiftRight", Commands.instant(elevators::liftRightElevator));
+
+
+        commandStore.putCommand("PrintPose", Commands.instant(() ->
+                TatorRobotBase.logger.info("Pose: " + drive.getPose())));
+        commandStore.registerCommand("SetPose", () -> new SetPose(robot));
     }
 }
