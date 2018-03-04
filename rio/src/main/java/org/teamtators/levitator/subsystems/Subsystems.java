@@ -28,6 +28,7 @@ public class Subsystems extends SubsystemsBase
     private Lift lift;
     private Auto auto;
     private Vision vision;
+    private Elevators elevators;
     //private YourSubsystem yourSubsystem;
 
     public Subsystems(TatorRobot robot) {
@@ -37,8 +38,9 @@ public class Subsystems extends SubsystemsBase
         lift = new Lift();
         auto = new Auto(robot);
         vision = new Vision(drive);
+        elevators = new Elevators();
         //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, elevators /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
     }
@@ -73,6 +75,7 @@ public class Subsystems extends SubsystemsBase
         lift.configure(config.lift);
         auto.configure(config.auto);
         vision.configure(config.vision);
+        elevators.configure(config.elevators);
 
         updatables.addAll(drive.getUpdatables());
         updatables.addAll(lift.getUpdatables());
@@ -87,6 +90,7 @@ public class Subsystems extends SubsystemsBase
         lift.deconfigure();
         auto.deconfigure();
         vision.deconfigure();
+        elevators.deconfigure();
 
         updatables.clear();
     }
@@ -105,6 +109,10 @@ public class Subsystems extends SubsystemsBase
 
     public OperatorInterface getOI() {
         return oi;
+    }
+
+    public Elevators getElevators() {
+        return elevators;
     }
 
     @Override
@@ -132,5 +140,6 @@ public class Subsystems extends SubsystemsBase
         public Lift.Config lift;
         public Auto.Config auto;
         public Vision.Config vision;
+        public Elevators.Config elevators;
     }
 }
