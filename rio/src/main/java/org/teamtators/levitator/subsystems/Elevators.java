@@ -52,6 +52,16 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         isDeployed = true;
     }
 
+    public void undeploy() {
+        releaser.set(false);
+        elevatorSlideSolenoid.set(DoubleSolenoid.Value.kReverse);
+        isDeployed = false;
+    }
+
+    public void unLiftRightElevator() {
+        rightElevatorSolenoid.set(false);
+    }
+
     public boolean isSafeToLiftElevators() {
         return isDeployed;
     }

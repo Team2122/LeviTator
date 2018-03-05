@@ -6,8 +6,8 @@ import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Elevators;
-import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.Picker;
 
 public class CommandRegistrar {
     private final TatorRobot robot;
@@ -63,5 +63,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
         commandStore.registerCommand("ElevatorsLeftLift", () -> new ElevatorsLiftLeft(robot));
         commandStore.putCommand("ElevatorsLiftRight", Commands.instant(elevators::liftRightElevator));
+        commandStore.putCommand("ElevatorsUnliftRight", Commands.instant(elevators::unLiftRightElevator));
+        commandStore.putCommand("ElevatorsRetract", Commands.instant(elevators::undeploy));
     }
 }
