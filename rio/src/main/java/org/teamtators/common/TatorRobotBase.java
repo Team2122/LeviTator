@@ -48,6 +48,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
     protected final Updater updater = new Updater(this, 1 / 120.0);
     protected final UpdatableCollection controllers = new UpdatableCollection("Controllers");
+    protected final UpdatableCollection motors = new UpdatableCollection("Motors");
     protected final Updater controllerUpdater = new Updater(controllers, 1 / 120.0);
     protected final DashboardUpdater smartDashboardUpdater = new DashboardUpdater(this, Dashboard.Type.TATOR_DASHBOARD);
     protected final Updater dashboardUpdater = new Updater(smartDashboardUpdater, 1 / 10.0);
@@ -147,6 +148,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
         subsystems.configure(configLoader);
         this.controllers.addAll(subsystems.getUpdatables());
+        this.motors.addAll(subsystems.getMotorUpdatables());
 
         subsystemList = subsystems.getSubsystemList();
         for (Subsystem subsystem : subsystemList) {
@@ -162,6 +164,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         pdp.free();
         LiveWindow.remove(pdp);
         this.controllers.clear();
+        this.motors.clear();
 
         getScheduler().clearStateListeners();
         getScheduler().clearFMSDataListeners();

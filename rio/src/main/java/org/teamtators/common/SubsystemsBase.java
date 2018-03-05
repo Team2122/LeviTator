@@ -19,6 +19,8 @@ public abstract class SubsystemsBase implements Deconfigurable {
 
     public abstract List<Updatable> getUpdatables();
 
+    public abstract List<Updatable> getMotorUpdatables();
+
     public abstract List<Controller<?, ?>> getControllers();
 
     public abstract LogitechF310 getTestModeController();

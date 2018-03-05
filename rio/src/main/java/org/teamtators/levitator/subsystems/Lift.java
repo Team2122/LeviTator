@@ -25,7 +25,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private SpeedControllerGroup liftMotor;
     private MotorPowerUpdater liftMotorUpdater;
-    private Updater liftUpdater;
     private Encoder liftEncoder;
     private DigitalSensor limitSensorTop;
     private DigitalSensor limitSensorBottom;
@@ -377,10 +376,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
         liftMotorUpdater = new MotorPowerUpdater(liftMotor);
 
-        liftUpdater = new Updater(liftMotorUpdater);
         pivotUpdater = new Updater(pivotMotorUpdater);
 
-        liftUpdater.start();
         pivotUpdater.start();
     }
 
@@ -397,10 +394,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotLockSolenoid.free();
         pivotLockSensor.free();
 
-        liftUpdater.stop();
         pivotUpdater.stop();
 
-        liftUpdater = null; //so the GC catches these bad boys
         pivotUpdater = null; //so the GC catches these bad boys
     }
 
@@ -433,6 +428,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         } else {
             pivotController.stop();
         }
+    }
+
+    public List<Updatable> getMotorUpdatables() {
+        return Arrays.asList(liftMotorUpdater, pivotMotorUpdater);
     }
 
     public enum HeightPreset {

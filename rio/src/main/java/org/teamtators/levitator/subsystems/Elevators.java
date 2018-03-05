@@ -9,6 +9,7 @@ import org.teamtators.common.config.helpers.DoubleSolenoidConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.MotorPowerUpdater;
+import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.RobotState;
@@ -19,13 +20,15 @@ import org.teamtators.common.tester.components.DoubleSolenoidTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Elevators extends Subsystem implements Configurable<Elevators.Config> {
     private Solenoid rightElevatorSolenoid;
     private Solenoid releaser;
     private DoubleSolenoid elevatorSlideSolenoid;
     private SpeedController leftFlap;
     private MotorPowerUpdater leftFlapMotorUpdater;
-    private Updater flapUpdater;
     private DigitalSensor leftFlapSensor;
 
     private boolean isDeployed;
@@ -115,9 +118,6 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         reset();
 
         leftFlapMotorUpdater = new MotorPowerUpdater(leftFlap);
-        flapUpdater = new Updater(leftFlapMotorUpdater);
-
-        flapUpdater.start();
     }
 
     public void deconfigure() {
@@ -126,9 +126,10 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         SpeedControllerConfig.free(leftFlap);
         leftFlapSensor.free();
         releaser.free();
+    }
 
-        flapUpdater.stop();
-        flapUpdater = null; //ditto
+    public List<Updatable> getMotorUpdatables() {
+        return Arrays.asList(leftFlapMotorUpdater);
     }
 
     public boolean isDeployed() {

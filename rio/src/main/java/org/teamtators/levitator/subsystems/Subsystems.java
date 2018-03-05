@@ -21,6 +21,7 @@ public class Subsystems extends SubsystemsBase
     private static final String SUBSYSTEMS_CONFIG_FILE = "Subsystems.yaml";
     private final List<Subsystem> subsystems;
     private final List<Updatable> updatables;
+    private final List<Updatable> motorUpdatables;
 
     private OperatorInterface oi;
     private Drive drive;
@@ -43,6 +44,7 @@ public class Subsystems extends SubsystemsBase
         subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, elevators /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
+        motorUpdatables = new ArrayList<>();
     }
 
     @Override
@@ -53,6 +55,11 @@ public class Subsystems extends SubsystemsBase
     @Override
     public List<Updatable> getUpdatables() {
         return updatables;
+    }
+
+    @Override
+    public List<Updatable> getMotorUpdatables() {
+        return motorUpdatables;
     }
 
     @Override
@@ -79,6 +86,10 @@ public class Subsystems extends SubsystemsBase
 
         updatables.addAll(drive.getUpdatables());
         updatables.addAll(lift.getUpdatables());
+
+        motorUpdatables.addAll(picker.getMotorUpdatables());
+        motorUpdatables.addAll(lift.getMotorUpdatables());
+        motorUpdatables.addAll(elevators.getMotorUpdatables());
     }
 
     @Override

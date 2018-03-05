@@ -8,6 +8,7 @@ import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.MotorPowerUpdater;
+import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
@@ -16,13 +17,15 @@ import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
     private MotorPowerUpdater leftMotorUpdater;
-    private Updater leftUpdater;
     private SpeedController rightMotor;
     private MotorPowerUpdater rightMotorUpdater;
-    private Updater rightUpdater;
     private Solenoid extensionSolenoid;
     private DigitalSensor cubeDetectSensor;
     private DigitalSensor upperCubeSensor;
@@ -113,12 +116,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
         leftMotorUpdater = new MotorPowerUpdater(leftMotor);
         rightMotorUpdater = new MotorPowerUpdater(rightMotor);
-
-        leftUpdater = new Updater(leftMotorUpdater);
-        rightUpdater = new Updater(rightMotorUpdater);
-
-        leftUpdater.start();
-        rightUpdater.start();
     }
 
     @Override
@@ -130,12 +127,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.free();
         upperCubeSensor.free();
         lowerCubeSensor.free();
+    }
 
-        leftUpdater.stop();
-        rightUpdater.stop();
-
-        leftUpdater = null; //so the GC catches these bad boys
-        rightUpdater = null; //so the GC catches these bad boys
+    public List<Updatable> getMotorUpdatables() {
+        return Arrays.asList(leftMotorUpdater, rightMotorUpdater);
     }
 
     public static class Config {
