@@ -49,6 +49,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     protected final Updater updater = new Updater(this, 1 / 120.0);
     protected final UpdatableCollection controllers = new UpdatableCollection("Controllers");
     protected final UpdatableCollection motors = new UpdatableCollection("Motors");
+    protected final Updater motorUpdater = new Updater(motors, 1 / 120.0);
     protected final Updater controllerUpdater = new Updater(controllers, 1 / 120.0);
     protected final DashboardUpdater smartDashboardUpdater = new DashboardUpdater(this, Dashboard.Type.TATOR_DASHBOARD);
     protected final Updater dashboardUpdater = new Updater(smartDashboardUpdater, 1 / 10.0);
@@ -241,6 +242,11 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
             } else {
                 this.getScheduler().startCommand(autoCommand);
             }
+        }
+        if (state == RobotState.AUTONOMOUS || state == RobotState.TELEOP) {
+            motorUpdater.start();
+        } else {
+            motorUpdater.stop();
         }
     }
 
