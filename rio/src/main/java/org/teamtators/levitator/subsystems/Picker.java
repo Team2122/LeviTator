@@ -1,5 +1,6 @@
 package org.teamtators.levitator.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -9,10 +10,15 @@ import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
 import org.teamtators.common.tester.ManualTestGroup;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
@@ -26,10 +32,26 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         super("Picker");
     }
 
+    public double getLeftCurrent() {
+        return ((WPI_TalonSRX)leftMotor).getOutputCurrent();
+    }
+
+    public double getRightCurrent() {
+        return ((WPI_TalonSRX)rightMotor).getOutputCurrent();
+    }
+
     public void setRollerPowers(double left, double right) {
 //        logger.trace("Setting roller powers to {}, {}", left, right);
         leftMotor.set(left);
         rightMotor.set(right);
+    }
+
+    public void setLeftMotorPower(double power) {
+        setRollerPowers(power, 0.0);
+    }
+
+    public void setRightMotorPower(double power) {
+        setRollerPowers(0.0, power);
     }
 
     public void setRollerPowers(RollerPowers rollerPowers) {
@@ -89,8 +111,20 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     @Override
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorCurrentTest("PickerLeftMotorCurrentTest", this::setLeftMotorPower, this::getLeftCurrent),
+                new MotorCurrentTest("PickerRightMotorCurrentTest", this::setRightMotorPower, this::getRightCurrent),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectSensorTest", this::isCubeDetected),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectLeftSensorTest", this::isCubeDetectedLeft),
+                new org.teamtators.common.tester.automated.DigitalSensorTest("CubeDetectRightSensorTest", this::isCubeDetectedRight)
+        );
+    }
+
+    @Override
     public void configure(Config config) {
         super.configure();
+
         this.leftMotor = config.leftMotor.create();
         this.rightMotor = config.rightMotor.create();
         this.extensionSolenoid = config.extensionSolenoid.create();

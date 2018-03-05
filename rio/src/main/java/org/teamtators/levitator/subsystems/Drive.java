@@ -12,8 +12,17 @@ import org.teamtators.common.math.Rotation;
 import org.teamtators.common.math.Translation2d;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
+import org.teamtators.common.tester.AutomatedTest;
+import org.teamtators.common.tester.AutomatedTestable;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
+import org.teamtators.common.tester.automated.MotorCurrentTest;
+import org.teamtators.common.tester.automated.MotorEncoderTest;
+import org.teamtators.common.tester.components.ADXRS453Test;
+import org.teamtators.common.tester.components.ControllerTest;
+import org.teamtators.common.tester.components.EncoderTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.levitator.TatorRobot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,9 +55,12 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     private Config config;
     private double speed;
+    private TatorRobot robot;
 
-    public Drive() {
+    public Drive(TatorRobot robot) {
         super("Drive");
+
+        this.robot = robot;
 
         rotationController.setInputProvider(this::getYawAngle);
         rotationController.setOutputConsumer((double output) -> {
@@ -210,6 +222,14 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         leftMotor.set(power);
     }
 
+    public double getLeftCurrent() {
+        return config.leftMotor.getTotalCurrent(robot.getPDP());
+    }
+
+    public double getRightCurrent() {
+        return config.rightMotor.getTotalCurrent(robot.getPDP());
+    }
+
     public double getLeftRate() {
         return leftEncoder.getRate();
     }
@@ -297,6 +317,15 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
             gyro.resetAngle();
             poseEstimator.setPose(new Pose2d(Translation2d.zero(), Rotation.fromDegrees(90)));
         }
+    }
+
+    public List<AutomatedTest> createAutomatedTests() {
+        return Arrays.asList(
+                new MotorEncoderTest("DriveLeftMotorEncoderTest", this::setLeftMotorPower, this::getLeftRate),
+                new MotorEncoderTest("DriveRightMotorEncoderTest", this::setRightMotorPower, this::getRightRate),
+                new MotorEncoderTest("DriveLeftMotorCurrentTest", this::setLeftMotorPower, this::getLeftCurrent),
+                new MotorEncoderTest("DriveRightMotorCurrentTest", this::setRightMotorPower, this::getRightCurrent)
+        );
     }
 
     @Override

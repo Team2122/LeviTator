@@ -33,12 +33,13 @@ public class Subsystems extends SubsystemsBase
 
     public Subsystems(TatorRobot robot) {
         oi = new OperatorInterface();
-        drive = new Drive();
-        picker = new Picker();
-        lift = new Lift();
         auto = new Auto(robot);
         vision = new Vision(drive);
         elevators = new Elevators();
+        drive = new Drive(robot);
+        picker = new Picker();
+        lift = new Lift(robot);
+
         //your subsystems here
         subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, elevators /*, yourSubsystem */);
 
