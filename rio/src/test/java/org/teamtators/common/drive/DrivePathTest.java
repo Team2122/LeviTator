@@ -18,6 +18,7 @@ public class DrivePathTest {
         point.setRadius(12);
         point.setSpeed(30);
         point.setArcSpeed(20);
+        point.setReverse(false);
         path.addPoint(point.copy());
         point.setTranslation(new Translation2d(0, 30));
         path.addPoint(point.copy());
