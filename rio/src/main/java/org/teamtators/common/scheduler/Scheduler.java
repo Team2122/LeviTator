@@ -3,6 +3,7 @@ package org.teamtators.common.scheduler;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.teamtators.common.util.FMSData;
 
 import java.util.*;
@@ -22,6 +23,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
 
     private RobotState robotState = RobotState.DISABLED;
     private FMSData fmsData;
+    private Profiler profiler;
 
     public Scheduler() {
     }
@@ -89,6 +91,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
     public void execute() {
 //        logger.trace("Scheduler in state {}, {} triggers, {} commands", robotState, triggerSchedulers.size(),
 //                runningCommands.size());
+        profiler.start("triggers");
         for (Map.Entry<TriggerSource, List<TriggerScheduler>> entry : triggerSchedulers.entrySet()) {
             TriggerSource triggerSource = entry.getKey();
             boolean active = triggerSource.getActive();
@@ -97,6 +100,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
             }
         }
         for (CommandRun run : runningCommands.values()) {
+            profiler.start(run.command.getName());
             if (run.cancel) {
                 logger.trace("Cancelling command {} by request", run.command.getName());
                 finishRun(run, true);
@@ -110,6 +114,8 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
                 if (!run.command.startRun(run.context)) {
                     logger.trace("Command {} not ready to run yet because of requirements", run.command.getName());
                     continue;
+                } else {
+                    logger.trace("Initialized command {}", run.command.getName());
                 }
                 run.initialized = true;
             }
@@ -119,6 +125,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
                 finishRun(run, run.cancel);
             }
         }
+        profiler.start("defaultCommands");
         for (Command command : defaultCommands) {
             if (command.checkRequirements()
                     && command.isValidInState(robotState)
@@ -126,6 +133,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
                 startCommand(command);
             }
         }
+        profiler.stop();
     }
 
     private void finishRun(CommandRun run, boolean cancelled) {
@@ -195,5 +203,13 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         for (FMSDataListener listener : dataListeners) {
             listener.onFMSData(data);
         }
+    }
+
+    public void setProfiler(Profiler profiler) {
+        this.profiler = profiler;
+    }
+
+    public Profiler getProfiler() {
+        return profiler;
     }
 }

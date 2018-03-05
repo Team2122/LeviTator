@@ -89,7 +89,10 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     }
 
     private void updateProfile() {
-        if (!hasSegment()) return;
+        if (!hasSegment()) {
+            logger.warn("can not update profile when does not have segment");
+            return;
+        }
         DriveSegment seg = getCurrentSegment();
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());

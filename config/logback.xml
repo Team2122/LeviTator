@@ -45,7 +45,7 @@
         <appender-ref ref="AsyncServer"/>
     </root>
 
-    <!--<logger name="org.teamtators.limbo.subsystems.Drive" level="TRACE" />-->
+    <logger name="org.teamtators.common.scheduler.Scheduler" level="TRACE" />
     <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftLow)" level="TRACE" />-->
     <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftHigh)" level="TRACE" />-->
     <!--<logger name="org.teamtators.levitator.commands.PickerAutoPick(PickerAutoPick)" level="TRACE" />-->

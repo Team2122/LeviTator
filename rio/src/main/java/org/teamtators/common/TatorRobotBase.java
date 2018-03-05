@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.teamtators.common.commands.CancelCommand;
 import org.teamtators.common.commands.LogCommand;
 import org.teamtators.common.commands.WaitCommand;
@@ -66,6 +67,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
     private NetworkTableEntry reinitializeEntry;
     protected int reinitializeListener;
+
+    protected Profiler profiler;
 
     public TatorRobotBase(String configDir) {
         configMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
@@ -248,9 +251,12 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     }
 
     public void update(double delta) {
+        profiler = new Profiler(getRobotName());
         lastDelta = delta;
+        getScheduler().setProfiler(profiler.startNested("Scheduler"));
         getScheduler().execute();
 
+        profiler.start("FMSData");
         FMSData fmsDataCurrent = FMSData.fromDriverStation(driverStation);
         if (!fmsDataCurrent.equals(fmsData)) {
             logger.info("FMS Data updated: " + fmsDataCurrent);
@@ -260,9 +266,16 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
         if (getState() != RobotState.TEST) {
             for (Subsystem subsystem : subsystemList) {
+                profiler.start(subsystem.getName());
                 subsystem.update(delta);
             }
         }
+        profiler.stop();
+    }
+
+    @Override
+    public Profiler getProfiler() {
+        return profiler;
     }
 
     private void setUpDashboards() {

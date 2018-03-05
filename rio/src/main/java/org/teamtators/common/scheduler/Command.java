@@ -47,7 +47,7 @@ public abstract class Command implements CommandRunContext {
         return context;
     }
 
-    private void setContext(CommandRunContext context) {
+    void setContext(CommandRunContext context) {
         this.context = context;
     }
 

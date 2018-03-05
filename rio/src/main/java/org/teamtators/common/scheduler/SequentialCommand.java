@@ -148,11 +148,11 @@ public class SequentialCommand extends Command implements CommandRunContext {
 
     private void cancelRun(SequentialCommandRun run) {
         if (run.parallel) {
-            getContext().cancelCommand(run.command);
+            cancelCommand(run.command);
         } else {
             run.command.finishRun(true);
         }
-        getContext().cancelCommand(this);
+        cancelCommand(this);
     }
 
     @Override
@@ -162,13 +162,15 @@ public class SequentialCommand extends Command implements CommandRunContext {
         } else {
             logger.debug("SequentialCommand finished");
         }
-        if (interrupted)
-            sequence.stream()
-                    .filter(r -> r.parallel)
-                    .forEach(r -> {
-                        if (r.command.isRunning())
-                            r.command.cancel();
-                    });
+        sequence
+            .forEach(r -> {
+                if (r.command.isRunning() && r.parallel) {
+                    r.command.setContext(this.getContext());
+                    if (interrupted) {
+                        r.command.cancel();
+                    }
+                }
+            });
         if (sequence.size() == 0 || currentPosition >= sequence.size()) return;
         Command currentCommand = currentRun().command;
         if (interrupted && currentCommand.isRunning()) {

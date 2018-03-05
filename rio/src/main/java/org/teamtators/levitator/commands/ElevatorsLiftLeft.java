@@ -29,6 +29,12 @@ public class ElevatorsLiftLeft extends Command implements Configurable<Elevators
     }
 
     @Override
+    protected void finish(boolean interrupted) {
+        super.finish(interrupted);
+        elevators.setFlapPower(0.0);
+    }
+
+    @Override
     public void configure(Config config) {
         this.config = config;
     }

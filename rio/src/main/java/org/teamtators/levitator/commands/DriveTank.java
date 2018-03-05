@@ -2,6 +2,7 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.util.JoystickModifiers;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -19,6 +20,7 @@ public class DriveTank extends Command implements Configurable<DriveTank.Config>
         drive = robot.getSubsystems().getDrive();
         oi = robot.getSubsystems().getOI();
         requires(drive);
+        validIn(RobotState.TELEOP);
     }
 
     @Override
