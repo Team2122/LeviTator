@@ -131,7 +131,7 @@ lift:
   heightTolerance: 2.0
   angleTolerance: 3.0
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "$Scale", "ScaleSwitch", "$CenterAuto"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"
 vision:
   width: 320
