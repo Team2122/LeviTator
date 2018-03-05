@@ -13,6 +13,7 @@ public class CtreMotorControllerConfig {
     public double neutralDeadband = 0.04; // factory default
     public double openLoopRamp = 0.0; // # of seconds from 0 to full output, or 0 to disable
     public double voltageCompensationSaturation = Double.NaN;
+    public boolean logTiming = false;
 
     protected void validate() {
         if (id == -1) {

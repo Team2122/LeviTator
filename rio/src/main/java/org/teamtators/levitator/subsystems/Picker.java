@@ -7,6 +7,8 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.control.MotorPowerUpdater;
+import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -16,7 +18,11 @@ import org.teamtators.common.tester.components.SpeedControllerTest;
 
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
+    private MotorPowerUpdater leftMotorUpdater;
+    private Updater leftUpdater;
     private SpeedController rightMotor;
+    private MotorPowerUpdater rightMotorUpdater;
+    private Updater rightUpdater;
     private Solenoid extensionSolenoid;
     private DigitalSensor cubeDetectSensor;
     private DigitalSensor upperCubeSensor;
@@ -28,8 +34,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     public void setRollerPowers(double left, double right) {
 //        logger.trace("Setting roller powers to {}, {}", left, right);
-        leftMotor.set(left);
-        rightMotor.set(right);
+        leftMotorUpdater.set(left);
+        rightMotorUpdater.set(right);
     }
 
     public void setRollerPowers(RollerPowers rollerPowers) {
@@ -104,6 +110,15 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.setName("Picker", "cubeDetectSensor");
         upperCubeSensor.setName("Picker", "upperCubeSensor");
         lowerCubeSensor.setName("Picker", "lowerCubeSensor");
+
+        leftMotorUpdater = new MotorPowerUpdater(leftMotor);
+        rightMotorUpdater = new MotorPowerUpdater(rightMotor);
+
+        leftUpdater = new Updater(leftMotorUpdater);
+        rightUpdater = new Updater(rightMotorUpdater);
+
+        leftUpdater.start();
+        rightUpdater.start();
     }
 
     @Override
@@ -115,6 +130,12 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.free();
         upperCubeSensor.free();
         lowerCubeSensor.free();
+
+        leftUpdater.stop();
+        rightUpdater.stop();
+
+        leftUpdater = null; //so the GC catches these bad boys
+        rightUpdater = null; //so the GC catches these bad boys
     }
 
     public static class Config {

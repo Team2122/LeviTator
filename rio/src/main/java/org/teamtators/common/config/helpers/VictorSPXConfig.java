@@ -10,17 +10,21 @@ public class VictorSPXConfig extends CtreMotorControllerConfig implements Config
 
     public WPI_VictorSPX create() {
         super.validate();
-        WPI_VictorSPX motor = new WPI_VictorSPX(id) {
-            @Override
-            public void set(ControlMode mode, double demand0, DemandType demand1Type, double demand1) {
-                double startTime = Timer.getFPGATimestamp();
-                super.set(mode, demand0, demand1Type, demand1);
-                double elapsedTime = Timer.getFPGATimestamp() - startTime;
-                if (elapsedTime > 0.008) {
-                    System.out.println("VictorSPX.set call time: " + elapsedTime);
+        WPI_VictorSPX motor;
+        if (super.logTiming)
+            motor = new WPI_VictorSPX(id) {
+                @Override
+                public void set(ControlMode mode, double demand0, DemandType demand1Type, double demand1) {
+                    double startTime = Timer.getFPGATimestamp();
+                    super.set(mode, demand0, demand1Type, demand1);
+                    double elapsedTime = Timer.getFPGATimestamp() - startTime;
+                    if (elapsedTime > 0.008) {
+                        System.out.println("VictorSPX.set call time: " + elapsedTime);
+                    }
                 }
-            }
-        };
+            };
+        else
+            motor = new WPI_VictorSPX(id);
         super.configure(motor);
         super.checkVersion(motor, REQUIRED_FIRMWARE);
 

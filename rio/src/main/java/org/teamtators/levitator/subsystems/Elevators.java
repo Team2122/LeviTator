@@ -8,6 +8,8 @@ import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.DoubleSolenoidConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.control.MotorPowerUpdater;
+import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
@@ -22,6 +24,8 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
     private Solenoid releaser;
     private DoubleSolenoid elevatorSlideSolenoid;
     private SpeedController leftFlap;
+    private MotorPowerUpdater leftFlapMotorUpdater;
+    private Updater flapUpdater;
     private DigitalSensor leftFlapSensor;
 
     private boolean isDeployed;
@@ -69,7 +73,7 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
     }
 
     public void setFlapPower(double power) {
-        leftFlap.set(power);
+        leftFlapMotorUpdater.set(power);
     }
 
     public boolean isFlapDetected() {
@@ -109,6 +113,11 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         this.leftFlap = config.leftFlap.create();
         this.leftFlapSensor = config.leftFlapSensor.create();
         reset();
+
+        leftFlapMotorUpdater = new MotorPowerUpdater(leftFlap);
+        flapUpdater = new Updater(leftFlapMotorUpdater);
+
+        flapUpdater.start();
     }
 
     public void deconfigure() {
@@ -117,6 +126,9 @@ public class Elevators extends Subsystem implements Configurable<Elevators.Confi
         SpeedControllerConfig.free(leftFlap);
         leftFlapSensor.free();
         releaser.free();
+
+        flapUpdater.stop();
+        flapUpdater = null; //ditto
     }
 
     public boolean isDeployed() {

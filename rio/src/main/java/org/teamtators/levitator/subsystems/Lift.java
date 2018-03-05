@@ -24,10 +24,14 @@ import java.util.Map;
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private SpeedControllerGroup liftMotor;
+    private MotorPowerUpdater liftMotorUpdater;
+    private Updater liftUpdater;
     private Encoder liftEncoder;
     private DigitalSensor limitSensorTop;
     private DigitalSensor limitSensorBottom;
     private SpeedController pivotMotor;
+    private MotorPowerUpdater pivotMotorUpdater;
+    private Updater pivotUpdater;
     private AnalogPotentiometer pivotEncoder;
     private Solenoid pivotLockSolenoid;
     private DigitalSensor pivotLockSensor;
@@ -260,7 +264,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         if (isAtBottomLimit() && liftPower < 0.0) {
             liftPower = 0.0;
         }
-        liftMotor.set(liftPower);
+        liftMotorUpdater.set(liftPower);
     }
 
     public void bumpLiftUp() {
@@ -281,9 +285,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setPivotPower(double pivotPower) {
         if(!isPivotLocked()) {
-            pivotMotor.set(pivotPower);
+            pivotMotorUpdater.set(pivotPower);
         } else {
-            pivotMotor.set(0);
+            pivotMotorUpdater.set(0);
         }
     }
 
@@ -369,6 +373,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         limitSensorBottom.setName("Lift", "limitSensorBottom");
         ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
         pivotEncoder.setName("Lift", "pivotEncoder");
+
+        pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
+        liftMotorUpdater = new MotorPowerUpdater(liftMotor);
+
+        liftUpdater = new Updater(liftMotorUpdater);
+        pivotUpdater = new Updater(pivotMotorUpdater);
+
+        liftUpdater.start();
+        pivotUpdater.start();
     }
 
     @Override
@@ -383,6 +396,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotEncoder.free();
         pivotLockSolenoid.free();
         pivotLockSensor.free();
+
+        liftUpdater.stop();
+        pivotUpdater.stop();
+
+        liftUpdater = null; //so the GC catches these bad boys
+        pivotUpdater = null; //so the GC catches these bad boys
     }
 
     private double getSafePivotAngle(double desiredAngle) {
