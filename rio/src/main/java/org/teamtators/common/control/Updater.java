@@ -1,5 +1,6 @@
 package org.teamtators.common.control;
 
+import edu.wpi.first.wpilibj.Notifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -17,6 +18,7 @@ public class Updater implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Updater.class);
     private static final double DEFAULT_PERIOD = 1.0 / 120.0;
     private static final double S_TO_NS = 1000000000.0;
+    private Notifier notifier;
     private final Updatable updatable;
     private double period;
     private boolean running = false;
@@ -26,23 +28,25 @@ public class Updater implements Runnable {
         this(updatable, DEFAULT_PERIOD);
     }
 
-    public Updater(Updatable updatable, double period) {
-        this(updatable, period, Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r,
-                "Updater-" + updatable.getName())));
-    }
+//    public Updater(Updatable updatable, double period) {
+//        this(updatable, period, Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r,
+//                "Updater-" + updatable.getName())));
+//    }
 
-    public Updater(Updatable updatable, double period, ScheduledExecutorService executorService) {
+    public Updater(Updatable updatable, double period) {
         if (updatable == null)
             throw new NullPointerException("updatable cannot be null");
         this.updatable = updatable;
         this.period = period;
-        executorService.scheduleAtFixedRate(this, 0, (long) (S_TO_NS * this.period), TimeUnit.NANOSECONDS);
+//        executorService.scheduleAtFixedRate(this, 0, (long) (S_TO_NS * this.period), TimeUnit.NANOSECONDS);
+        this.notifier = new Notifier(this::run);
     }
 
     public void start() {
         if (isRunning()) return;
         running = true;
         lastStepTime = getTime();
+        notifier.startPeriodic(period);
     }
 
     private double getTime() {
@@ -51,6 +55,7 @@ public class Updater implements Runnable {
 
     public void stop() {
         running = false;
+        notifier.stop();
     }
 
     public boolean isRunning() {

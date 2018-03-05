@@ -29,20 +29,20 @@
 
     <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
         <neverBlock>true</neverBlock>
-        <queueSize>240</queueSize>
+        <queueSize>1024</queueSize>
         <appender-ref ref="File"/>
     </appender>
 
     <appender name="AsyncServer" class="ch.qos.logback.classic.AsyncAppender">
         <neverBlock>true</neverBlock>
-        <queueSize>240</queueSize>
+        <queueSize>1024</queueSize>
         <appender-ref ref="Server"/>
     </appender>
 
     <root level="debug">
         <appender-ref ref="Console"/>
         <appender-ref ref="AsyncFile"/>
-        <appender-ref ref="AsyncServer"/>
+        <!--<appender-ref ref="AsyncServer"/>-->
     </root>
 
     <logger name="org.teamtators.common.scheduler.Scheduler" level="TRACE" />

@@ -157,6 +157,11 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
     }
 
     @Override
+    public CommandRunContext getContext() {
+        return this;
+    }
+
+    @Override
     public void startWithContext(Command command, CommandRunContext context) throws CommandException {
         checkNotNull(command);
         CommandRun run = runningCommands.get(command.getName());

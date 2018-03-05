@@ -262,12 +262,13 @@ public class Robot {
     }
 
     private void findLogDirectory() {
-        File logDir = new File("/media/sda1");
+        String robotName = new File(configDir).getParentFile().getName();
+        File logDir = new File("/media/sda1/" + robotName);
         if (logDir.exists() && logDir.canWrite()) {
-            System.out.println("****** Using USB drive for logs at /media/sda1 ******");
+            System.out.println("****** Using USB drive for logs at " + logDir.getAbsolutePath() + " ******");
         } else {
             System.out.println("ERROR: USB drive not present, or permissions are incorrect. Logging to /home/lvuser");
-            logDir = new File(configDir).getParentFile();
+            logDir = new File("/home/lvuser/" + robotName);
         }
         System.setProperty("tator.logdir", logDir.getAbsolutePath());
     }

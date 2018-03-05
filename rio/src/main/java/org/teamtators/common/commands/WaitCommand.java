@@ -30,7 +30,7 @@ public class WaitCommand extends Command implements Configurable<WaitCommand.Con
 
     @Override
     public boolean step() {
-        return timer.periodically(config.period);
+        return timer.hasPeriodElapsed(config.period);
     }
 
     public static class Config {

@@ -256,14 +256,6 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         getScheduler().setProfiler(profiler.startNested("Scheduler"));
         getScheduler().execute();
 
-        profiler.start("FMSData");
-        FMSData fmsDataCurrent = FMSData.fromDriverStation(driverStation);
-        if (!fmsDataCurrent.equals(fmsData)) {
-            logger.info("FMS Data updated: " + fmsDataCurrent);
-            fmsData = fmsDataCurrent;
-            this.onFMSData(fmsData);
-        }
-
         if (getState() != RobotState.TEST) {
             for (Subsystem subsystem : subsystemList) {
                 profiler.start(subsystem.getName());
@@ -326,6 +318,12 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         if (reinitialize) {
             reinitialize();
             reinitialize = false;
+        }
+        FMSData fmsDataCurrent = FMSData.fromDriverStation(driverStation);
+        if (!fmsDataCurrent.equals(fmsData)) {
+            logger.info("FMS Data updated: " + fmsDataCurrent);
+            fmsData = fmsDataCurrent;
+            this.onFMSData(fmsData);
         }
     }
 

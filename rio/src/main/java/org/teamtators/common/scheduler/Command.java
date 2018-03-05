@@ -43,7 +43,7 @@ public abstract class Command implements CommandRunContext {
         this.logger = LoggerFactory.getLogger(loggerName);
     }
 
-    CommandRunContext getContext() {
+    public CommandRunContext getContext() {
         return context;
     }
 

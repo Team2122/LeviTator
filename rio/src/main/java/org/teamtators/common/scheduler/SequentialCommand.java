@@ -162,10 +162,14 @@ public class SequentialCommand extends Command implements CommandRunContext {
         } else {
             logger.debug("SequentialCommand finished");
         }
+        CommandRunContext rootContext = getRootContext();
+        if (rootContext == null) {
+            logger.error("rootContext is null??");
+        }
         sequence
             .forEach(r -> {
                 if (r.command.isRunning() && r.parallel) {
-                    r.command.setContext(this.getContext());
+                    r.command.setContext(rootContext);
                     if (interrupted) {
                         r.command.cancel();
                     }

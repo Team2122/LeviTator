@@ -62,12 +62,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotController.setInputProvider(this::getCurrentPivotAngle);
         pivotController.setOutputConsumer(this::setPivotPower);
 //        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
-        holdPowerApplier = delta -> {
-                  if(getCurrentHeight() < 1) {
-                      Lift.this.liftController.setHoldPower(-0.1);
-                  } else {
-                      Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
-                  }
+        holdPowerApplier = new Updatable() {
+            @Override
+            public String getName() {
+                return "holdPowerApplier";
+            }
+
+            @Override
+            public void update(double delta) {
+                if (Lift.this.getCurrentHeight() < 1) {
+                    Lift.this.liftController.setHoldPower(-0.1);
+                } else {
+                    Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
+                }
+            }
         };
     }
 

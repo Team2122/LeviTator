@@ -8,4 +8,16 @@ public interface CommandRunContext {
     }
 
     void startWithContext(Command command, CommandRunContext context) throws CommandException;
+
+    CommandRunContext getContext();
+
+    default CommandRunContext getRootContext() {
+        if (getContext() == null) {
+            return null;
+        }
+        if (getContext() == this) {
+            return this;
+        }
+        return getContext().getRootContext();
+    }
 }

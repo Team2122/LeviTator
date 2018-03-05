@@ -32,6 +32,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private Pose2d currentPose;
     private Twist2d twist;
     private DriveOutputs driveOutputs;
+    private boolean logData;
 
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
@@ -175,7 +176,9 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             reset();
             speedFollower.reset();
             speedFollower.start();
-            DataCollector.getDataCollector().startProvider(logDataProvider);
+            if (logData) {
+                DataCollector.getDataCollector().startProvider(logDataProvider);
+            }
         }
     }
 
@@ -223,6 +226,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public void configure(Config config) {
         setLookAheadFunction(config.lookAhead);
         speedFollower.configure(config.speedFollower);
+        this.logData = config.logData;
     }
 
     public PursuitReport getReport() {
@@ -232,6 +236,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
+        public boolean logData = false;
     }
 
     private class LogDataProvder implements LogDataProvider {
