@@ -151,6 +151,6 @@ vision:
 elevators:
     rightElevatorSolenoid: { channel: 4 }
     releaser: { channel: 2 }
-    elevatorSlideSolenoid: { channel: 3 }
-    leftFlap: { type: VICTOR_SPX, config: { id: 6 } }
+    elevatorSlideSolenoid: { forwardChannel: 5, reverseChannel: 6 }
+    leftFlap: { type: VICTOR_SPX, config: { id: 6, inverted: true } }
     leftFlapSensor: { channel: 15, type: NPN }

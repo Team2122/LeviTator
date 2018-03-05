@@ -1,5 +1,6 @@
 package org.teamtators.levitator.commands;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
@@ -25,10 +26,10 @@ public class ElevatorsDeploy extends Command implements Configurable<ElevatorsDe
     @Override
     protected boolean step() {
         if(retractTimer.hasPeriodElapsed(config.retractTime)) {
-            elevators.slide(false);
+            elevators.slide(DoubleSolenoid.Value.kReverse);
             return false;
         }
-        elevators.slide(true);
+        elevators.slide(DoubleSolenoid.Value.kForward);
         elevators.deployElevators();
         return true;
     }
