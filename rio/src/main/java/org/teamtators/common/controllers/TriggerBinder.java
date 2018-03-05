@@ -143,6 +143,9 @@ public class TriggerBinder {
                 case "whenReleased":
                     binder.whenReleased();
                     return;
+                case "afterHeld":
+                    binder.afterHeld();
+                    return;
             }
         }
         throw new ConfigException("Invalid binding specifier: " + bindingSpecifier);

@@ -1,5 +1,7 @@
 package org.teamtators.common.scheduler;
 
+import org.teamtators.common.control.Timer;
+
 public class TriggerSchedulers {
     public static TriggerScheduler onActive(Runnable runnable) {
         return new LastStateScheduler(runnable) {
@@ -33,6 +35,20 @@ public class TriggerSchedulers {
             @Override
             protected boolean shouldRun(boolean active) {
                 return !active;
+            }
+        };
+    }
+
+    public static TriggerScheduler activeFor(Runnable runnable, int duration) {
+        return new RunnableScheduler(runnable) {
+            private Timer timer = new Timer();
+            @Override
+            protected boolean shouldRun(boolean active) {
+                if(!active) {
+                    timer.restart();
+                    return false;
+                }
+                return timer.hasPeriodElapsed(duration);
             }
         };
     }

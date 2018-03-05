@@ -1,5 +1,7 @@
 package org.teamtators.common.scheduler;
 
+import org.teamtators.common.control.Timer;
+
 public class TriggerAdder {
     TriggerSource triggerSource;
     private Scheduler scheduler;
@@ -63,6 +65,11 @@ public class TriggerAdder {
 
         public TriggerAdder whileReleased() {
             putScheduler(TriggerSchedulers.whileInactive(runnable));
+            return TriggerAdder.this;
+        }
+
+        public TriggerAdder afterHeld() {
+            putScheduler(TriggerSchedulers.activeFor(runnable, 1));
             return TriggerAdder.this;
         }
     }

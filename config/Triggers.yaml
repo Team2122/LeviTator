@@ -11,6 +11,7 @@ driver:
   A: start whenPressed $LiftHome
   START: start whenPressed PrintPose
   BACK: toggle whenPressed $TestDrive
+  B: start afterHeld DebugAfterHeld
 gunner:
   LEFT_PINKY: start whenPressed $PickerReleaseSoft
   LEFT_MIDDLE: start whenPressed PickerSwitchDeploy
@@ -26,7 +27,7 @@ gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
-  2: start whenPressed ElevatorsDeploy
+  2: start afterHeld ElevatorsDeploy
   3: toggle whenPressed ElevatorsLiftLeft
   4: start whenPressed PickerExtend
   5: start whenPressed PickerRetract

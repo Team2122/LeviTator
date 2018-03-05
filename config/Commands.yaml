@@ -141,7 +141,7 @@ ElevatorsLiftLeft:
 #                                                                                           #
 #############################################################################################
 NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
-DebugChooserAuto: { class: Log, level: INFO, message: "Woohoo! The autochooser works!"}
+DebugAfterHeld: { class: Log, level: INFO, message: "Woohoo! afterHeld works!"}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
 
 SetPoseLeft:
