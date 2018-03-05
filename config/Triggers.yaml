@@ -24,6 +24,8 @@ gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
+  2: start whenPressed ElevatorsDeploy
+  3: toggle whenPressed ElevatorsLiftLeft
   4: start whenPressed PickerExtend
   5: start whenPressed PickerRetract
   6: start whenPressed BumpPivotLeft
@@ -31,4 +33,5 @@ gunnerSecondary:
   8: start whenPressed BumpLiftUp
   9: start whenPressed BumpLiftDown
   10: start whenPressed PivotCenter
+  11: start whenPressed ElevatorsLiftRight
   12: start whenPressed $PickerReleaseHard

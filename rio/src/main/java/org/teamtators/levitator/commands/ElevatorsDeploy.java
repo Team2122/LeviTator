@@ -25,13 +25,18 @@ public class ElevatorsDeploy extends Command implements Configurable<ElevatorsDe
 
     @Override
     protected boolean step() {
-        if(retractTimer.hasPeriodElapsed(config.retractTime)) {
-            elevators.slide(DoubleSolenoid.Value.kReverse);
-            return false;
+        if(!elevators.isDeployed()) {
+            if (!retractTimer.hasPeriodElapsed(config.retractTime)) {
+                elevators.slide(DoubleSolenoid.Value.kReverse);
+                return false;
+            }
+            elevators.slide(DoubleSolenoid.Value.kForward);
+            elevators.deployElevators();
+            return true;
+        } else {
+            elevators.undeploy();
+            return true;
         }
-        elevators.slide(DoubleSolenoid.Value.kForward);
-        elevators.deployElevators();
-        return true;
     }
 
     @Override

@@ -61,9 +61,7 @@ public class CommandRegistrar {
         //Elevators commands
         Elevators elevators = robot.getSubsystems().getElevators();
         commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
-        commandStore.registerCommand("ElevatorsLeftLift", () -> new ElevatorsLiftLeft(robot));
+        commandStore.registerCommand("ElevatorsLiftLeft", () -> new ElevatorsLiftLeft(robot));
         commandStore.putCommand("ElevatorsLiftRight", Commands.instant(elevators::liftRightElevator));
-        commandStore.putCommand("ElevatorsUnliftRight", Commands.instant(elevators::unLiftRightElevator));
-        commandStore.putCommand("ElevatorsRetract", Commands.instant(elevators::undeploy));
     }
 }
