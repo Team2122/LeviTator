@@ -22,7 +22,6 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
         this.picker = robot.getSubsystems().getPicker();
         requires(vision);
         requires(drive);
-        requires(picker);
     }
 
     @Override

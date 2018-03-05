@@ -93,7 +93,7 @@ public abstract class Command implements CommandRunContext {
         requirements.addAll(subsystems);
     }
 
-    Set<Subsystem> getRequirements() {
+    public Set<Subsystem> getRequirements() {
         return requirements;
     }
 
@@ -103,6 +103,10 @@ public abstract class Command implements CommandRunContext {
 
     public boolean doesRequire(Subsystem subsystem) {
         return requirements != null && requirements.contains(subsystem);
+    }
+
+    public void updateRequirements() {
+
     }
 
     private boolean isRequiring(Subsystem subsystem, CommandRunContext context) {
@@ -174,13 +178,17 @@ public abstract class Command implements CommandRunContext {
         releaseRequirements();
     }
 
-    private void releaseRequirements() {
+    void releaseRequirements(Set<Subsystem> requirements) {
         if (requirements == null)
             return;
         for (Subsystem subsystem : requirements) {
             if (subsystem.getRequiringCommand() == this)
                 subsystem.setRequiringCommand(null);
         }
+    }
+
+    void releaseRequirements() {
+        releaseRequirements(this.requirements);
     }
 
     public boolean isValidInState(RobotState state) {

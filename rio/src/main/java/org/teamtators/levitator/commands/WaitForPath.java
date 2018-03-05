@@ -18,11 +18,11 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
     @Override
     protected boolean step() {
         PursuitReport report = drive.getDriveSegmentsFollower().getReport();
-        if (report == null) {
-            return false;
+        if (report == null || !drive.getDriveSegmentsFollower().isRunning()) {
+            return true;
         }
         if (!Double.isNaN(config.remainingDistance)) {
-            return report.remainingDistance <= config.remainingDistance || report.isFinished;
+            return report.remainingDistance <= config.remainingDistance || !report.isFinished;
         } else {
             return report.isFinished;
         }

@@ -1,11 +1,16 @@
 package org.teamtators.levitator.commands;
 
+import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.util.FieldSide;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Auto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AutoSelector extends Command implements Configurable<AutoSelector.Config> {
     private final Auto auto;
@@ -14,11 +19,14 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     private Config config;
     private Command selected;
     private boolean hasStarted;
+    private ConfigCommandStore commandStore;
 
     public AutoSelector(TatorRobot robot) {
         super("AutoSelector");
         this.robot = robot;
         this.auto = robot.getSubsystems().getAuto();
+        commandStore = robot.getCommandStore();
+        validIn(RobotState.AUTONOMOUS);
     }
 
     @Override
@@ -49,7 +57,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
             }
         }
         try {
-            selected = robot.getCommandStore().getCommand(toStart);
+            selected = commandStore.getCommand(toStart);
             logger.info("Starting chosen command: {}", selected.getName());
             startWithContext(selected, this);
         } catch (IllegalArgumentException e) {
@@ -73,6 +81,34 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     public void configure(Config config) {
         this.type = config.type;
         this.config = config;
+        updateRequirements();
+    }
+
+    @Override
+    public void updateRequirements() {
+        if (config == null) {
+            return;
+        }
+        List<String> commandNames = new ArrayList<>();
+        if (config.type == SelectorType.FIELD_CONFIGURATION) {
+            commandNames.add(config.left);
+            commandNames.add(config.right);
+            commandNames.add(config.center);
+        } else if (config.type == SelectorType.STARTING_POSITION) {
+            commandNames.add(config.L);
+            commandNames.add(config.R);
+        } else {
+            logger.error("Invalid selector type: " + config.type);
+        }
+        for (String commandName : commandNames) {
+            Command command;
+            try {
+                command = commandStore.getCommand(commandName);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+            requiresAll(command.getRequirements());
+        }
     }
 
     public enum SelectorType {

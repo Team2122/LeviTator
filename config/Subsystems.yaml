@@ -102,7 +102,7 @@ lift:
 #    maxAcceleration: 180.0
 #    travelVelocity: 90.0
 #    endVelocity: 0.0
-    target: { within: 10.0 }
+    target: { within: 3.0 }
     minSetpoint: -90.0
     maxSetpoint: 90.0
     maxAcceleration: 0.8

@@ -23,7 +23,7 @@ deploy {
             targets << 'roborio'
             filename = "LeviTator.jar"
             arguments = ["$robotDir/config"]
-            debug = true
+//            debug = true
         }
         artifact('config', FileCollectionArtifact) {
             targets << 'roborio'
@@ -57,6 +57,12 @@ repositories {
     }
 }
 
+wpi {
+    wpilibVersion = '2018.3.3'
+    wpiutilVersion = '3.1.0'
+    shuffleboardVersion = '1.2.1'
+}
+
 dependencies {
     compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.9'
 //    compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.1.0'
@@ -72,7 +78,11 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
 
     compile wpilib()
-    compile ctre()
+//    compile ctre()
+    compile name: 'CTRE_Phoenix'
+    nativeLib name: 'libCTRE_PhoenixCCI', ext: 'so'
+    nativeLib name: 'libCTRLibDriver', ext: 'so'
+    nativeLib name: 'libCTRLibDriver', ext: 'so.debug'
 //    compile navx()
     compile openrio.powerup.matchData()
 
