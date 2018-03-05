@@ -42,13 +42,19 @@ public class TriggerSchedulers {
     public static TriggerScheduler activeFor(Runnable runnable, int duration) {
         return new RunnableScheduler(runnable) {
             private Timer timer = new Timer();
+            private boolean hasRun = false;
             @Override
             protected boolean shouldRun(boolean active) {
                 if(!active) {
                     timer.restart();
+                    hasRun = false;
                     return false;
                 }
-                return timer.hasPeriodElapsed(duration);
+                if (timer.hasPeriodElapsed(duration) && !hasRun) {
+                    hasRun = true;
+                    return true;
+                }
+                else return false;
             }
         };
     }
