@@ -413,7 +413,7 @@ $AutoStartRightScaleLeftSwitchRight:
   - { class: DriveArc, angle: -90, radius: -36, endSpeed: 60 }
   - $LiftSwitchLow
   - { class: DriveStraight, angle: -90, distance: 65, endSpeed: 40 }
-  - { class: DriveArc, angle: -60, arcLength: 30, speed: 40, endSpFsceed: 40 }
+  - { class: DriveArc, angle: -60, arcLength: 30, speed: 40, endSpeed: 40 }
   - { class: DriveStraight, distance: 12 }
 #  - { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
   - PickerQuickDeploy
