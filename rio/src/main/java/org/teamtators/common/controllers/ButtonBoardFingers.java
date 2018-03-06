@@ -7,6 +7,8 @@ public class ButtonBoardFingers
 
     public ButtonBoardFingers(String name) {
         super(name);
+        setAxisCount(0);
+        setButtonCount(12);
     }
 
     @Override
@@ -45,16 +47,6 @@ public class ButtonBoardFingers
     @Override
     public TriggerSource getTriggerSource(org.teamtators.common.controllers.ButtonBoardFingers.Button button) {
         return () -> isButtonDown(button);
-    }
-
-    @Override
-    public int getAxisCount() {
-        return 0;
-    }
-
-    @Override
-    public int getButtonCount() {
-        return 10;
     }
 
     /**

@@ -37,20 +37,19 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
     private final AtomicDouble rightRumble = new AtomicDouble(0);
     private final AtomicInteger outputs = new AtomicInteger(0);
 
-    private int lastAxisCount = 0;
-    private int lastButtonCount = 0;
+    private int lastAxisCount = -1;
+    private int lastButtonCount = -1;
 
     private Timer rumbleTimer = new Timer();
     private double rumbleTime;
+    private int axisCount = 0;
+    private int buttonCount = 0;
 
     public ControllerBase(String name, GenericHID hid) {
         this.name = name;
         this.hid = hid;
 
         axisStates = Collections.synchronizedList(new ArrayList<>(getAxisCount()));
-        for (int i = 0; i < axisStates.size(); i++) {
-            axisStates.set(i, new AtomicDouble(0.0));
-        }
     }
 
     public void reset() {
@@ -149,6 +148,28 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         setRumble(rumbleType, value);
     }
 
+    protected final void setAxisCount(int axisCount) {
+        this.axisCount = axisCount;
+        axisStates.clear();
+        for (int i = 0; i < axisCount; i++) {
+            axisStates.add(new AtomicDouble(0.0));
+        }
+    }
+
+    protected final void setButtonCount(int buttonCount) {
+        this.buttonCount = buttonCount;
+    }
+
+    @Override
+    public final int getAxisCount() {
+        return axisCount;
+    }
+
+    @Override
+    public final int getButtonCount() {
+        return buttonCount;
+    }
+
     @Override
     public void configure(TConfig config) {
         this.hid = new Joystick(config.port);
@@ -177,7 +198,9 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
             }
         }
         buttonsState.set(driverStation.getStickButtons(hid.getPort()));
-        povState.set(hid.getPOV());
+        if (hid.getPOVCount() > 0) {
+            povState.set(hid.getPOV());
+        }
         for (int i = 0; i < axisCount && i < axisStates.size(); i++) {
             axisStates.get(i).set(hid.getRawAxis(i));
         }

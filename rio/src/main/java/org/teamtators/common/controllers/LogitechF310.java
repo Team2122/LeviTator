@@ -11,6 +11,8 @@ public class LogitechF310
 
     public LogitechF310(String name) {
         super(name);
+        setAxisCount(6);
+        setButtonCount(10);
     }
 
     @Override
@@ -61,16 +63,6 @@ public class LogitechF310
     @Override
     public TriggerSource getTriggerSource(Button button) {
         return () -> isButtonDown(button);
-    }
-
-    @Override
-    public int getAxisCount() {
-        return 6;
-    }
-
-    @Override
-    public int getButtonCount() {
-        return 12;
     }
 
     @Override

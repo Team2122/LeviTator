@@ -7,13 +7,15 @@ public class InputDerivative implements Updatable, ControllerInput {
     private ControllerInput inputProvider;
     private double lastInput;
     private double lastRate;
+    private String name;
 
-    public InputDerivative() {
+    public InputDerivative(String name) {
+        this.name = name;
         reset();
     }
 
-    public InputDerivative(ControllerInput inputProvider) {
-        this();
+    public InputDerivative(String name, ControllerInput inputProvider) {
+        this(name);
         setInputProvider(inputProvider);
     }
 
@@ -31,7 +33,7 @@ public class InputDerivative implements Updatable, ControllerInput {
 
     @Override
     public String getName() {
-        return "InputDerivative";
+        return name;
     }
 
     @Override

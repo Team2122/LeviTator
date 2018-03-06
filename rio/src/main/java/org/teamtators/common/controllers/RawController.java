@@ -9,19 +9,23 @@ import org.teamtators.common.scheduler.TriggerSource;
 public class RawController extends ControllerBase<Integer, Integer, RawController.Config> {
     public static final int DEFAULT_BUTTON_COUNT = 12;
     public static final int DEFAULT_AXIS_COUNT = 6;
-    private int axisCount = DEFAULT_BUTTON_COUNT;
-    private int buttonCount = DEFAULT_AXIS_COUNT;
 
     public RawController(String name, GenericHID hid) {
         super(name, hid);
+        setAxisCount(DEFAULT_AXIS_COUNT);
+        setButtonCount(DEFAULT_BUTTON_COUNT);
     }
 
     public RawController(String name, int port) {
         super(name, port);
+        setAxisCount(DEFAULT_AXIS_COUNT);
+        setButtonCount(DEFAULT_BUTTON_COUNT);
     }
 
     public RawController(String name) {
         super(name);
+        setAxisCount(DEFAULT_AXIS_COUNT);
+        setButtonCount(DEFAULT_BUTTON_COUNT);
     }
 
     @Override
@@ -57,24 +61,6 @@ public class RawController extends ControllerBase<Integer, Integer, RawControlle
     @Override
     public TriggerSource getTriggerSource(Integer button) {
         return getRawTriggerSource(button);
-    }
-
-    public void setAxisCount(int axisCount) {
-        this.axisCount = axisCount;
-    }
-
-    public void setButtonCount(int buttonCount) {
-        this.buttonCount = buttonCount;
-    }
-
-    @Override
-    public int getAxisCount() {
-        return axisCount;
-    }
-
-    @Override
-    public int getButtonCount() {
-        return buttonCount;
     }
 
     @Override

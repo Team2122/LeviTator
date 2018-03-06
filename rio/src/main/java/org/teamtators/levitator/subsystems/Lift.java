@@ -58,7 +58,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.setOutputConsumer(this::setLiftPower);
         liftController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
-        pivotVelocity = new InputDerivative(this::getCurrentPivotAngle);
+        pivotVelocity = new InputDerivative("pivotAngleDerivative", this::getCurrentPivotAngle);
         pivotController = new /*TrapezoidalProfileFollower*/StupidController("pivotController");
 //        pivotController.setPositionProvider(this::getCurrentPivotAngle);
 //        pivotController.setVelocityProvider(pivotVelocity);
