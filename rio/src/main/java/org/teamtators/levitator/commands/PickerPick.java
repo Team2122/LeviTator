@@ -19,7 +19,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     private BooleanSampler jammed = new BooleanSampler(() ->
             cubePresent && (!cubeLeft || !cubeRight));
     private BooleanSampler finished = new BooleanSampler(() ->
-            cubePresent && cubeLeft && cubeRight);
+            (cubePresent && cubeLeft && cubeRight) || (!cubePresent && cubeLeft));
 
     private boolean unjamming;
     private boolean unjamRight;

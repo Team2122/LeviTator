@@ -31,6 +31,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("PickerRelease", () -> new PickerRelease(robot));
         commandStore.registerCommand("PickerQuickDeploy", () -> new PickerQuickDeploy(robot));
         commandStore.registerCommand("PickerRegrip", () -> new PickerRegrip(robot));
+        commandStore.putCommand("WaitForCube", new WaitForCube(robot));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();

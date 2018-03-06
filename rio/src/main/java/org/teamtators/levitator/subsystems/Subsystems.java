@@ -104,6 +104,7 @@ public class Subsystems extends SubsystemsBase
         elevators.deconfigure();
 
         updatables.clear();
+        motorUpdatables.clear();
     }
 
     public Drive getDrive() {
