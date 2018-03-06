@@ -141,9 +141,9 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     }
 
     @Override
-    public void updateRequirements() {
+    public boolean updateRequirements() {
         if (config == null) {
-            return;
+            return false;
         }
         List<String> commandNames = new ArrayList<>();
         if (config.type == SelectorType.FIELD_CONFIGURATION) {
@@ -156,6 +156,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
         } else {
             logger.error("Invalid selector type: " + config.type);
         }
+        boolean wasUpdated = false;
         for (String commandName : commandNames) {
             Command command;
             try {
@@ -163,8 +164,11 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
             } catch (IllegalArgumentException e) {
                 continue;
             }
+            int lengthBefore = getRequirements().size();
             requiresAll(command.getRequirements());
+            wasUpdated = wasUpdated || (lengthBefore != getRequirements().size());
         }
+        return wasUpdated;
     }
 
     public enum SelectorType {

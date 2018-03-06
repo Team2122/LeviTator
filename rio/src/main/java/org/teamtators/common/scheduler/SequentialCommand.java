@@ -76,13 +76,17 @@ public class SequentialCommand extends Command implements CommandRunContext {
     }
 
     @Override
-    public void updateRequirements() {
+    public boolean updateRequirements() {
         // A sequential command requires all subsystems required by all child commands
-        sequence.forEach(run -> {
-            run.command.updateRequirements();
-            if (run.command.getRequirements() != null)
+        boolean wasUpdated = false;
+        for (SequentialCommandRun run : sequence) {
+            wasUpdated = wasUpdated || run.command.updateRequirements();
+            int lengthBefore = getRequirements().size();
+            if (run.command.getRequirements() != null && !run.parallel)
                 requiresAll(run.command.getRequirements());
-        });
+            wasUpdated = wasUpdated || (lengthBefore != getRequirements().size());
+        }
+        return wasUpdated;
     }
 
     @Override
