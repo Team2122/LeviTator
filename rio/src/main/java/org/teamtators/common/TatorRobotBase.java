@@ -24,6 +24,7 @@ import org.teamtators.common.control.Timer;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.UpdatableCollection;
 import org.teamtators.common.control.Updater;
+import org.teamtators.common.controllers.Controller;
 import org.teamtators.common.controllers.TriggerBinder;
 import org.teamtators.common.datalogging.Dashboard;
 import org.teamtators.common.datalogging.DashboardUpdatable;
@@ -34,6 +35,7 @@ import org.teamtators.common.tester.AutomatedTester;
 import org.teamtators.common.tester.ManualTester;
 import org.teamtators.common.util.FMSData;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class TatorRobotBase implements RobotStateListener, Updatable, FMSDataListener {
@@ -55,6 +57,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     protected final Updater dashboardUpdater = new Updater(smartDashboardUpdater, 1 / 10.0);
     protected final DataCollector dataCollector = DataCollector.getDataCollector();
     protected final Updater dataCollectorUpdater = new Updater(dataCollector, 1.0 / 60.0);
+    protected List<Controller<?, ?>> gameControllers = Collections.emptyList();
     protected final Timer stateTimer = new Timer();
     protected double lastDelta = 0.0;
 
@@ -202,7 +205,8 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
 
     protected void configureTriggers() {
         logger.debug("Configuring triggers");
-        getTriggerBinder().putControllers(getSubsystemsBase().getControllers());
+        gameControllers = getSubsystemsBase().getControllers();
+        getTriggerBinder().putControllers(gameControllers);
         ObjectNode triggersConfig = (ObjectNode) configLoader.load("Triggers.yaml");
         triggerBinder.bindTriggers(triggersConfig);
     }
@@ -333,6 +337,9 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
             logger.info("FMS Data updated: " + fmsDataCurrent);
             fmsData = fmsDataCurrent;
             this.onFMSData(fmsData);
+        }
+        for (Controller<?, ?> gameController : gameControllers) {
+            gameController.onDriverStationData();
         }
     }
 

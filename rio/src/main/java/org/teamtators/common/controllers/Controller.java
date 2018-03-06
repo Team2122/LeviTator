@@ -1,6 +1,5 @@
 package org.teamtators.common.controllers;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import org.teamtators.common.scheduler.TriggerSource;
 
 /**
@@ -23,6 +22,9 @@ public interface Controller<TButton, TAxis> {
      */
     TriggerSource getTriggerSource(TButton button);
 
+    int getAxisCount();
+    int getButtonCount();
+
     double getRawAxisValue(int axis);
     boolean isRawButtonDown(int button);
     boolean isRawButtonPressed(int button);
@@ -44,6 +46,8 @@ public interface Controller<TButton, TAxis> {
     void setOutput(int outputNumber, boolean value);
     void setOutputs(int outputs);
     void setRumble(RumbleType type, double value);
+
+    void onDriverStationData();
 
     /**
      * An enum to rumble the left, right or both sides of a controller

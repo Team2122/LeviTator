@@ -1,20 +1,44 @@
 package org.teamtators.common.controllers;
 
+import com.google.common.util.concurrent.AtomicDouble;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.Deconfigurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.scheduler.TriggerSource;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Alex Mikhalev
  */
 public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerBase.Config>
-        implements Controller<TButton, TAxis>, Updatable, Configurable<TConfig>, Deconfigurable {
+        implements Controller<TButton, TAxis>, Configurable<TConfig>, Deconfigurable {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     private String name;
     private GenericHID hid = null;
+    private DriverStation driverStation = DriverStation.getInstance();
+
+    private final AtomicInteger buttonsState = new AtomicInteger(0);
+    private final AtomicInteger povState = new AtomicInteger(0);
+    private final List<AtomicDouble> axisStates;
+
+    private final AtomicDouble leftRumble = new AtomicDouble(0);
+    private final AtomicDouble rightRumble = new AtomicDouble(0);
+    private final AtomicInteger outputs = new AtomicInteger(0);
+
+    private int lastAxisCount = 0;
+    private int lastButtonCount = 0;
 
     private Timer rumbleTimer = new Timer();
     private double rumbleTime;
@@ -22,6 +46,24 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
     public ControllerBase(String name, GenericHID hid) {
         this.name = name;
         this.hid = hid;
+
+        axisStates = Collections.synchronizedList(new ArrayList<>(getAxisCount()));
+        for (int i = 0; i < axisStates.size(); i++) {
+            axisStates.set(i, new AtomicDouble(0.0));
+        }
+    }
+
+    public void reset() {
+        buttonsState.set(0);
+        povState.set(0);
+        for (AtomicDouble axisState : axisStates) {
+            axisState.set(0);
+        }
+        leftRumble.set(0);
+        rightRumble.set(0);
+        outputs.set(0);
+        lastAxisCount = 0;
+        lastButtonCount = 0;
     }
 
     public ControllerBase(String name, int port) {
@@ -39,12 +81,20 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
 
     @Override
     public double getRawAxisValue(int axis) {
-        return hid.getRawAxis(axis);
+        if (axis >= axisStates.size()) {
+            logger.warn("Invalid axis number: {}", axis);
+            return 0.0;
+        }
+        return axisStates.get(axis).get();
     }
 
     @Override
     public boolean isRawButtonDown(int button) {
-        return hid.getRawButton(button);
+        if (button > getButtonCount()) {
+            logger.warn("Invalid button number: {}", button);
+            return false;
+        }
+        return (buttonsState.get() & (1 << (button - 1))) != 0;
     }
 
     @Override
@@ -64,26 +114,32 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
 
     @Override
     public int getPov(int pov) {
-        return hid.getPOV(pov);
+        return povState.get();
     }
 
     @Override
     public void setOutput(int outputNumber, boolean value) {
-        hid.setOutput(outputNumber, value);
+        this.outputs.getAndUpdate(outputs -> {
+            if (value) {
+                return outputs | (1 << (outputNumber - 1));
+            } else {
+                return outputs & ~(1 << (outputNumber - 1));
+            }
+        });
     }
 
     @Override
     public void setOutputs(int outputs) {
-        hid.setOutputs(outputs);
+        this.outputs.set(outputs);
     }
 
     @Override
     public void setRumble(RumbleType type, double value) {
         if (type == RumbleType.LEFT || type == RumbleType.BOTH) {
-            hid.setRumble(GenericHID.RumbleType.kLeftRumble, value);
+            leftRumble.set(value);
         }
         if (type == RumbleType.RIGHT || type == RumbleType.BOTH) {
-            hid.setRumble(GenericHID.RumbleType.kRightRumble, value);
+            rightRumble.set(value);
         }
     }
 
@@ -94,13 +150,6 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
     }
 
     @Override
-    public void update(double delta) {
-        if (rumbleTimer.hasPeriodElapsed(rumbleTime)) {
-            setRumble(RumbleType.BOTH, 0.0);
-        }
-    }
-
-    @Override
     public void configure(TConfig config) {
         this.hid = new Joystick(config.port);
     }
@@ -108,6 +157,36 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
     @Override
     public void deconfigure() {
         this.hid = null;
+    }
+
+    @Override
+    public void onDriverStationData() {
+        int axisCount = hid.getAxisCount();
+        int buttonCount = hid.getButtonCount();
+        if (lastAxisCount != axisCount ||
+                lastButtonCount != buttonCount) {
+            lastAxisCount = axisCount;
+            lastButtonCount = buttonCount;
+            if (axisCount < getAxisCount()) {
+                logger.warn("Joystick {} does not have enough axes ({} < {})",
+                        hid.getPort(), axisCount, getAxisCount());
+            }
+            if (buttonCount < getButtonCount()) {
+                logger.warn("Joystick {} does not have enough buttons ({} < {})",
+                        hid.getPort(), buttonCount, getButtonCount());
+            }
+        }
+        buttonsState.set(driverStation.getStickButtons(hid.getPort()));
+        povState.set(hid.getPOV());
+        for (int i = 0; i < axisCount && i < axisStates.size(); i++) {
+            axisStates.get(i).set(hid.getRawAxis(i));
+        }
+        if (rumbleTimer.hasPeriodElapsed(rumbleTime)) {
+            setRumble(RumbleType.BOTH, 0.0);
+        }
+        hid.setRumble(GenericHID.RumbleType.kLeftRumble, leftRumble.get());
+        hid.setRumble(GenericHID.RumbleType.kRightRumble, rightRumble.get());
+        hid.setOutputs(outputs.get());
     }
 
     public static class Config {

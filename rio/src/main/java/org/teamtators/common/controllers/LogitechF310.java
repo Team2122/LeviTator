@@ -64,6 +64,16 @@ public class LogitechF310
     }
 
     @Override
+    public int getAxisCount() {
+        return 6;
+    }
+
+    @Override
+    public int getButtonCount() {
+        return 12;
+    }
+
+    @Override
     public void configure(Config config) {
         super.configure(config);
         this.leftTriggerDeadzone = config.leftTriggerDeadzone;

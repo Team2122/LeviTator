@@ -47,6 +47,16 @@ public class ButtonBoardFingers
         return () -> isButtonDown(button);
     }
 
+    @Override
+    public int getAxisCount() {
+        return 0;
+    }
+
+    @Override
+    public int getButtonCount() {
+        return 10;
+    }
+
     /**
      * Enum to reference buttons
      */
