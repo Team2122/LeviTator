@@ -4,7 +4,7 @@ DriveTank:
 PickerPick:
   pickPowers: { left: 1.0, right: 0.5 }
   unjamPowers: { left: 0.25, right: -0.25 }
-  holdPowers: { left: 0.3, right: 0.3 }
+  holdPowers: { left: 0.15, right: 0.15 }
   jamDetectPeriod: 0.1
   unjamPeriod: 0.2
   afterUnjamWait: 0.5
@@ -225,13 +225,13 @@ $CenterAutoLSwitch:
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -48 }
   - { class: DriveRotate, angle: 60 }
-  - { class: DriveStraight, angle: 60, distance: 36.0 }
+  - { class: DriveStraight, angle: 60, distance: 44.0 }
 #  - { class: DriveArc, arcLength: -58, speed: 100, angle: 65 }
 #  - { class: DriveStraight, angle: 65, distance: 54.0 }
   - WaitForCube
   - { class: DriveStraight, angle: 60, distance: -4.0 }
   - { class: WaitFor, command: PickerPick }
-  - { class: DriveStraight, angle: 60, distance: -32 }
+  - { class: DriveStraight, angle: 60, distance: -40 }
   - { class: DriveRotate, angle: 0 }
   - { class: DriveStraight, angle: 0, distance: 50.0 }
 #  - { class: DriveStraight, angle: 65, distance: -50.0 }
@@ -251,13 +251,13 @@ $CenterAutoRSwitch:
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -48 }
   - { class: DriveRotate, angle: -60 }
-  - { class: DriveStraight, angle: -60, distance: 36.0 }
+  - { class: DriveStraight, angle: -60, distance: 44.0 }
 #  - { class: DriveArc, arcLength: -53, speed: 100, angle: -65 }
 #  - { class: DriveStraight, angle: -65, distance: 50.0 }
   - WaitForCube
   - { class: DriveStraight, angle: -60, distance: -4.0 }
   - { class: WaitFor, command: PickerPick }
-  - { class: DriveStraight, angle: -60, distance: -32 }
+  - { class: DriveStraight, angle: -60, distance: -40 }
   - { class: DriveRotate, angle: 0 }
   - { class: DriveStraight, angle: 0, distance: 50.0 }
 #  - { class: DriveStraight, angle: -65, distance: -50.0 }
@@ -268,7 +268,7 @@ $CenterAutoRSwitch:
 #  - { class: DriveStraight, angle: -65, distance: 50.0 }
   - { class: DriveStraight, angle: 0, distance: -36 }
   - { class: DriveRotate, angle: -60 }
-  - { class: DriveStraight, angle: -60, distance: 34.0 }
+  - { class: DriveStraight, angle: -60, distance: 42.0 }
 
 $LiftSequenceScaleLowLeft:
   - { class: WaitFor, command: PickerPick }
@@ -295,8 +295,8 @@ $StartRightScaleLeft:
     path:
 #      - { x: -115, y: 19 }
       - { x: 115, y: 109 }
-      - { x: 115, y: 228, radius: 48 }
-      - { x: -45, y: 228, radius: 48 }
+      - { x: 115, y: 231, radius: 48 }
+      - { x: -45, y: 231, radius: 48 }
       - { x: -114, y: 284 }
   - $LiftScaleLow
   - WaitForHeight
@@ -379,21 +379,21 @@ $StartRightScaleRight:
 
 $AutoStartLeftScaleLeftScaleLeft:
   - $StartLeftScaleLeft
-  - { parallel: true, name: $LiftSequenceScaleLowLeft }
+  #- { parallel: true, name: $LiftSequenceScaleLowLeft }
   - { class: DriveArc, angle: 0, arcLength: -106 }
-  - WaitForLeft
-  - PickerQuickDeploy
-  - PivotCenter
-  - $LiftHome
+  #- WaitForLeft
+  #- PickerQuickDeploy
+  #- PivotCenter
+  #- $LiftHome
 
 $AutoStartRightScaleRightScaleRight:
   - $StartRightScaleRight
-  - { parallel: true, name: $LiftSequenceScaleLowRight }
+  #- { parallel: true, name: $LiftSequenceScaleLowRight }
   - { class: DriveArc, angle: 0, arcLength: -106 }
-  - WaitForRight
-  - PickerQuickDeploy
-  - PivotCenter
-  - $LiftHome
+  #- WaitForRight
+  #- PickerQuickDeploy
+  #- PivotCenter
+  #- $LiftHome
 
 $AutoStartLeftScaleLeftSwitchLeft:
   - $StartLeftScaleLeft

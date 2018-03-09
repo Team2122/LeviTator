@@ -27,6 +27,10 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
         startPosition.addObject("Right", "Right");
 
         startPosition.addDefault("Unselected", "!!!unselected_start_pos!!!");
+
+        SmartDashboard.putData(autoChoices);
+        SmartDashboard.putData(startPosition);
+
         this.robot = robot;
     }
 
