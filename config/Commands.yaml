@@ -38,12 +38,12 @@ $PickerReleaseHard:
 #  - WaitForCenter
 
 $PickerReleaseMedium:
-  - { class: PickerQuickDeploy, kickPower: 0.6 }
+  - { class: PickerQuickDeploy, kickPower: 0.6, timeToKick: 0.8 }
   - PivotCenter
 #  - WaitForCenter
 
 $PickerReleaseSoft:
-  - { class: PickerQuickDeploy, kickPower: 0.4 }
+  - { class: PickerQuickDeploy, kickPower: 0.4, timeToKick: 1.0 }
 
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
 PivotHalfLeft: { class: PivotAnglePreset, preset: HALF_LEFT }
