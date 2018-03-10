@@ -129,7 +129,7 @@ $PickerAutoPick:
 ElevatorsDeploy:
   retractTime: .2
 ElevatorsLiftLeft:
-  flapPower: .5
+  flapPower: 1.0
 
 ^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
@@ -177,9 +177,8 @@ Scale:
 ScaleSwitch:
   { class: AutoSelector, type: STARTING_POSITION, left: $ScaleSwitchLeft, right: $ScaleSwitchRight}
 
-$SmartScale:
-  - { class: AutoSelector, type: STARTING_POSITION, left: SetPoseLeft, center: SetPoseCenter, right: SetPoseRight }
-  - $CommonDriveSequence
+SmartScale:
+  { class: AutoSelector, type: STARTING_POSITION, left: $SmartScaleLeft, right: $SmartScaleRight }
 
 $ScaleStartLeft:
   - SetPoseLeft
@@ -211,6 +210,29 @@ StartLeftScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, obj
 StartLeftScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftScaleRightSwitchLeft, R: $AutoStartLeftScaleRightSwitchRight }
 StartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleLeftSwitchLeft, R: $AutoStartRightScaleLeftSwitchRight }
 StartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightSwitchLeft, R: $ AutoStartRightScaleRightSwitchRight }
+
+$SmartScaleLeft:
+  - SetPoseLeft
+  - $CommonDriveSequence
+  - SmartScaleStartLeftChooser
+
+$SmartScaleRight:
+  - SetPoseRight
+  - $CommonDriveSequence
+  - SmartScaleStartRightChooser
+
+SmartScaleStartLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: StartLeftScaleLeftChooser, R: StartLeftScaleRightChooser }
+SmartScaleStartRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: StartRightScaleLeftChooser, R: StartRightScaleRightChooser }
+
+SmartScaleStartLeftScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftScaleLeftScaleLeft, R: $AutoStartLeftScaleLeftScaleLeft }
+SmartScaleStartLeftScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: SlowDown, R: SlowDown }
+SmartScaleStartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: SlowDown, R: SlowDown }
+SmartScaleStartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightScaleRight, R: $ $AutoStartRightScaleRightScaleRight }
+
+SlowDown:
+  class: DriveStraight
+  distance: -48
+  speed: 30.0
 
 $CenterAuto:
   - SetPoseCenter
