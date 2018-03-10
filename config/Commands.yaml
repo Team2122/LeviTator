@@ -399,19 +399,32 @@ $StartRightScaleRight:
   - { class: DriveArc, angle: 38, arcLength: 118 }
   - { class: DriveStraight, distance: -3 }
 
+
+$LiftSequenceScaleLowLeftSlow:
+  - { class: WaitFor, command: PickerPick }
+  - $LiftScaleLow
+  - WaitForHeight
+
 $AutoStartLeftScaleLeftScaleLeft:
   - $StartLeftScaleLeft
-  - { parallel: true, name: $LiftSequenceScaleLowLeft }
+  - { parallel: true, name: $LiftSequenceScaleLowLeftSlow }
   - { class: DriveArc, angle: 0, arcLength: -106 }
+  - PivotLeft
   - WaitForLeft
   - PickerQuickDeploy
   - PivotCenter
   - $LiftHome
 
+$LiftSequenceScaleLowRightSlow:
+  - { class: WaitFor, command: PickerPick }
+  - $LiftScaleLow
+  - WaitForHeight
+
 $AutoStartRightScaleRightScaleRight:
   - $StartRightScaleRight
-  - { parallel: true, name: $LiftSequenceScaleLowRight }
+  - { parallel: true, name: $LiftSequenceScaleLowRightSlow }
   - { class: DriveArc, angle: 0, arcLength: -106 }
+  - PivotRight
   - WaitForRight
   - PickerQuickDeploy
   - PivotCenter
