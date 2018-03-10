@@ -85,6 +85,14 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setPickerExtended(false);
     }
 
+    public void toggleExtension() {
+        if (extensionSolenoid.get()) {
+            retract();
+        } else {
+            extend();
+        }
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();

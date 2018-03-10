@@ -165,7 +165,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             if (targetHeight == safeHeight && lastAttemptedHeight == height) {
                 return;
             } else {
-                logger.warn("Target height is unsafe with current picker conditions: {}. Moving to {}", height, safeHeight);
+                logger.warn("Target height is unsafe with current picker conditions (angle: {}): {}. Moving to {}", getCurrentPivotAngle(),
+                        height, safeHeight);
                 lastAttemptedHeight = height;
                 height = safeHeight;
             }
@@ -267,19 +268,19 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void bumpLiftUp() {
-        setDesiredHeight(getCurrentHeight() + config.bumpHeightValue);
+        setDesiredHeight(getDesiredHeight() + config.bumpHeightValue);
     }
 
     public void bumpLiftDown() {
-        setDesiredHeight(getCurrentHeight() - config.bumpHeightValue);
+        setDesiredHeight(getDesiredHeight() - config.bumpHeightValue);
     }
 
     public void bumpPivotRight() {
-        setDesiredPivotAngle(getCurrentPivotAngle() + config.bumpPivotValue);
+        setDesiredPivotAngle(getDesiredPivotAngle() + config.bumpPivotValue);
     }
 
     public void bumpPivotLeft() {
-        setDesiredPivotAngle(getCurrentPivotAngle() - config.bumpPivotValue);
+        setDesiredPivotAngle(getDesiredPivotAngle() - config.bumpPivotValue);
     }
 
     public void setPivotPower(double pivotPower) {

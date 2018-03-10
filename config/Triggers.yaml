@@ -2,7 +2,7 @@ defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   TRIGGER_RIGHT: toggle whenPressed PickerPick
-  TRIGGER_LEFT: start whenPressed $PickerReleaseHard
+  TRIGGER_LEFT: start whenPressed PickerSwitchDeploy
   BUMPER_RIGHT: toggle whenPressed $AutoPick
   POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
@@ -17,24 +17,24 @@ gunner:
   LEFT_MIDDLE: start whenPressed PickerSwitchDeploy
   LEFT_RING: start whenPressed PivotLeft
   LEFT_INDEX: start whenPressed PivotRight
-  LEFT_THUMB: toggle whenPressed PickerPick
+  LEFT_THUMB: start whenPressed PickerExtendToggle
   RIGHT_THUMB: start whenPressed $LiftHome
   RIGHT_INDEX: start whenPressed $LiftSwitchLow
-  RIGHT_MIDDLE: start whenPressed $LiftSwitch
-  RIGHT_RING: start whenPressed $LiftScaleLow
-  RIGHT_PINKY: start whenPressed $LiftScaleHigh
+  RIGHT_MIDDLE: start whenPressed $LiftScaleLow
+  RIGHT_RING: start whenPressed BumpLiftDown
+  RIGHT_PINKY: start whenPressed BumpLiftUp
 gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
   2: start afterHeld ElevatorsDeploy
   3: toggle whenPressed ElevatorsLiftLeft
-  4: start whenPressed PickerExtend
+  4: toggle whenPressed PickerPick
   5: start whenPressed PickerRetract
   6: start whenPressed BumpPivotLeft
   7: start whenPressed BumpPivotRight
-  8: start whenPressed BumpLiftUp
-  9: start whenPressed BumpLiftDown
+  8: start whenPressed $LiftSwitch
+  9: start whenPressed $LiftScaleHigh
   10: start whenPressed PivotCenter
   11: start whenPressed ElevatorsLiftRight
   12: start whenPressed $PickerReleaseHard

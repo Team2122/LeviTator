@@ -66,7 +66,7 @@ lift:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 123
+    offset: 123.6
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
@@ -129,7 +129,7 @@ lift:
   bumpPivotValue: 15
 
   heightTolerance: 2.0
-  angleTolerance: 3.0
+  angleTolerance: 4.0
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"

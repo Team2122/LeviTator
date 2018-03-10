@@ -40,6 +40,10 @@ public class LogCommand extends Command implements Configurable<LogCommand.Confi
         return true;
     }
 
+    @Override
+    protected void finish(boolean interrupted) {
+    }
+
     public static class Config {
         public LogLevel level = LogLevel.INFO;
         public String message;

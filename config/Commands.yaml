@@ -315,8 +315,8 @@ $StartRightScaleLeft:
   - class: DrivePath
     path:
       - { x: -114, y: 284, speed: 40 }
-      - { x: -90, y: 258, radius: 36, speed: 30.0 }
-      - { x: -78, y: 226 }
+      - { x: -90, y: 258, radius: 36, speed: 20.0 }
+      - { x: -82, y: 226 }
 
 $StartLeftScaleRight:
 #  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
@@ -352,12 +352,12 @@ $StartLeftScaleRight:
   - class: DrivePath
     path:
       - { x: 114, y: 296, speed: 40 }
-      - { x: 90, y: 270, radius: 36, speed: 30.0 }
-      - { x: 78, y: 232 }
+      - { x: 90, y: 270, radius: 36, speed: 20.0 }
+      - { x: 82, y: 232 }
 
 $StartLeftScaleLeft:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
-  - { class: DriveStraight, distance: -216 }
+  - { class: DriveStraight, distance: -208 }
   - WaitForLeft
   - PickerQuickDeploy
   - PivotCenter
@@ -368,7 +368,7 @@ $StartLeftScaleLeft:
 
 $StartRightScaleRight:
   - { parallel: true, name: $LiftSequenceScaleLowRight }
-  - { class: DriveStraight, distance: -216 }
+  - { class: DriveStraight, distance: -208 }
   - WaitForRight
   - PickerQuickDeploy
   - PivotCenter
@@ -379,21 +379,21 @@ $StartRightScaleRight:
 
 $AutoStartLeftScaleLeftScaleLeft:
   - $StartLeftScaleLeft
-  #- { parallel: true, name: $LiftSequenceScaleLowLeft }
+  - { parallel: true, name: $LiftSequenceScaleLowLeft }
   - { class: DriveArc, angle: 0, arcLength: -106 }
-  #- WaitForLeft
-  #- PickerQuickDeploy
-  #- PivotCenter
-  #- $LiftHome
+  - WaitForLeft
+  - PickerQuickDeploy
+  - PivotCenter
+  - $LiftHome
 
 $AutoStartRightScaleRightScaleRight:
   - $StartRightScaleRight
-  #- { parallel: true, name: $LiftSequenceScaleLowRight }
+  - { parallel: true, name: $LiftSequenceScaleLowRight }
   - { class: DriveArc, angle: 0, arcLength: -106 }
-  #- WaitForRight
-  #- PickerQuickDeploy
-  #- PivotCenter
-  #- $LiftHome
+  - WaitForRight
+  - PickerQuickDeploy
+  - PivotCenter
+  - $LiftHome
 
 $AutoStartLeftScaleLeftSwitchLeft:
   - $StartLeftScaleLeft

@@ -32,6 +32,10 @@ public class CommandRegistrar {
         commandStore.registerCommand("PickerQuickDeploy", () -> new PickerQuickDeploy(robot));
         commandStore.registerCommand("PickerRegrip", () -> new PickerRegrip(robot));
         commandStore.putCommand("WaitForCube", new WaitForCube(robot));
+        commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
+        commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
+        commandStore.putCommand("PickerExtendToggle", Commands.instant(picker::toggleExtension, picker));
+        commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();
@@ -41,10 +45,6 @@ public class CommandRegistrar {
         commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
         commandStore.registerCommand("WaitForHeight", () -> new WaitForHeight(robot));
         commandStore.putCommand("WaitForCenter", new WaitForCenter(robot));
-
-        commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
-        commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
-        commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
 
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
