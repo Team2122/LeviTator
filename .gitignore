@@ -83,7 +83,16 @@ gradle-app.setting
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
 
-# Don't exclude bundled jar files
-!/lib/*.jar
-!/rio/lib/*.jar
-!/vision/lib/*.jar
+# Eclipse files
+.project
+.settings
+.classpath
+
+# Visual Studio Code Files
+.vscode
+
+# Compiled artifacts
+*.so
+
+# Don't exclude bundled jar/artifact files
+!**/lib/*
