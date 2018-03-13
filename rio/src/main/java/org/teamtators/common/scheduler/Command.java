@@ -206,4 +206,26 @@ public abstract class Command implements CommandRunContext {
     protected void setValidStates(EnumSet<RobotState> validStates) {
         this.validStates = validStates;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "name='" + name + '\'' +
+                "running=" + isRunning() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Command command = (Command) o;
+        return Objects.equals(name, command.name);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(name);
+    }
 }
