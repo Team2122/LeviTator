@@ -18,7 +18,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
     private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
     private final Map<TriggerSource, List<TriggerScheduler>> triggerSchedulers = new HashMap<>();
-    private final List<CommandRun> runningCommands = Collections.synchronizedList(new ArrayList<>());
+    private final List<CommandRun> runningCommands = Collections.synchronizedList(new LinkedList<>());
     private AtomicReference<ListIterator<CommandRun>> runIterator = new AtomicReference<>(null);
     private final Set<Command> defaultCommands = new HashSet<>();
 
