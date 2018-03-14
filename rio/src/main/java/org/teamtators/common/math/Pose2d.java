@@ -55,11 +55,11 @@ public class Pose2d {
     }
 
     public Pose2d add(Pose2d other) {
-        return new Pose2d(this.translation.add(other.translation), this.yaw.add(other.yaw));
+        return new Pose2d(this.translation.plus(other.translation), this.yaw.add(other.yaw));
     }
 
     public Pose2d addTranslation(Translation2d translation) {
-        return new Pose2d(this.translation.add(translation), this.yaw);
+        return new Pose2d(this.translation.plus(translation), this.yaw);
     }
 
     public Pose2d addYaw(Rotation yaw) {
@@ -71,11 +71,11 @@ public class Pose2d {
     }
 
     public Pose2d sub(Pose2d other) {
-        return new Pose2d(this.translation.sub(other.translation), this.yaw.sub(other.yaw));
+        return new Pose2d(this.translation.minus(other.translation), this.yaw.sub(other.yaw));
     }
 
     public Pose2d neg() {
-        return new Pose2d(this.translation.neg(), this.yaw.neg());
+        return new Pose2d(this.translation.negative(), this.yaw.neg());
     }
 
     public Pose2d rotateBy(Rotation rotation) {
@@ -89,7 +89,7 @@ public class Pose2d {
     }
 
     public Pose2d extend(double distance) {
-        return new Pose2d(this.translation.add(yaw.toTranslation(distance)), this.yaw);
+        return new Pose2d(this.translation.plus(yaw.toTranslation(distance)), this.yaw);
     }
 
     public Translation2d getIntersection(Pose2d other) {
@@ -112,7 +112,7 @@ public class Pose2d {
         double tan_b = b_r.tan();
         double t = ((a_t.getX() - b_t.getX()) * tan_b + b_t.getY() - a_t.getY())
                 / (a_r.sin() - a_r.cos() * tan_b);
-        return a_t.add(a_r.toTranslation(t));
+        return a_t.plus(a_r.toTranslation(t));
     }
 
     public Translation2d getNearestPoint(Translation2d point) {
@@ -121,7 +121,7 @@ public class Pose2d {
     }
 
     public double getDistanceAhead(Translation2d point) {
-        Translation2d diff = point.sub(translation);
+        Translation2d diff = point.minus(translation);
         if (isEpsilonZero(diff.getMagnitude())) {
             return 0.0;
         }

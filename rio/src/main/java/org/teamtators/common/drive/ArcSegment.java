@@ -73,12 +73,12 @@ public class ArcSegment extends DriveSegmentBase {
     }
 
     public Pose2d getStartPose() {
-        return new Pose2d(center.add(getStartNormal().toTranslation(radius)),
+        return new Pose2d(center.plus(getStartNormal().toTranslation(radius)),
                 startAngle);
     }
 
     public Pose2d getEndPose() {
-        return new Pose2d(center.add(getEndNormal().toTranslation(radius)),
+        return new Pose2d(center.plus(getEndNormal().toTranslation(radius)),
                 endAngle);
     }
 
@@ -89,17 +89,17 @@ public class ArcSegment extends DriveSegmentBase {
 
     @Override
     protected Pose2d getNearestPoint(Translation2d point) {
-        Translation2d diff = point.sub(center);
+        Translation2d diff = point.minus(center);
         if (isEpsilonZero(diff.getMagnitude())) { //wtf?
             return getStartPose();
         }
         Rotation direction = diff.getDirection();
-        Translation2d nearest = center.add(direction.toTranslation(radius));
+        Translation2d nearest = center.plus(direction.toTranslation(radius));
         if (!direction.isBetween(getStartNormal(), getEndNormal())) {
             Translation2d startTrans = getStartPose().getTranslation();
-            double startDist = point.sub(startTrans).getMagnitude();
+            double startDist = point.minus(startTrans).getMagnitude();
             Translation2d endTrans = getEndPose().getTranslation();
-            double endDist = point.sub(endTrans).getMagnitude();
+            double endDist = point.minus(endTrans).getMagnitude();
             if (startDist < endDist) {
                 nearest = startTrans;
             } else {
@@ -111,17 +111,17 @@ public class ArcSegment extends DriveSegmentBase {
 
     @Override
     public Pose2d getLookAhead(Pose2d nearestPoint, double arcDistance) {
-        Translation2d diff = nearestPoint.getTranslation().sub(center);
+        Translation2d diff = nearestPoint.getTranslation().minus(center);
         Rotation direction = diff.getDirection();
         Rotation angleDelta = Rotation.fromRadians(arcDistance / radius * (isClockwise() ? -1 : 1));
         Rotation newDirection = direction.add(angleDelta);
-        return new Pose2d(center.add(newDirection.toTranslation(radius)),
+        return new Pose2d(center.plus(newDirection.toTranslation(radius)),
                 normalToHeading(newDirection));
     }
 
     @Override
     protected double getTraveledDistance(Translation2d point) {
-        Translation2d diff = point.sub(center);
+        Translation2d diff = point.minus(center);
         Rotation direction = diff.getDirection();
         Rotation angleDelta = direction.sub(getStartNormal());
         return angleDelta.toRadians() * radius * (isClockwise() ? -1 : 1);
@@ -129,7 +129,7 @@ public class ArcSegment extends DriveSegmentBase {
 
     @Override
     protected double getRemainingDistance(Translation2d point) {
-        Translation2d diff = point.sub(center);
+        Translation2d diff = point.minus(center);
         Rotation direction = diff.getDirection();
         Rotation angleDelta = direction.sub(getEndNormal());
         return angleDelta.toRadians() * radius * (isClockwise() ? 1 : -1);

@@ -1,1 +1,1 @@
-include 'rio'
+include 'config', 'rio'

@@ -4,8 +4,8 @@ package org.teamtators.common.math;
  * @author Alex Mikhalev
  */
 public class Translation2d {
-    private final double x;
-    private final double y;
+    private double x;
+    private double y;
 
     public Translation2d(double x, double y) {
         this.x = x;
@@ -33,12 +33,36 @@ public class Translation2d {
         return y;
     }
 
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
     public Translation2d withX(double x) {
         return new Translation2d(x, this.y);
     }
 
     public Translation2d withY(double y) {
         return new Translation2d(this.x, y);
+    }
+
+    public Translation2d mirrorX(double centerX) {
+        return withX(centerX - this.x);
+    }
+
+    public Translation2d mirrorY(double centerY) {
+        return withY(centerY - this.y);
+    }
+
+    public Translation2d mirrorX() {
+        return mirrorX(0);
+    }
+
+    public Translation2d mirrorY() {
+        return mirrorY(0);
     }
 
     public boolean isNaN() {
@@ -58,15 +82,15 @@ public class Translation2d {
         return Math.hypot(this.x, this.y);
     }
 
-    public Translation2d add(Translation2d other) {
+    public Translation2d plus(Translation2d other) {
         return new Translation2d(this.x + other.x, this.y + other.y);
     }
 
-    public Translation2d sub(Translation2d other) {
+    public Translation2d minus(Translation2d other) {
         return new Translation2d(this.x - other.x, this.y - other.y);
     }
 
-    public Translation2d neg() {
+    public Translation2d negative() {
         return new Translation2d(-this.x, -this.y);
     }
 

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class DrivePathTest {
     public static DrivePath getTestPath() {
         DrivePath path = new DrivePath();
-        DrivePath.Point point = new DrivePath.Point();
+        PathPoint point = new PathPoint();
         point.setTranslation(new Translation2d(0, 0));
         point.setRadius(12);
         point.setSpeed(30);

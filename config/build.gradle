@@ -1,0 +1,23 @@
+apply plugin: 'groovy'
+
+def rio = rootProject.project('rio')
+
+rio.afterEvaluate {
+    rio.repositories.collect {
+        project.repositories.add(it)
+    }
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir file('paths')
+        }
+    }
+}
+
+dependencies {
+    compile rio
+
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.14'
+}

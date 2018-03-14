@@ -42,9 +42,9 @@ public class Twist2d {
     }
 
     public static Twist2d fromTangentArc(Pose2d startPose, Translation2d endPoint) {
-        Translation2d diff = endPoint.sub(startPose.getTranslation());
+        Translation2d diff = endPoint.minus(startPose.getTranslation());
         Translation2d halfDiff = diff.scale(0.5);
-        Pose2d perpBisector = new Pose2d(startPose.getTranslation().add(halfDiff), diff.getDirection().ccwNormal());
+        Pose2d perpBisector = new Pose2d(startPose.getTranslation().plus(halfDiff), diff.getDirection().ccwNormal());
         Rotation startHeading = startPose.getYaw();
         Rotation startNormal = startHeading.ccwNormal();
         Pose2d startNormalLine = new Pose2d(startPose.getTranslation(), startNormal);
@@ -55,8 +55,8 @@ public class Twist2d {
             twist.setDeltaX(diff.getMagnitude());
         } else {
             boolean isCcw = startNormalLine.getDistanceAhead(center) > 0;
-            double radius = endPoint.sub(center).getMagnitude();
-            Rotation endNormal = endPoint.sub(center).getDirection();
+            double radius = endPoint.minus(center).getMagnitude();
+            Rotation endNormal = endPoint.minus(center).getDirection();
             Rotation endHeading = isCcw ? endNormal.ccwNormal() : endNormal.cwNormal();
             Rotation deltaHeading = endHeading.sub(startHeading);
             double arcLength = deltaHeading.toRadians() * radius;

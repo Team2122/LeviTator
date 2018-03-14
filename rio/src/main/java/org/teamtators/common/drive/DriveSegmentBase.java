@@ -1,6 +1,5 @@
 package org.teamtators.common.drive;
 
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Translation2d;
 
@@ -60,7 +59,7 @@ public abstract class DriveSegmentBase implements DriveSegment {
     public LookaheadReport getLookaheadReport(Pose2d currentPose, double lookaheadDistance) {
         LookaheadReport report = new LookaheadReport();
         report.nearestPoint = getNearestPoint(currentPose.getTranslation());
-        report.trackError = report.nearestPoint.getTranslation().sub(currentPose.getTranslation()).getMagnitude();
+        report.trackError = report.nearestPoint.getTranslation().minus(currentPose.getTranslation()).getMagnitude();
         report.yawError = currentPose.getYaw().sub(report.nearestPoint.getYaw());
         report.lookaheadPoint = getLookAhead(report.nearestPoint, lookaheadDistance);
         report.traveledDistance = getTraveledDistance(report.nearestPoint.getTranslation());

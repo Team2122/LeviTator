@@ -47,7 +47,6 @@ deploy {
 }
 
 repositories {
-    mavenCentral()
     maven {
         name = "Eclipse Paho"
         url = "https://repo.eclipse.org/content/repositories/paho-releases/"
@@ -77,6 +76,8 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
+//    compile group: 'org.mozilla', name: 'rhino', version: '1.7.8'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.14'
 
     compile wpilib()
 //    compile ctre()
@@ -89,6 +90,9 @@ dependencies {
 
     testCompile group: 'org.testng', name: 'testng', version: '6.14.2'
 }
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 jar {
     from configurations.compile.findAll { it.isDirectory() }

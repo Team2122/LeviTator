@@ -3,6 +3,10 @@ ext.teamNumber = 2122
 allprojects {
     apply plugin: "idea"
 
+    repositories {
+        mavenCentral()
+    }
+
     idea {
         module {
             downloadJavadoc = true

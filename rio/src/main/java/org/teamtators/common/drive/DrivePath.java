@@ -2,8 +2,6 @@ package org.teamtators.common.drive;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.teamtators.common.config.ConfigException;
-import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
 import org.teamtators.common.math.Translation2d;
@@ -11,7 +9,6 @@ import org.teamtators.common.math.Translation2d;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.teamtators.common.math.Epsilon.isEpsilonPositive;
 import static org.teamtators.common.math.Epsilon.isEpsilonZero;
@@ -19,138 +16,35 @@ import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 public class DrivePath {
     private static final Logger logger = LoggerFactory.getLogger(DrivePath.class);
 
-    public static class Point {
-        private Translation2d translation;
-        private double radius = Double.NaN;
-        private double speed = Double.NaN;
-        private double arcSpeed = Double.NaN;
-        private Boolean reverse = null;
+    private final String name;
+    private List<PathPoint> points;
 
-        public Point(Translation2d translation) {
-            this.translation = translation;
-        }
-
-        public Point() {
-            this(Translation2d.zero());
-        }
-
-        public Point(Point point) {
-            this.translation = new Translation2d(point.translation);
-            this.radius = point.radius;
-            this.speed = point.speed;
-            this.arcSpeed = point.arcSpeed;
-            this.reverse = point.reverse;
-        }
-
-        public void setTranslation(Translation2d translation) {
-            this.translation = translation;
-        }
-
-        public Translation2d getTranslation() {
-            return translation;
-        }
-
-        public double getX() {
-            return translation.getX();
-        }
-
-        public void setX(double x) {
-            translation = translation.withX(x);
-        }
-
-        public double getY() {
-            return translation.getY();
-        }
-
-        public void setY(double y) {
-            translation = translation.withY(y);
-        }
-
-        public double getRadius() {
-            return radius;
-        }
-
-        public void setRadius(double radius) {
-            this.radius = radius;
-        }
-
-        public double getSpeed() {
-            return speed;
-        }
-
-        public void setSpeed(double speed) {
-            this.speed = speed;
-        }
-
-        public double getArcSpeed() {
-            return arcSpeed;
-        }
-
-        public void setArcSpeed(double arcSpeed) {
-            this.arcSpeed = arcSpeed;
-        }
-
-        public Boolean isReverse() {
-            return reverse;
-        }
-
-        public void setReverse(boolean reverse) {
-            this.reverse = reverse;
-        }
-
-        void check() {
-            if (Double.isNaN(radius)) {
-                throw new ConfigException("radius on DrivePath.Point not set");
-            }
-            if (Double.isNaN(arcSpeed)) {
-                throw new ConfigException("arcSpeed on DrivePath.Point not set");
-            }
-            if (Double.isNaN(speed)) {
-                throw new ConfigException("speed on DrivePath.Point not set");
-            }
-            if (reverse == null) {
-                throw new ConfigException("reverse on DrivePath.Point not set");
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "Point{" +
-                    "translation=" + translation +
-                    ", radius=" + radius +
-                    ", speed=" + speed +
-                    ", arcSpeed=" + arcSpeed +
-                    ", reverse=" + reverse +
-                    '}';
-        }
-
-        public Point copy() {
-            return new Point(this);
-        }
-    }
-
-    private List<Point> points;
-
-    public DrivePath(Collection<Point> points) {
+    public DrivePath(String name, Collection<PathPoint> points) {
+        this.name = name;
         this.points = new ArrayList<>(points);
     }
 
-    public DrivePath() {
+    public DrivePath(String name) {
+        this.name = name;
         this.points = new ArrayList<>();
     }
 
-    public void addPoint(Point point) {
+    public String getName() {
+        return name;
+    }
+
+    public void addPoint(PathPoint point) {
         point.check();
         this.points.add(point);
     }
 
-    public List<Point> getPoints() {
+    public List<PathPoint> getPoints() {
         return points;
     }
 
 
     public DriveSegments toSegments() {
-        List<DrivePath.Point> points = this.getPoints();
+        List<PathPoint> points = this.getPoints();
         DriveSegments segments = new DriveSegments();
         int numPoints = points.size();
         double speed = 0.0, lastSpeed = 0.0;
@@ -158,9 +52,9 @@ public class DrivePath {
         double takeOffLength, lastTakeOffLength = 0.0;
 
         for (int i = 0; i < numPoints - 1; i++) {
-            DrivePath.Point point1 = points.get(i);
-            DrivePath.Point point2 = points.get(i + 1);
-            Translation2d trans = point2.getTranslation().sub(point1.getTranslation());
+            PathPoint point1 = points.get(i);
+            PathPoint point2 = points.get(i + 1);
+            Translation2d trans = point2.getTranslation().minus(point1.getTranslation());
             double length = trans.getMagnitude();
             heading = trans.getDirection();
             StraightSegment straight = new StraightSegment();
@@ -173,14 +67,14 @@ public class DrivePath {
                     .extend(lastTakeOffLength);
             straight.setStartPose(startPose);
             straight.setEndSpeed(point2.getArcSpeed());
-            straight.setReverse(point1.reverse);
+            straight.setReverse(point1.isReverse());
             Rotation deltaHeading = null, angle = null;
             Translation2d trans2 = null;
             double length2 = 0;
             boolean isStraight = false;
             if (isRadius) {
-                DrivePath.Point point3 = points.get(i + 2);
-                trans2 = point3.getTranslation().sub(point2.getTranslation());
+                PathPoint point3 = points.get(i + 2);
+                trans2 = point3.getTranslation().minus(point2.getTranslation());
                 length2 = trans2.getMagnitude();
                 nextHeading = trans2.getDirection();
                 deltaHeading = nextHeading.sub(heading);
@@ -217,7 +111,7 @@ public class DrivePath {
                 arc.setRadius(radius);
                 arc.setStartAngle(heading);
                 arc.setEndAngle(nextHeading);
-                arc.setReverse(point1.reverse);
+                arc.setReverse(point1.isReverse());
                 speed = point2.getArcSpeed();
             } else {
                 if (isStraight) {

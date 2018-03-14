@@ -36,7 +36,7 @@ public class StraightSegment extends DriveSegmentBase {
     @Override
     protected Pose2d getNearestPoint(Translation2d point) {
         Translation2d nearestPoint = startPose.getNearestPoint(point);
-        Translation2d diff = nearestPoint.sub(startPose.getTranslation());
+        Translation2d diff = nearestPoint.minus(startPose.getTranslation());
         if (!Epsilon.isEpsilonZero(diff.getMagnitude())) {
             if (diff.getDirection().epsilonEquals(startPose.getYaw())) {
                 if (diff.getMagnitude() > length) {
@@ -53,7 +53,7 @@ public class StraightSegment extends DriveSegmentBase {
     public Pose2d getLookAhead(Pose2d nearestPoint, double distance) {
         return new Pose2d(
                 nearestPoint.getTranslation()
-                        .add(startPose.getYaw().toTranslation(distance)),
+                        .plus(startPose.getYaw().toTranslation(distance)),
                 startPose.getYaw());
     }
 
