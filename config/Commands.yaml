@@ -38,7 +38,7 @@ $PickerReleaseHard:
 #  - WaitForCenter
 
 $PickerReleaseMedium:
-  - { class: PickerQuickDeploy, kickPower: 0.6, timeToKick: 0.8 }
+  - { class: PickerQuickDeploy, timeBeforeKick: 0.2, kickPower: 0.6, timeToKick: 0.8 }
   - PivotCenter
 #  - WaitForCenter
 

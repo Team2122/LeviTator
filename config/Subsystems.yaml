@@ -1,7 +1,7 @@
 operatorInterface:
   driverJoystick: { port: 0 }
-  gunnerJoystick: { port: 2 }
-  gunnerSecondary: { port: 1 }
+  gunnerJoystick: { port: 1 }
+  gunnerSecondary: { port: 2 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
@@ -66,7 +66,7 @@ lift:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 171
+    offset: -3.8
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
