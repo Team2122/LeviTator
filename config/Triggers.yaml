@@ -17,7 +17,7 @@ driver:
   STICK_RIGHT: start whenPressed PickerExtendToggle
 
 gunner:
-  LEFT_PINKY: start whenPressed $PickerReleaseSoft
+  LEFT_PINKY: start whenPressed PickerReleaseSoft
   LEFT_MIDDLE: start whenPressed PickerSwitchDeploy
   LEFT_RING: start whenPressed PivotLeft
   LEFT_INDEX: start whenPressed PivotRight

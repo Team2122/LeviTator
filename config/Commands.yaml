@@ -42,8 +42,8 @@ $PickerReleaseMedium:
   - PivotCenter
 #  - WaitForCenter
 
-$PickerReleaseSoft:
-  - { class: PickerQuickDeploy, kickPower: 0.4, timeToKick: 1.0 }
+PickerReleaseSoft:
+  { class: PickerRelease, powers: { left: -0.4, right: -0.4 } }
 
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
 PivotHalfLeft: { class: PivotAnglePreset, preset: HALF_LEFT }
