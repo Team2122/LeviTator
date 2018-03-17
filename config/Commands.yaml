@@ -30,7 +30,7 @@ PickerQuickDeploy:
   timeToKick: 0.6
 
 PickerSwitchDeploy:
-  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .4, timeBeforeRetract: 0 }
+  { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
 
 $PickerReleaseHard:
   - { class: PickerQuickDeploy, kickPower: 0.8 }

@@ -2,6 +2,7 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
+import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Picker;
@@ -26,7 +27,6 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
     public void initialize() {
         super.initialize();
         timer.start();
-        picker.setPickerExtended(true);
     }
 
     @Override
@@ -40,7 +40,9 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
             picker.setRollerPower(0.0);
         }
         if (startRetracting) {
-            picker.setPickerExtended(false);
+            if (!Double.isNaN(config.timeBeforeRetract)) {
+                picker.setPickerExtended(false);
+            }
         } else {
             picker.setPickerExtended(true);
         }
@@ -51,7 +53,9 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
         picker.setRollerPower(0.0);
-        picker.setPickerExtended(false);
+        if (!Double.isNaN(config.timeBeforeRetract)) {
+            picker.setPickerExtended(false);
+        }
     }
 
     public static class Config {
