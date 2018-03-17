@@ -75,6 +75,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
 //        usbCamera.setExposureManual(config.exposure);
         usbCamera.setExposureAuto();
 
+/*
         for (VideoProperty property : usbCamera.enumerateProperties()) {
             if (property.getName().equalsIgnoreCase("contrast")) {
                 property.set(config.contrast);
@@ -158,7 +159,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
                 MatOfInt convexHull = new MatOfInt();
                 Imgproc.convexHull(contours.get(i), convexHull, false);
                 hulls.set(i, convexHull);
-            }*/
+    }*//*
             if (displayMode == DisplayMode.AllContours) {
                 Imgproc.drawContours(output, contours, -1, REJECTED_CONTOUR_COLOR);
             }
@@ -203,6 +204,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         threshold.release();
         hierarchy.release();
         output.release();
+        */
     }
 
     private UsbCameraInfo[] getCameras() {

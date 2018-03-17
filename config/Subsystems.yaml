@@ -86,7 +86,7 @@ lift:
     maxAcceleration: 140.0
     travelVelocity: 80.0
     endVelocity: 0.0
-    logData: true
+#    logData: true
 
   pivotController:
 #    kpP: 0.04 # 0.04
