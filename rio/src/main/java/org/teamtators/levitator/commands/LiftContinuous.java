@@ -56,10 +56,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                     //Reset sweep target
                     logger.debug("Pivot locked");
                     sweepTarget = 0;
-                } else if (sweepTimer.hasPeriodElapsed(config.sweepTimeoutSeconds)) {
-                    //Reset sweep target
+                } else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
                     logger.warn("Pivot could not lock, timeout elapsed");
-                    sweepTarget = 0;
                 }
             } else {
                 if (!lift.isPivotLocked()) {
