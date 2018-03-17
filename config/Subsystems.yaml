@@ -74,7 +74,7 @@ lift:
   heightController:
     kpP: 0.2
     kiP: 0.0
-    kpV: 0.005
+    kpV: 0.02
     kfV: 0.009
     kMinOutput: 0.0823
     kfA: 0.00089
@@ -84,8 +84,9 @@ lift:
     minPosition: 0.0
     maxPosition: 85.0
     maxAcceleration: 140.0
-    travelVelocity: 100.0
+    travelVelocity: 80.0
     endVelocity: 0.0
+    logData: true
 
   pivotController:
 #    kpP: 0.04 # 0.04
