@@ -1,1 +1,1 @@
-include 'rio'
+include 'rio', 'shuffleboardPlugin'

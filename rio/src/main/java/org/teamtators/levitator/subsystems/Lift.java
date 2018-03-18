@@ -50,6 +50,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private Config config;
 
+    private boolean isMovementInitiatedByCommand = false;
+
     public Lift() {
         super("Lift");
 
@@ -107,7 +109,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     /**
      * @param desiredHeight height in inches
      */
-    public void setDesiredHeight(double desiredHeight) {
+    public void setDesiredHeight(double desiredHeight, boolean commandInitiated) {
         if (desiredHeight < config.heightController.minPosition) {
             logger.warn("Lift desired height exceeded bottom height limit ({} < {})", desiredHeight,
                     config.heightController.minPosition);
@@ -117,16 +119,21 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                     config.heightController.maxPosition);
             desiredHeight = config.heightController.maxPosition;
         }
+
+        if (isMovementInitiatedByCommand && !commandInitiated) {
+            return;
+        }
 //        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
         logger.info("Setting desired lift height to {}", desiredHeight);
         this.desiredHeight = desiredHeight;
+        isMovementInitiatedByCommand = commandInitiated;
 //        } else {
 //            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
 //        }
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
-        setDesiredHeight(getHeightPreset(desiredHeight));
+        setDesiredHeight(getHeightPreset(desiredHeight), true);
     }
 
     public double getHeightPreset(HeightPreset heightPreset) {
@@ -252,11 +259,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void bumpLiftUp() {
-        setDesiredHeight(getDesiredHeight() + config.bumpHeightValue);
+        setDesiredHeight(getDesiredHeight() + config.bumpHeightValue, true);
     }
 
     public void bumpLiftDown() {
-        setDesiredHeight(getDesiredHeight() - config.bumpHeightValue);
+        setDesiredHeight(getDesiredHeight() - config.bumpHeightValue, true);
     }
 
     public void bumpPivotRight() {
@@ -275,6 +282,13 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         }
     }
 
+    public boolean isAtDesiredHeight() {
+        return liftController.isOnTarget();
+    }
+
+    public double toHeight(double slider) {
+        return slider * config.heightController.maxPosition;
+    }
 
     public TrapezoidalProfileFollower getLiftController() {
         return liftController;
@@ -302,12 +316,25 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotLockSolenoid.set(lock);
     }
 
+    public void clearForceMovementFlag() {
+        this.isMovementInitiatedByCommand = false;
+    }
+
+    public boolean isMovementInitiatedByCommand() {
+        return isMovementInitiatedByCommand;
+    }
+
+    public boolean isAtHeight() {
+        return getCurrentHeight() + config.heightTolerance > getDesiredHeight() &&
+                getCurrentHeight() - config.heightTolerance < getDesiredHeight();
+    }
+
     @Override
     public void onEnterRobotState(RobotState state) {
         switch (state) {
             case AUTONOMOUS:
             case TELEOP:
-                setDesiredHeight(getCurrentHeight());
+                setDesiredHeight(getCurrentHeight(), true);
                 setDesiredAnglePreset(AnglePreset.CENTER);
                 setTargetAngle(getAnglePreset(AnglePreset.CENTER));
                 pivotController.start();

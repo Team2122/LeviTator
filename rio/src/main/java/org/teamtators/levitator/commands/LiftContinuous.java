@@ -6,6 +6,7 @@ import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.OperatorInterface;
 
 public class LiftContinuous extends Command implements Configurable<LiftContinuous.Config> {
 
@@ -18,20 +19,30 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Timer sweepTimer = new Timer();
     private Config config;
     private BooleanSampler locked = new BooleanSampler(() -> lift.isPivotLocked());
+    private OperatorInterface operatorInterface;
 
     public LiftContinuous(TatorRobot robot) {
         super("LiftContinuous");
         this.robot = robot;
         lift = (robot.getSubsystems()).getLift();
+        operatorInterface = (robot.getSubsystems()).getOI();
         requires(lift);
     }
 
     @Override
     protected boolean step() {
+        if(lift.isAtHeight()) {
+            lift.clearForceMovementFlag();
+        }
         desiredHeight = lift.getDesiredHeight();
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
+        boolean allowSlider = lift.isMovementInitiatedByCommand();
+        if(allowSlider) {
+            double sliderValue = operatorInterface.getSliderValue();
+            desiredHeight = lift.toHeight(sliderValue);
+        }
         if (desiredPivotAngle != centerAngle && locking) {
             locking = false;
             logger.debug("Moving away from center, disengaging lock");
