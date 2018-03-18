@@ -97,7 +97,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         DriveSegment seg = getCurrentSegment();
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());
-        speedFollower.moveToPosition(previousTraveled + lookaheadReport.remainingDistance);
+        speedFollower.moveDistance(lookaheadReport.remainingDistance);
         if (!speedFollower.isRunning()) {
             speedFollower.start();
         }

@@ -39,14 +39,15 @@ drive:
   driveSegmentsFollower:
     lookAhead: { minX: 9, maxX: 9, minY: 120, maxY: 21 }
     speedFollower:
-      kpP: 0.05
-      kiP: 0.05
+      kpP: 0.2
+      kiP: 0.2
       kpV: 0.02
       kfV: .01
       kMinOutput: .0461
       kfA: 0.0025
       maxIError: 10.0
       maxAcceleration: 80.0
+    logData: true
   tankKinematics: { effectiveTrackWidth: 36.0 }
 picker:
   leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
@@ -139,7 +140,7 @@ lift:
   centerTolerance: 20.0
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
-  defaultChoice: "$Scale"
+  defaultChoice: "LineCrossAuto"
 vision:
   width: 320
   height: 240

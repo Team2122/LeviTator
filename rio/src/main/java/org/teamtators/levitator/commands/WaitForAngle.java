@@ -16,7 +16,7 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
 
     @Override
     protected void initialize() {
-        logger.info("Waiting for center");
+        logger.info("Waiting for angle: {} with tolerance {}", config.preset, config.tolerance);
     }
 
     @Override

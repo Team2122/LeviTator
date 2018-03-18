@@ -60,9 +60,10 @@ WaitForRight: { class: WaitForAngle, preset: RIGHT, tolerance: 20.0 }
 WaitForCenter: { class: WaitForAngle, preset: CENTER, tolerance: 20.0 }
 
 WaitForHeight: { tolerance: 1 }
+LiftHome: { class: LiftHeightPreset, preset: HOME }
 $LiftHome:
   - $PrepareLiftMovement
-  - { class: LiftHeightPreset, preset: HOME }
+  - LiftHome
 $LiftPick:
   - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: PICK }
@@ -375,7 +376,7 @@ $StartLeftScaleLeft:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
   - { class: DriveStraight, distance: -208 }
   - WaitForLeft
-  - PickerQuickDeploy
+  - PickerAutoDeploy
   - PivotCenter
   - $LiftHome
   - { parallel: true, name: PickerPick }
@@ -384,14 +385,30 @@ $StartLeftScaleLeft:
 
 $StartRightScaleRight:
   - { parallel: true, name: $LiftSequenceScaleLowRight }
-  - { class: DriveStraight, distance: -208 }
+  - class: DrivePath
+    reverse: true
+    speed: 80
+    path:
+#      - { x: 115, y: 19 }
+      - { x: 115, y: 109 }
+      - { x: 115, y: 300 }
+#  - { class: DriveStraight, distance: -208 }
   - WaitForRight
-  - PickerQuickDeploy
+  - PickerAutoDeploy
   - PivotCenter
   - $LiftHome
   - { parallel: true, name: PickerPick }
-  - { class: DriveArc, angle: 38, arcLength: 118 }
-  - { class: DriveStraight, distance: -3 }
+#  - { class: Wait, period: 0.5 }
+  - class: DrivePath
+    parallel: true
+    speed: 80
+    path:
+      - { x: 115, y: 300, speed: 80.0 }
+      - { x: 115, y: 260, radius: 36, speed: 20.0 }
+      - { x: 76, y: 204 }
+#  - { class: DriveArc, angle: 38, arcLength: 118 }
+#  - { class: DriveStraight, distance: -3 }
+  - WaitForCube
 
 
 $LiftSequenceScaleLowLeftSlow:
@@ -405,7 +422,7 @@ $AutoStartLeftScaleLeftScaleLeft:
   - { class: DriveArc, angle: 0, arcLength: -106 }
   - PivotLeft
   - WaitForLeft
-  - PickerQuickDeploy
+  - PickerAutoDeploy
   - PivotCenter
   - $LiftHome
 
@@ -416,11 +433,17 @@ $LiftSequenceScaleLowRightSlow:
 
 $AutoStartRightScaleRightScaleRight:
   - $StartRightScaleRight
-  - { parallel: true, name: $LiftSequenceScaleLowRightSlow }
-  - { class: DriveArc, angle: 0, arcLength: -106 }
-  - PivotRight
+  - { parallel: true, name: $LiftSequenceScaleLowRight }
+  - class: DrivePath
+    reverse: true
+    speed: 40
+    path:
+      - { x: 82, y: 208 }
+      - { x: 90, y: 240, radius: 36 }
+      - { x: 110, y: 280 }
+#  - { class: DriveArc, angle: 0, arcLength: -106 }
   - WaitForRight
-  - PickerQuickDeploy
+  - PickerAutoDeploy
   - PivotCenter
   - $LiftHome
 
