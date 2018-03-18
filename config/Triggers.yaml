@@ -9,6 +9,10 @@ driver:
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight
   POV_DOWN: start whenPressed $LiftSwitchLow
+#  POV_UP: start whenPressed BumpLiftUp
+#  POV_DOWN: start whenPressed BumpLiftDown
+#  POV_LEFT: start whenPressed BumpPivotLeft
+#  POV_RIGHT: start whenPressed BumpPivotRight
   A: start whenPressed $LiftHome
   START: start whenPressed PrintPose
   BACK: toggle whenPressed $TestDrive

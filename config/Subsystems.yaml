@@ -119,18 +119,22 @@ lift:
     CENTER: 0
     HALF_RIGHT: 45
     RIGHT: 85
-  heightPresetPick: 2
-  heightPresetLowSwitch: 12
-  heightPresetSwitch: 46
-  heightPresetScaleLow: 58
-  heightPresetScaleHigh: 70
-  heightPresetHome: 0
+  heightPresets:
+    HOME: 0
+    PICK: 0
+    NEED_LOCK: 6
+    SWITCH_LOW: 12
+    NEED_CENTER: 40
+    SWITCH: 46
+    SCALE_LOW: 58
+    SCALE_HIGH: 70
 
   bumpHeightValue: 5
   bumpPivotValue: 15
 
   heightTolerance: 2.0
   angleTolerance: 4.0
+  centerTolerance: 20.0
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
   defaultChoice: "$Scale"

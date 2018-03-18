@@ -11,6 +11,7 @@ import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
+import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
@@ -117,8 +118,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             desiredHeight = config.heightController.maxPosition;
         }
 //        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
-            logger.info("Setting desired lift height to {}", desiredHeight);
-            this.desiredHeight = desiredHeight;
+        logger.info("Setting desired lift height to {}", desiredHeight);
+        this.desiredHeight = desiredHeight;
 //        } else {
 //            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
 //        }
@@ -129,27 +130,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public double getHeightPreset(HeightPreset heightPreset) {
-        double heightValue = 0.0;
-        switch (heightPreset) {
-            case PICK:
-                heightValue = config.heightPresetPick;
-                break;
-            case SWITCH:
-                heightValue = config.heightPresetSwitch;
-                break;
-            case SWITCH_LOW:
-                heightValue = config.heightPresetLowSwitch;
-                break;
-            case SCALE_LOW:
-                heightValue = config.heightPresetScaleLow;
-                break;
-            case SCALE_HIGH:
-                heightValue = config.heightPresetScaleHigh;
-                break;
-            case HOME:
-                heightValue = config.heightPresetHome;
+        if (!config.heightPresets.containsKey(heightPreset)) {
+            return 0.0;
         }
-        return heightValue;
+        return config.heightPresets.get(heightPreset);
     }
 
     public double getTargetHeight() {
@@ -198,8 +182,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setDesiredPivotAngle(double desiredAngle) {
 //        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
-            logger.info("Setting desired pivot angle {}", desiredAngle);
-            this.desiredPivotAngle = desiredAngle;
+        logger.info("Setting desired pivot angle {}", desiredAngle);
+        this.desiredPivotAngle = desiredAngle;
 //        } else {
 //            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
 //        }
@@ -284,7 +268,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setPivotPower(double pivotPower) {
-        if(!isPivotLocked()) {
+        if (!isPivotLocked()) {
             pivotMotorUpdater.set(pivotPower);
         } else {
             pivotMotorUpdater.set(0);
@@ -306,6 +290,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public boolean isPivotLocked() {
         return !pivotLockSensor.get();
+    }
+
+    public boolean isPivotInCenter() {
+        return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
+                getAnglePreset(AnglePreset.CENTER),
+                config.centerTolerance);
     }
 
     public void setPivotLockSolenoid(boolean lock) {
@@ -401,23 +391,37 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private double getSafePivotAngle(double desiredAngle) {
-        if (getCurrentHeight() < config.heightPresetSwitch - config.heightTolerance) {
-            return config.anglePresets.get(AnglePreset.CENTER);
+        double centerAngle = getAnglePreset(AnglePreset.CENTER);
+        if (Epsilon.isEpsilonLessThan(getCurrentHeight(),
+                getHeightPreset(HeightPreset.NEED_LOCK),
+                config.heightTolerance)) {
+            return centerAngle;
+        }
+        if (Epsilon.isEpsilonLessThan(getCurrentHeight(),
+                getHeightPreset(HeightPreset.NEED_CENTER),
+                config.heightTolerance)) {
+            double maxAngle = centerAngle + config.centerTolerance;
+            double minAngle = centerAngle - config.centerTolerance;
+            return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
         }
         return desiredAngle;
     }
 
     public double getSafeLiftHeight(double desiredHeight) {
-        double currentPivotAngle = getCurrentPivotAngle();
         double currentLiftHeight = getCurrentHeight();
-        if (currentPivotAngle < (config.anglePresets.get(AnglePreset.CENTER) - config.angleTolerance) ||
-                currentPivotAngle > (config.anglePresets.get(AnglePreset.CENTER) + config.angleTolerance) ||
-                !isPivotLocked()) { // if the picker is out far enough that we can't go below level of elevators
-            if (currentLiftHeight < config.heightPresetSwitch) { // if we are not above the elevators
+        double needLockHeight = getHeightPreset(HeightPreset.NEED_LOCK);
+        double needCenterHeight = getHeightPreset(HeightPreset.NEED_CENTER);
+        if (!isPivotLocked()) { // if the pivot is not locked
+            if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
+                return needLockHeight; // then descend to the minimum height at which we can be unlocked
+            }
+        }
+        if (!isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
+            if (currentLiftHeight < needCenterHeight) { // if we are not above the elevators
                 return getCurrentHeight(); // don't move
             }
-            if (desiredHeight < config.heightPresetSwitch) { // if we want to descend to below the elevators
-                return config.heightPresetSwitch; // then descend to the minimum height at which we can rotate
+            if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
+                return needCenterHeight; // then descend to the minimum height at which we can rotate
             }
         }
         return desiredHeight; // if picker is all good, go wherever we need to
@@ -436,12 +440,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public enum HeightPreset {
+        HOME,
         PICK,
+        NEED_LOCK,
+        NEED_CENTER,
         SWITCH_LOW,
         SWITCH,
         SCALE_LOW,
-        SCALE_HIGH,
-        HOME;
+        SCALE_HIGH;
     }
 
     public enum AnglePreset {
@@ -463,23 +469,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
-        public /*TrapezoidalProfileFollower*/StupidController.Config pivotController;
+        public /*TrapezoidalProfileFollower*/ StupidController.Config pivotController;
         public double pivotHoldPower;
 
         public Map<AnglePreset, Double> anglePresets;
-
-        public double heightPresetPick;
-        public double heightPresetSwitch;
-        public double heightPresetLowSwitch;
-        public double heightPresetScaleLow;
-        public double heightPresetScaleHigh;
-        public double heightPresetHome;
+        public Map<HeightPreset, Double> heightPresets;
 
         public double bumpHeightValue;
         public double bumpPivotValue;
 
         public double heightTolerance;
         public double angleTolerance;
+        public double centerTolerance;
     }
 
     private class LiftTest extends ManualTest {
