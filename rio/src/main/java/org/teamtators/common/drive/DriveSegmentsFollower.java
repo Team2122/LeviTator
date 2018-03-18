@@ -56,7 +56,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         currentSegmentIdx = -1;
         previousTraveled = 0.0;
         totalLength = segments.getArcLength();
-        report = new PursuitReport();
+        report = null;
         setSpeedPower(0.0);
     }
 
@@ -98,14 +98,17 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         speedFollower.setTravelVelocity(seg.getTravelSpeed());
         speedFollower.setEndVelocity(seg.getEndSpeed());
         speedFollower.moveToPosition(previousTraveled + lookaheadReport.remainingDistance);
+        if (!speedFollower.isRunning()) {
+            speedFollower.start();
+        }
         logger.debug("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
     }
 
     void updatePursuitReport(Pose2d currentPose, double centerWheelRate) {
-        if (report.isFinished) {
+        if (isFinished()) {
             return;
         }
-        report = new PursuitReport();
+        PursuitReport report = new PursuitReport();
         if (currentSegmentIdx < 0) {
             currentSegmentIdx++;
             report.updateProfile = true;
@@ -144,6 +147,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             report.lookaheadPoint = nextSegment
                     .getLookAhead(nextSegment.getStartPose(), nextLookahead);
         }
+        this.report = report;
     }
 
     private DriveSegment getNextSegment() {
@@ -175,7 +179,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             running = true;
             reset();
             speedFollower.reset();
-            speedFollower.start();
             if (logData) {
                 DataCollector.getDataCollector().startProvider(logDataProvider);
             }
@@ -190,11 +193,11 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     }
 
     public boolean isFinished() {
-        return report.isFinished/* && speedFollower.isFinished()*/;
+        return report != null && report.isFinished;
     }
 
     public boolean isOnTarget() {
-        return report.remainingDistance < 0.1;
+        return report != null && report.remainingDistance < 0.1;
     }
 
     @Override
@@ -253,6 +256,10 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
         @Override
         public List<Object> getValues() {
+            PursuitReport report = DriveSegmentsFollower.this.report;
+            if (report == null) {
+                report = new PursuitReport();
+            }
             return Arrays.asList(report.traveledDistance, report.remainingDistance, currentPose, report.nearestPoint, report.lookaheadPoint,
                     twist, speedPower, driveOutputs);
         }

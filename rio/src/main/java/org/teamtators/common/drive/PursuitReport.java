@@ -4,7 +4,7 @@ import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
 
 public class PursuitReport {
-    public boolean isFinished;
+    public boolean isFinished = false;
     public double traveledDistance;
     public double remainingDistance;
     public Pose2d nearestPoint;

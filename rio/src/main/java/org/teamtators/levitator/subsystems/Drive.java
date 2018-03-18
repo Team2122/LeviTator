@@ -296,6 +296,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         if (state == RobotState.AUTONOMOUS || state == RobotState.TELEOP) {
             gyro.resetAngle();
             poseEstimator.setPose(new Pose2d(Translation2d.zero(), Rotation.fromDegrees(90)));
+            driveSegmentsFollower.reset();
         }
     }
 

@@ -29,6 +29,9 @@ PickerQuickDeploy:
   timeBeforeRetract: 0.4
   timeToKick: 0.6
 
+PickerAutoDeploy:
+  { class: PickerQuickDeploy, timeBeforeKick: 0.2, kickPower: 0.6, timeToKick: 0.8 }
+
 PickerSwitchDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
 
@@ -341,41 +344,35 @@ $StartRightScaleLeft:
       - { x: -82, y: 226 }
 
 $StartLeftScaleRight:
-#  - { class: DriveStraight, distance: -24, endSpeed: 60.0 }
-#  - { class: DriveArc, angle: 90, radius: -48, speed: 50, endSpeed: 50 }
-#  - { class: DriveStraight, distance: -112, angle: 90, endSpeed: 50 }
-#  - { class: DriveArc, radius: -72, angle: 30, speed: 50.0, endSpeed: 50.0 }
-#  - { class: DriveStraight, angle: 30, distance: -24, speed: 60 } 96
   - class: DrivePath
-#    parallel: true
+    parallel: true
     reverse: true
     speed: 80
     path:
 #      - { x: -115, y: 19 }
       - { x: -115, y: 109 }
       - { x: -115, y: 240, radius: 48 }
-      - { x: 45, y: 240, radius: 48 }
-      - { x: 114, y: 296 }
-#  - { class: WaitForPath, remainingDistance: 30.0 }
+      - { x: 60, y: 240, radius: 48 }
+      - { x: 102, y: 284 }
+  - { class: WaitForPath, remainingDistance: 80.0 }
   - $LiftScaleLow
   - WaitForHeight
   - PivotRight
   - WaitForRight
-#  - { class: WaitForPath }
+  - { class: WaitForPath }
   - { class: Wait, period: 0.5 }
-  - PickerQuickDeploy
+  - PickerAutoDeploy
   - PivotCenter
   - WaitForCenter
   - $LiftHome
   - { parallel: true, name: PickerPick }
   - { class: Wait, period: 0.5 }
-#  - { class: DriveArc, arcLength: 60, angle: 0 }
-#  - { class: DriveStraight, angle: 30, distance: 48 } #72
   - class: DrivePath
     path:
-      - { x: 114, y: 296, speed: 40 }
+      - { x: 102, y: 284, speed: 80 }
       - { x: 90, y: 270, radius: 36, speed: 20.0 }
       - { x: 82, y: 232 }
+  - WaitForCube
 
 $StartLeftScaleLeft:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
@@ -462,19 +459,19 @@ $AutoStartRightScaleLeftScaleLeft:
 
 $AutoStartLeftScaleRightScaleRight:
   - $StartLeftScaleRight
-#  - { parallel: true, name: $LiftSequenceScaleLowRight }
-  - { class: Wait, period: 0.5 }
-#  - class: DrivePath
-#    reverse: true
-#    path:
-#      - { x: 78, y: 232 }
-#      - { x: 78, y: 270, radius: 36, speed: 30.0 }
-#      - { x: 114, y: 296, speed: 40 }
-#  - WaitForRight
-#  - PickerQuickDeploy
-#  - PivotCenter
-#  - WaitForCenter
-#  - $LiftHome
+  - { parallel: true, name: $LiftSequenceScaleLowRight }
+#  - { class: Wait, period: 0.5 }
+  - class: DrivePath
+    reverse: true
+    path:
+      - { x: 82, y: 232, speed: 30.0 }
+      - { x: 82, y: 244, radius: 36, speed: 20.0 }
+      - { x: 102, y: 272, speed: 0 }
+  - WaitForRight
+  - PickerAutoDeploy
+  - PivotCenter
+  - WaitForCenter
+  - $LiftHome
 
 $AutoStartRightScaleLeftSwitchLeft:
   - $StartRightScaleLeft

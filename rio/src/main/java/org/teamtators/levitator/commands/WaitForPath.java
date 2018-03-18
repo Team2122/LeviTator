@@ -9,6 +9,7 @@ import org.teamtators.levitator.subsystems.Drive;
 public class WaitForPath extends Command implements Configurable<WaitForPath.Config> {
     private final Drive drive;
     private Config config;
+    private PursuitReport report;
 
     public WaitForPath(TatorRobot robot) {
         super("WaitForPath");
@@ -16,15 +17,32 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
     }
 
     @Override
+    protected void initialize() {
+    }
+
+    @Override
     protected boolean step() {
-        PursuitReport report = drive.getDriveSegmentsFollower().getReport();
-        if (report == null || !drive.getDriveSegmentsFollower().isRunning()) {
-            return true;
+        report = drive.getDriveSegmentsFollower().getReport();
+        if (report == null) {
+            return false;
         }
         if (!Double.isNaN(config.remainingDistance)) {
-            return report.remainingDistance <= config.remainingDistance || !report.isFinished;
-        } else {
-            return report.isFinished;
+            if (report.remainingDistance <= config.remainingDistance || report.isFinished){
+                logger.info("WaitForPath finished remaining distance {} < {}", report.remainingDistance, config.remainingDistance);
+                return true;
+            }
+        }
+        if (report.isFinished) {
+            logger.info("WaitForPath finished because path finished");
+            return true;
+        }
+        else return false;
+    }
+
+    @Override
+    protected void finish(boolean interrupted) {
+        if (interrupted) {
+            logger.error("WaitForPath interrupted");
         }
     }
 
