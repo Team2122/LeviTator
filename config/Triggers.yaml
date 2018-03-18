@@ -5,17 +5,19 @@ driver:
   TRIGGER_LEFT: start whenPressed PickerSwitchDeploy
   BUMPER_RIGHT: start whenPressed $LiftHome
   BUMPER_LEFT: start whenPressed $LiftSwitchLow
-  POV_UP: start whenPressed PivotCenter
+#  POV_UP: start whenPressed PivotCenter
   POV_LEFT: start whenPressed PivotLeft
   POV_RIGHT: start whenPressed PivotRight
-  POV_DOWN: start whenPressed $LiftSwitchLow
-#  POV_UP: start whenPressed BumpLiftUp
-#  POV_DOWN: start whenPressed BumpLiftDown
+#  POV_DOWN: start whenPressed $LiftSwitchLow
+  POV_UP: start whenPressed BumpLiftUp
+  POV_DOWN: start whenPressed BumpLiftDown
 #  POV_LEFT: start whenPressed BumpPivotLeft
 #  POV_RIGHT: start whenPressed BumpPivotRight
   A: start whenPressed $LiftHome
-  START: start whenPressed PrintPose
-  BACK: toggle whenPressed $TestDrive
+#  START: start whenPressed PrintPose
+#  BACK: toggle whenPressed $TestDrive
+  START: start whenPressed $LiftScaleLow
+  BACK: start whenPressed $PickerReleaseMedium
   B: start whenPressed $LiftSwitchLow
   STICK_LEFT: start whenPressed $LiftHome
   STICK_RIGHT: start whenPressed PickerExtendToggle

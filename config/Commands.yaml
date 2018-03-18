@@ -299,13 +299,11 @@ $CenterAutoRSwitch:
 $LiftSequenceScaleLowLeft:
   - { class: WaitFor, command: PickerPick }
   - $LiftScaleLow
-  - WaitForHeight
   - PivotLeft
 
 $LiftSequenceScaleLowRight:
   - { class: WaitFor, command: PickerPick }
   - $LiftScaleLow
-  - WaitForHeight
   - PivotRight
 
 $StartRightScaleLeft:
@@ -355,19 +353,17 @@ $StartLeftScaleRight:
       - { x: -115, y: 240, radius: 48 }
       - { x: 60, y: 240, radius: 48 }
       - { x: 102, y: 284 }
-  - { class: WaitForPath, remainingDistance: 80.0 }
+  - { class: WaitForPath, remainingDistance: 100.0 }
   - $LiftScaleLow
-  - WaitForHeight
   - PivotRight
   - WaitForRight
   - { class: WaitForPath }
-  - { class: Wait, period: 0.5 }
   - PickerAutoDeploy
   - PivotCenter
-  - WaitForLock
   - $LiftHome
+#  - WaitForLock
+#  - { class: Wait, period: 0.5 }
   - { parallel: true, name: PickerPick }
-  - { class: Wait, period: 0.5 }
   - class: DrivePath
     path:
       - { x: 102, y: 284, speed: 80 }
