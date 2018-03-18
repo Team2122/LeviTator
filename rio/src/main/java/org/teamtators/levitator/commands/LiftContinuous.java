@@ -31,17 +31,21 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
 
     @Override
     protected boolean step() {
-        if(lift.isAtHeight()) {
-            lift.clearForceMovementFlag();
+        double sliderValue = operatorInterface.getSliderValue();
+        if (lift.isAtHeight() && lift.isMovementInitiatedByCommand()) {
+            if (Math.abs(lift.getCurrentHeight() - lift.toHeight(sliderValue)) < config.sliderTolerance) {
+                logger.info("Clearing movement flag");
+                lift.clearForceMovementFlag();
+            }
         }
         desiredHeight = lift.getDesiredHeight();
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
-        boolean allowSlider = lift.isMovementInitiatedByCommand();
-        if(allowSlider) {
-            double sliderValue = operatorInterface.getSliderValue();
-            desiredHeight = lift.toHeight(sliderValue);
+        boolean allowSlider = !lift.isMovementInitiatedByCommand();
+        if (allowSlider && Math.abs(lift.getTargetHeight() - lift.toHeight(sliderValue)) < config.sliderThreshold) {
+            lift.setDesiredHeight(lift.toHeight(sliderValue), false);
+            desiredHeight = lift.getDesiredHeight();
         }
         if (desiredPivotAngle != centerAngle && locking) {
             locking = false;
@@ -118,5 +122,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         public double startSweepAngle;
         public double sweepTimeoutSeconds;
         public double lockedPeriod;
+        public double sliderTolerance;
+        public double sliderThreshold;
     }
 }

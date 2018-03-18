@@ -6,21 +6,24 @@ AUTHOR: Avery Bainbridge
 DATE: 3/17/2018
 
 **********************************************************/
+
 #define AI1  21
 #define AI2  22
 #define PWMA 23
 
 #define TOUCH_SENSOR 3
 #define LIFT_SLIDER 5
-
+#define DEBUG
+#ifdef DEBUG
 #define ENABLE_LOGGING
 //#define SELF_TEST
+#endif
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
 #define ERROR_MARGIN 0.003
 
+const int BUTTON_PORTS[] = {};
 const int NUM_BUTTONS = 0;
-const double HEIGHT_PRESETS[] = {0, .5, 1};
 const double DETENTS[] = {0, .125, .25, .375, .5, .625, .75, .875, 1};
 const int DETENTS_LENGTH = 9;
 
@@ -46,18 +49,22 @@ int tests = 0;
 boolean enabled = true;
 boolean finished;
 
+long lastTime;
+
 void setup() {
   // put your setup code here, to run once:
   Joystick.useManualSend(false);
   for(int i = 0; i < NUM_BUTTONS; i++) {
-    pinMode(i, INPUT_PULLUP);
+    pinMode(BUTTON_PORTS[i], INPUT_PULLUP);
   }
   pinMode(AI1, OUTPUT);
   pinMode(AI2, OUTPUT);
   pinMode(PWMA, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   analogReadResolution(READ_RESOLUTION);
   analogWriteResolution(WRITE_RESOLUTION);
+
+  lastTime = millis();
 }
 
 void loop() {
@@ -69,17 +76,31 @@ void loop() {
   int serialValue = Serial.read();
 
   if(serialValue != -1) {
-    serialSetpoint = HEIGHT_PRESETS[serialValue - 48];
+    //serialSetpoint = HEIGHT_PRESETS[serialValue - 48];
+    union { char serial[8]; double val; };
+    serial[7] = serialValue;
+
+
+    int serialBytesRecieved = 1;
+
+    while(serialBytesRecieved < 8) {
+      while(Serial.available() > 0) {
+        serial[++serialBytesRecieved] = Serial.read();
+      }
+    }
+    serialSetpoint = val;
     enabled = true;
   }
-  double delta = .005; 
+  double delta = (millis() - lastTime) / 1000.0; 
+  #ifdef ENABLE_LOGGING
+  Serial.printf("Delta: %.4f\n", delta);
+  #endif
   //Buttons
   for(int i = 0; i < NUM_BUTTONS; i++) {
-    Joystick.button(i, digitalRead(i));
+    Joystick.button(i, digitalRead(BUTTON_PORTS[i]));
   }
   double sliderValRaw = analogRead(LIFT_SLIDER);
   double sliderVal = sliderValRaw / ((1 << READ_RESOLUTION) - 1);
-  //Serial.println(sliderVal);
 
   if(true /*and more future conditions*/) {
       //Serial.println("Possible move to detent!");
@@ -88,7 +109,7 @@ void loop() {
       boolean setDetent = false;
       for(int i = 0; i < DETENTS_LENGTH; i++) {
         double distance = DETENTS[i] - sliderVal;
-        if(abs(distance) < bestDistance /*&& signOf(distance) == signOf(errorVal - lastError)*/){
+        if(abs(distance) < bestDistance){
           nearestDetent = i;
           bestDistance = abs(distance);
         }
@@ -98,32 +119,40 @@ void loop() {
       }
       if(setDetent) {
         detentSetpoint = DETENTS[nearestDetent];
+        #ifdef ENABLE_LOGGING
         Serial.println("Found close detent!");
+        #endif
       } else {
+        #ifdef ENABLE_LOGGING
         Serial.println("No close detents!");
+        #endif
         detentSetpoint = 1.0 / 0.0;
       }
-    }
+  }
   double errorVal;
 
-    if(abs(serialSetpoint - sliderVal) <= ERROR_MARGIN) {
-      Serial.println("Resetting serial setpoint");
-      serialSetpoint = 1.0 / 0.0;
-    }
+  if(abs(serialSetpoint - sliderVal) <= ERROR_MARGIN) {
+     #ifdef ENABLE_LOGGING
+     Serial.println("Resetting serial setpoint");
+     #endif
+     serialSetpoint = 1.0 / 0.0;
+  }
   
   if(!isinf(serialSetpoint) && abs(serialSetpoint - sliderVal) > ERROR_MARGIN) {
+    #ifdef ENABLE_LOGGING
     Serial.println("Using serial setpoint");
+    #endif
     errorVal = serialSetpoint - sliderVal;
 
   } else if(!isinf(detentSetpoint) && abs(detentSetpoint - sliderVal) > ERROR_MARGIN) {
+    #ifdef ENABLE_LOGGING
     Serial.println("Using detent setpoint");
+    #endif
     errorVal = detentSetpoint - sliderVal;
     serialSetpoint = 1.0 / 0.0;
   } else {
     errorVal = 0;
   }
-
-  Serial.println(serialSetpoint);
   
   if(enabled && tests <= TEST_ITER) {
     double output = errorVal * kP;
@@ -140,27 +169,18 @@ void loop() {
     }
 
     if(abs(errorVal) <= 0.003) {
-      Serial.println("On target!");
       output = 0;
-    } else {
-   }
+    }
     
 #ifdef ENABLE_LOGGING
-    //Serial.print("Writing value: ");
-    Serial.print(output);
-    //Serial.print(" Actual slider value: ");
-    Serial.print(",");
-    Serial.print(sliderVal);
-    Serial.print(",");
-    //Serial.print(" Target slider value: ");
-    Serial.println(setpoint);
+    Serial.printf("%.3f,%.3f,%.3f\n", output, sliderVal, setpoint);
 #endif
     driveMotor(output);
   } else {
     totalError = 0;
     driveMotor(0);
 #ifdef SELF_TEST
-    //setpoint = random(0, 8191);
+    setpoint = random(0, OUTPUT_CONVERSION_FACTOR) / OUTPUT_CONVERSION_FACTOR;
     enabled = true;
     tests++;
 #endif
@@ -173,6 +193,7 @@ void loop() {
 
   Joystick.X(sliderVal * 1023);
   Joystick.send_now();
+  lastTime = millis();
   delay(5);
 }
 

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.*;
@@ -47,6 +48,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private /*TrapezoidalProfileFollower*/ StupidController pivotController;
     private InputDerivative pivotVelocity;
     private Updatable holdPowerApplier;
+    private Updatable networkTablesUpdater;
+
 
     private Config config;
 
@@ -79,8 +82,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 if (Lift.this.getCurrentHeight() < 1) {
                     Lift.this.liftController.setHoldPower(-0.1);
                 } else {
+
                     Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
                 }
+            }
+        };
+        networkTablesUpdater = new Updatable() {
+            @Override
+            public String getName() {
+                return "networkTablesUpdater";
+            }
+
+            @Override
+            public void update(double delta) {
+                SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight() );
             }
         };
     }
@@ -299,7 +314,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(holdPowerApplier, pivotVelocity, pivotController, liftController);
+        return Arrays.asList(holdPowerApplier, pivotVelocity, pivotController, liftController, networkTablesUpdater);
     }
 
     public boolean isPivotLocked() {
