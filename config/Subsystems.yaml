@@ -72,13 +72,15 @@ lift:
   pivotLockSensor: { channel: 16, type: PNP }
 
   heightController:
-    kpP: 0.2
-    kiP: 0.0
-    kpV: 0.02
+    kpP: 0.3
+    kiP: 0.0 # 0.2
+    kpV: 0.015
+    maxIError: 5.0
     kfV: 0.009
     kMinOutput: 0.0823
     kfA: 0.00089
     kHoldPower: 0.129
+    tolerance: 0.5
     maxOutput: 1.0
     minOutput: -0.5
     minPosition: 0.0
@@ -124,7 +126,7 @@ lift:
     PICK: 0
     NEED_LOCK: 6
     SWITCH_LOW: 12
-    NEED_CENTER: 40
+    NEED_CENTER: 42
     SWITCH: 46
     SCALE_LOW: 58
     SCALE_HIGH: 70

@@ -230,14 +230,19 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         positionError = calculator.getPosition() - getCurrentPosition();
         velocityError = calculator.getVelocity() - getCurrentVelocity();
 
-        double output = positionError * config.kpP + velocityError * config.kpV +
-                calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA + holdPower;
+        double output = holdPower;
 
         if (Epsilon.isEpsilonPositive(calculator.getVelocity())) {
             output += config.kMinOutput;
         } else if (Epsilon.isEpsilonNegative(calculator.getVelocity())) {
             output -= config.kMinOutput;
+        } else if (Epsilon.isEpsilonZero(calculator.getAcceleration()) &&
+                Epsilon.isEpsilonZero(positionError, config.tolerance)) {
+            return output;
         }
+
+        output += positionError * config.kpP + velocityError * config.kpV +
+                calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA;
 
         double endPositionError = calculator.getProfile().getDistance() - getCurrentPosition();
         if (Math.abs(endPositionError) <= config.maxIError) {
@@ -375,6 +380,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
         public double maxIError = Double.POSITIVE_INFINITY; // maximum absolute error for which it will apply kiP
         public double maxAbsoluteOutput = Double.NaN; // maximum absolute output power
+        public double tolerance = Double.POSITIVE_INFINITY;
         public double maxOutput = Double.POSITIVE_INFINITY; // maximum output power
         public double minOutput = Double.NEGATIVE_INFINITY; // minumum output power
         public double minPosition = Double.NEGATIVE_INFINITY; // the minimum position the follower will move to

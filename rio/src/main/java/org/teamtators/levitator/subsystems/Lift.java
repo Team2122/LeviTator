@@ -391,13 +391,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private double getSafePivotAngle(double desiredAngle) {
+        double currentLiftHeight = getCurrentHeight();
         double centerAngle = getAnglePreset(AnglePreset.CENTER);
-        if (Epsilon.isEpsilonLessThan(getCurrentHeight(),
+        if (Epsilon.isEpsilonLessThan(currentLiftHeight,
                 getHeightPreset(HeightPreset.NEED_LOCK),
                 config.heightTolerance)) {
             return centerAngle;
         }
-        if (Epsilon.isEpsilonLessThan(getCurrentHeight(),
+        if (Epsilon.isEpsilonLessThan(currentLiftHeight,
                 getHeightPreset(HeightPreset.NEED_CENTER),
                 config.heightTolerance)) {
             double maxAngle = centerAngle + config.centerTolerance;
@@ -417,7 +418,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             }
         }
         if (!isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
-            if (currentLiftHeight < needCenterHeight) { // if we are not above the elevators
+            if (Epsilon.isEpsilonLessThan(currentLiftHeight, needCenterHeight,
+                    config.heightTolerance)) { // if we are not above the elevators
                 return getCurrentHeight(); // don't move
             }
             if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
