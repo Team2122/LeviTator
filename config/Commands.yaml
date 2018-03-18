@@ -38,12 +38,12 @@ PickerSwitchDeploy:
 $PickerReleaseHard:
   - { class: PickerQuickDeploy, kickPower: 0.8 }
   - PivotCenter
-#  - WaitForCenter
+#  - WaitForLock
 
 $PickerReleaseMedium:
   - { class: PickerQuickDeploy, timeBeforeKick: 0.2, kickPower: 0.6, timeToKick: 0.8 }
   - PivotCenter
-#  - WaitForCenter
+#  - WaitForLock
 
 PickerReleaseSoft:
   { class: PickerRelease, powers: { left: -0.4, right: -0.4 } }
@@ -57,6 +57,7 @@ PivotRight: { class: PivotAnglePreset, preset: RIGHT }
 WaitForAngle: {}
 WaitForLeft: { class: WaitForAngle, preset: LEFT, tolerance: 20.0 }
 WaitForRight: { class: WaitForAngle, preset: RIGHT, tolerance: 20.0 }
+WaitForCenter: { class: WaitForAngle, preset: CENTER, tolerance: 20.0 }
 
 WaitForHeight: { tolerance: 1 }
 $LiftHome:
@@ -331,7 +332,7 @@ $StartRightScaleLeft:
   - { class: Wait, period: 0.5 }
   - PickerQuickDeploy
   - PivotCenter
-  - WaitForCenter
+  - WaitForLock
   - $LiftHome
   - { parallel: true, name: PickerPick }
   - { class: Wait, period: 0.5 }
@@ -363,7 +364,7 @@ $StartLeftScaleRight:
   - { class: Wait, period: 0.5 }
   - PickerAutoDeploy
   - PivotCenter
-  - WaitForCenter
+  - WaitForLock
   - $LiftHome
   - { parallel: true, name: PickerPick }
   - { class: Wait, period: 0.5 }
@@ -454,7 +455,7 @@ $AutoStartRightScaleLeftScaleLeft:
 #  - WaitForLeft
 #  - PickerQuickDeploy
 #  - PivotCenter
-#  - WaitForCenter
+#  - WaitForLock
 #  - $LiftHome
 
 $AutoStartLeftScaleRightScaleRight:
@@ -470,7 +471,7 @@ $AutoStartLeftScaleRightScaleRight:
   - WaitForRight
   - PickerAutoDeploy
   - PivotCenter
-  - WaitForCenter
+  - WaitForLock
   - $LiftHome
 
 $AutoStartRightScaleLeftSwitchLeft:

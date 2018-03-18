@@ -44,7 +44,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
         commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
         commandStore.registerCommand("WaitForHeight", () -> new WaitForHeight(robot));
-        commandStore.putCommand("WaitForCenter", new WaitForCenter(robot));
+        commandStore.putCommand("WaitForLock", new WaitForLock(robot));
 
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
