@@ -26,10 +26,12 @@ public class SliderApp {
         }
 
         System.out.println("Slider found!");
+
+        slider.openPort();
         System.out.println("Connecting to NetworkTables");
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        inst.startDSClient();
+        inst.startClientTeam(2122);
         NetworkTable smartDashboard = inst.getTable("SmartDashboard");
 
         double lastTargetHeight = 0.0;
@@ -43,9 +45,11 @@ public class SliderApp {
         while (true) {
             NetworkTableEntry pos = smartDashboard.getEntry("liftTarget");
             double num = pos.getNumber(-1).doubleValue();
+            //System.out.println(num);
             if (num != -1 && lastTargetHeight != num) {
-                System.out.printf("Target height changed, was %.3f now %.3f", lastTargetHeight, num);
-                slider.writeBytes(toBytes(num), 8);
+                System.out.printf("Target height changed, was %.3f now %.3f\n", lastTargetHeight, num);
+                int result = slider.writeBytes(toBytes(num), 8);
+                System.out.println(result);
                 lastTargetHeight = num;
             }
         }

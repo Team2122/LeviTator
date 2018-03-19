@@ -95,7 +95,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
             @Override
             public void update(double delta) {
-                SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight() );
+                SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
             }
         };
     }
@@ -301,8 +301,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return liftController.isOnTarget();
     }
 
-    public double toHeight(double slider) {
-        return slider * config.heightController.maxPosition;
+    public double sliderToHeight(double slider) {
+        return ((slider + 1) / 2) * config.heightController.maxPosition;
     }
 
     public TrapezoidalProfileFollower getLiftController() {
@@ -340,8 +340,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public boolean isAtHeight() {
-        return getCurrentHeight() + config.heightTolerance > getDesiredHeight() &&
-                getCurrentHeight() - config.heightTolerance < getDesiredHeight();
+        return Math.abs(getCurrentHeight() - getDesiredHeight()) < config.heightTolerance;
     }
 
     @Override

@@ -1,19 +1,31 @@
-/*********************************************************
-
-Buttonboard Slider
+/************************************************************
+  ____        _   _              _                         _
+ |  _ \      | | | |            | |                       | |
+ | |_) |_   _| |_| |_ ___  _ __ | |__   ___   __ _ _ __ __| |
+ |  _ <| | | | __| __/ _ \| '_ \| '_ \ / _ \ / _` | '__/ _` |
+ | |_) | |_| | |_| || (_) | | | | |_) | (_) | (_| | | | (_| |
+ |____/ \__,_|\__|\__\___/|_| |_|_.__/ \___/ \__,_|_|  \__,_|
 
 AUTHOR: Avery Bainbridge
 DATE: 3/17/2018
 
-**********************************************************/
+************************************************************/
+
+#define ENCODER_OPTIMIZE_INTERRUPTS
+#include <Encoder.h>
 
 #define AI1  21
 #define AI2  22
 #define PWMA 23
 
+#define ENCODER_PIN_1 3
+#define ENCODER_PIN_2 4
+#define ENCODER_RESET_BUTTON 2
+
 #define TOUCH_SENSOR 3
 #define LIFT_SLIDER 5
-#define DEBUG
+#define POWER_SLIDER 17
+//#define DEBUG
 #ifdef DEBUG
 #define ENABLE_LOGGING
 //#define SELF_TEST
@@ -21,11 +33,12 @@ DATE: 3/17/2018
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
 #define ERROR_MARGIN 0.003
+#define CPR 96.0
 
 const int BUTTON_PORTS[] = {};
 const int NUM_BUTTONS = 0;
-const double DETENTS[] = {0, .125, .25, .375, .5, .625, .75, .875, 1};
-const int DETENTS_LENGTH = 9;
+const double DETENTS[] = {0, 0.145, 0.554, 0.699, 0.843};
+const int DETENTS_LENGTH = 5;
 
 //PID values
 const double kP = 95;
@@ -51,8 +64,9 @@ boolean finished;
 
 long lastTime;
 
+Encoder knob(ENCODER_PIN_1, ENCODER_PIN_2);
+
 void setup() {
-  // put your setup code here, to run once:
   Joystick.useManualSend(false);
   for(int i = 0; i < NUM_BUTTONS; i++) {
     pinMode(BUTTON_PORTS[i], INPUT_PULLUP);
@@ -60,11 +74,13 @@ void setup() {
   pinMode(AI1, OUTPUT);
   pinMode(AI2, OUTPUT);
   pinMode(PWMA, OUTPUT);
+  pinMode(ENCODER_RESET_BUTTON, INPUT);
   Serial.begin(115200);
   analogReadResolution(READ_RESOLUTION);
   analogWriteResolution(WRITE_RESOLUTION);
 
-  lastTime = millis();
+  lastTime = micros();
+  knob.write(0);
 }
 
 void loop() {
@@ -80,7 +96,6 @@ void loop() {
     union { char serial[8]; double val; };
     serial[7] = serialValue;
 
-
     int serialBytesRecieved = 1;
 
     while(serialBytesRecieved < 8) {
@@ -91,7 +106,7 @@ void loop() {
     serialSetpoint = val;
     enabled = true;
   }
-  double delta = (millis() - lastTime) / 1000.0; 
+  double delta = (micros() - lastTime) / 1000000.0;
   #ifdef ENABLE_LOGGING
   Serial.printf("Delta: %.4f\n", delta);
   #endif
@@ -187,13 +202,26 @@ void loop() {
     lastError = errorVal;
   }
 
-  
   lastValue = sliderVal;
   lastPosition = sliderVal;
 
   Joystick.X(sliderVal * 1023);
+
+  if(digitalRead(ENCODER_RESET_BUTTON) > 0) {
+    knob.write(0);
+    //Serial.println("reset");
+  }
+  /*if(knob.read() > 24) {
+    knob.write(-23);
+  }
+  if(knob.read() < -24) {
+    knob.write(23);
+  }
+  */
+  int knobV = knob.read();
+  Joystick.Y((knobV / CPR + .5) * 1023);
   Joystick.send_now();
-  lastTime = millis();
+  lastTime = micros();
   delay(5);
 }
 
@@ -213,4 +241,3 @@ void driveMotor(double speed) {
 bool signOf(double value) {
   return value > 0 ? 1 : value < 0 ? -1 : 0;
 }
-

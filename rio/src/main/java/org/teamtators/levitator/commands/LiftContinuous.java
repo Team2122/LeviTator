@@ -4,6 +4,7 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.BooleanSampler;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Lift;
 import org.teamtators.levitator.subsystems.OperatorInterface;
@@ -32,8 +33,12 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     @Override
     protected boolean step() {
         double sliderValue = operatorInterface.getSliderValue();
-        if (lift.isAtHeight() && lift.isMovementInitiatedByCommand()) {
-            if (Math.abs(lift.getCurrentHeight() - lift.toHeight(sliderValue)) < config.sliderTolerance) {
+        boolean atHeight = lift.isAtHeight();
+        boolean movementInitiatedByCommand = lift.isMovementInitiatedByCommand();
+        if (atHeight && movementInitiatedByCommand) {
+            double abs = Math.abs(lift.getCurrentHeight() - lift.sliderToHeight(sliderValue));
+            //logger.info("Abs {} Tolerance?: {}", abs, config.sliderTolerance);
+            if (abs < config.sliderTolerance) {
                 logger.info("Clearing movement flag");
                 lift.clearForceMovementFlag();
             }
@@ -42,9 +47,9 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
-        boolean allowSlider = !lift.isMovementInitiatedByCommand();
-        if (allowSlider && Math.abs(lift.getTargetHeight() - lift.toHeight(sliderValue)) < config.sliderThreshold) {
-            lift.setDesiredHeight(lift.toHeight(sliderValue), false);
+        boolean allowSlider = !lift.isMovementInitiatedByCommand() && robot.getState() == RobotState.TELEOP;
+        if (allowSlider && Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue)) > config.sliderThreshold) {
+            lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
             desiredHeight = lift.getDesiredHeight();
         }
         if (desiredPivotAngle != centerAngle && locking) {
