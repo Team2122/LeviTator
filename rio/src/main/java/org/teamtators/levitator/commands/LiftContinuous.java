@@ -4,8 +4,10 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.BooleanSampler;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.OperatorInterface;
 
 public class LiftContinuous extends Command implements Configurable<LiftContinuous.Config> {
 
@@ -18,20 +20,38 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Timer sweepTimer = new Timer();
     private Config config;
     private BooleanSampler locked = new BooleanSampler(() -> lift.isPivotLocked());
+    private OperatorInterface operatorInterface;
 
     public LiftContinuous(TatorRobot robot) {
         super("LiftContinuous");
         this.robot = robot;
         lift = (robot.getSubsystems()).getLift();
+        operatorInterface = (robot.getSubsystems()).getOI();
         requires(lift);
     }
 
     @Override
     protected boolean step() {
+        double sliderValue = operatorInterface.getSliderValue();
+        boolean atHeight = lift.isAtHeight();
+        boolean movementInitiatedByCommand = lift.isMovementInitiatedByCommand();
+        if (atHeight && movementInitiatedByCommand) {
+            double abs = Math.abs(lift.getCurrentHeight() - lift.sliderToHeight(sliderValue));
+            //logger.info("Abs {} Tolerance?: {}", abs, config.sliderTolerance);
+            if (abs < config.sliderTolerance) {
+                logger.info("Clearing movement flag");
+                lift.clearForceMovementFlag();
+            }
+        }
         desiredHeight = lift.getDesiredHeight();
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
+        boolean allowSlider = !lift.isMovementInitiatedByCommand() && robot.getState() == RobotState.TELEOP;
+        if (allowSlider && Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue)) > config.sliderThreshold) {
+            lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
+            desiredHeight = lift.getDesiredHeight();
+        }
         if (desiredPivotAngle != centerAngle && locking) {
             locking = false;
             logger.debug("Moving away from center, disengaging lock");
@@ -107,5 +127,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         public double startSweepAngle;
         public double sweepTimeoutSeconds;
         public double lockedPeriod;
+        public double sliderTolerance;
+        public double sliderThreshold;
     }
 }
