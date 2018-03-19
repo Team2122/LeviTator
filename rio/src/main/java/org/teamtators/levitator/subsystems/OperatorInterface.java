@@ -33,6 +33,10 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return slider.getRawAxisValue(0);
     }
 
+    public double getPivotKnob() {
+        return slider.getRawAxisValue(1);
+    }
+
     @Override
     public void configure(Config config) {
         super.configure();

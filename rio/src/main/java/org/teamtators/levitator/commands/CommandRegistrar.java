@@ -32,12 +32,12 @@ public class CommandRegistrar {
         commandStore.registerCommand("PickerQuickDeploy", () -> new PickerQuickDeploy(robot));
         commandStore.registerCommand("PickerRegrip", () -> new PickerRegrip(robot));
         commandStore.putCommand("WaitForCube", new WaitForCube(robot));
-        commandStore.putCommand("PickerExtend", Commands.instant(picker::extend, picker));
-        commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
-        commandStore.putCommand("PickerExtendToggle", Commands.instant(picker::toggleExtension, picker));
+        commandStore.putCommand("PickerExtend", Commands.instant(picker::extend));
+        commandStore.putCommand("PickerRetract", Commands.instant(picker::retract));
+        commandStore.putCommand("PickerExtendToggle", Commands.instant(picker::toggleExtension));
         commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
-        commandStore.putCommand("PickerDefaultExtend", Commands.instant(picker::setDefaultExtend, picker));
-        commandStore.putCommand("PickerDefaultRetract", Commands.instant(picker::setDefaultRetract, picker));
+        commandStore.putCommand("PickerDefaultExtend", Commands.instant(picker::setDefaultExtend));
+        commandStore.putCommand("PickerDefaultRetract", Commands.instant(picker::setDefaultRetract));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();

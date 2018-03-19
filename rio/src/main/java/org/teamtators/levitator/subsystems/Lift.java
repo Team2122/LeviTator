@@ -204,8 +204,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public void setDesiredPivotAngle(double desiredAngle) {
 //        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
-        logger.info("Setting desired pivot angle {}", desiredAngle);
-        this.desiredPivotAngle = desiredAngle;
+        if (desiredPivotAngle != desiredAngle) {
+            logger.info("Setting desired pivot angle {}", desiredAngle);
+            this.desiredPivotAngle = desiredAngle;
+        }
 //        } else {
 //            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
 //        }

@@ -47,10 +47,18 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
-        boolean allowSlider = !lift.isMovementInitiatedByCommand() && robot.getState() == RobotState.TELEOP;
+        boolean isTeleop = robot.getState() == RobotState.TELEOP;
+        boolean allowSlider = !lift.isMovementInitiatedByCommand() && isTeleop;
         if (allowSlider && Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue)) > config.sliderThreshold) {
             lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
             desiredHeight = lift.getDesiredHeight();
+        }
+        if (isTeleop) {
+            double pivotAngle = operatorInterface.getPivotKnob() * 90;
+            if (Math.abs(pivotAngle) < 2) {
+                pivotAngle = 0;
+            }
+            lift.setDesiredPivotAngle(pivotAngle);
         }
         if (desiredPivotAngle != centerAngle && locking) {
             locking = false;
