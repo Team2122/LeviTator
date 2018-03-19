@@ -31,7 +31,7 @@ public class PickerRelease extends Command implements Configurable<PickerRelease
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
         picker.stopRollers();
-        picker.setPickerExtended(false);
+        picker.extendDefault();
     }
 
     @Override

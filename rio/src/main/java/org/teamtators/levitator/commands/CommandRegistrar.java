@@ -36,6 +36,8 @@ public class CommandRegistrar {
         commandStore.putCommand("PickerRetract", Commands.instant(picker::retract, picker));
         commandStore.putCommand("PickerExtendToggle", Commands.instant(picker::toggleExtension, picker));
         commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
+        commandStore.putCommand("PickerDefaultExtend", Commands.instant(picker::setDefaultExtend, picker));
+        commandStore.putCommand("PickerDefaultRetract", Commands.instant(picker::setDefaultRetract, picker));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();

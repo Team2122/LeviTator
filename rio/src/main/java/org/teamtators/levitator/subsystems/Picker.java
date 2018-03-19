@@ -31,6 +31,8 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private DigitalSensor upperCubeSensor;
     private DigitalSensor lowerCubeSensor;
 
+    private boolean defaultExtended = false;
+
     public Picker() {
         super("Picker");
     }
@@ -91,6 +93,29 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         } else {
             extend();
         }
+    }
+
+    public void extendDefault() {
+        setPickerExtended(defaultExtended);
+    }
+
+    public boolean getDefaultExtended() {
+        return defaultExtended;
+    }
+
+    public void setDefaultExtended(boolean defaultExtended) {
+        this.defaultExtended = defaultExtended;
+        if (extensionSolenoid.get() != defaultExtended) {
+            extendDefault();
+        }
+    }
+
+    public void setDefaultExtend() {
+        setDefaultExtended(true);
+    }
+
+    public void setDefaultRetract() {
+        setDefaultExtended(false);
     }
 
     @Override
