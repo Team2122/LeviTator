@@ -13,6 +13,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
     private LogitechF310 driverJoystick = new LogitechF310("driver");
     private ButtonBoardFingers gunnerJoystick = new ButtonBoardFingers("gunner");
     private RawController gunnerSecondary = new RawController("gunnerSecondary");
+    private RawController slider = new RawController("slider");
     private List<Controller<?, ?>> controllers;
 
     public OperatorInterface() {
@@ -28,17 +29,23 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return -driverJoystick.getAxisValue(LogitechF310.Axis.RIGHT_STICK_Y);
     }
 
+    public double getSliderValue() {
+        return slider.getRawAxisValue(0);
+    }
+
     @Override
     public void configure(Config config) {
         super.configure();
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
         gunnerSecondary.configure(config.gunnerSecondary);
+        slider.configure(config.slider);
 
         controllers = Arrays.asList(
                 driverJoystick,
                 gunnerJoystick,
-                gunnerSecondary
+                gunnerSecondary,
+                slider
         );
     }
 
@@ -65,6 +72,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         public LogitechF310.Config driverJoystick;
         public ButtonBoardFingers.Config gunnerJoystick;
         public RawController.Config gunnerSecondary;
+        public RawController.Config slider;
     }
 
     private class OITest extends ManualTest {
