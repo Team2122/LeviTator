@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id "application"
 }
 
 repositories {
@@ -12,4 +13,10 @@ dependencies {
     compile 'edu.wpi.first.ntcore:ntcore-java:4.1.0'
     runtime 'edu.wpi.first.wpiutil:wpiutil-java:3.2.0'
     runtime 'edu.wpi.first.ntcore:ntcore-jni:4.1.0'
+}
+
+mainClassName = "SliderApp"
+
+run {
+    jvmArgs << "-Djava.library.path=" + file('lib')
 }

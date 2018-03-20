@@ -11,6 +11,7 @@ import org.teamtators.common.control.MotorPowerUpdater;
 import org.teamtators.common.control.Updatable;
 import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.DigitalSensorTest;
@@ -154,6 +155,13 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
         leftMotorUpdater = new MotorPowerUpdater(leftMotor);
         rightMotorUpdater = new MotorPowerUpdater(rightMotor);
+    }
+
+    @Override
+    public void onEnterRobotState(RobotState state) {
+        if (state == RobotState.AUTONOMOUS) {
+            setDefaultRetract();
+        }
     }
 
     @Override

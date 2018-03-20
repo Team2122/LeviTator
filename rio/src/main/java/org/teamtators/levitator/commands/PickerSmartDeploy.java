@@ -33,22 +33,31 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     @Override
     public void initialize() {
         timer.start();
+        powerName = null;
+        isQuick = !picker.isExtended();
+        updatePower();
+    }
+
+    private void updatePower() {
         int numPowers = DeployPower.values().length;
         double sliderValue = oi.getReleasePower();
-        int powerIdx = (int) (((sliderValue + 1.0) / 2.0) * (1.0 / numPowers));
-        powerName = DeployPower.values()[powerIdx];
-        powerConfig = config.deployPowers.get(powerName);
-        if (picker.isExtended()) {
-            logger.info("Picker is extended, doing long deploy with kickPower {}", powerName);
-            isQuick = false;
-        } else {
-            logger.info("Picker is retracted, doing quick deploy with kickPower {}", powerName);
-            isQuick = true;
+        int powerIdx = (int) (((sliderValue + 1.0) / 2.0) * numPowers);
+        powerIdx = Math.max(0, Math.min(numPowers - 1, powerIdx));
+        DeployPower powerName = DeployPower.values()[powerIdx];
+        if (this.powerName != powerName) {
+            this.powerName = powerName;
+            powerConfig = config.powers.get(powerName);
+            if (isQuick) {
+                logger.info("Picker is retracted, doing quick deploy with kickPower {}", powerName);
+            } else {
+                logger.info("Picker is extended, doing long deploy with kickPower {}", powerName);
+            }
         }
     }
 
     @Override
     protected boolean step() {
+        updatePower();
         if (!isQuick) {
             picker.setRollerPower(-powerConfig.kickPower);
             return false;
@@ -97,6 +106,6 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
             public double timeToKick;
             public double timeBeforeRetract;
         }
-        public Map<DeployPower, PowerConfig> deployPowers;
+        public Map<DeployPower, PowerConfig> powers;
     }
 }

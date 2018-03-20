@@ -36,7 +36,7 @@ gunner:
   RIGHT_RING: start whenPressed BumpLiftDown
   RIGHT_PINKY: start whenPressed BumpLiftUp
 gunnerSecondary:
-  1: start whenPressed $PickerReleaseMedium
+  1: toggle whenPressed PickerSmartDeploy
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
   2: start afterHeld ElevatorsDeploy

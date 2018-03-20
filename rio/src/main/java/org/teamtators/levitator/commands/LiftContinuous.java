@@ -35,20 +35,17 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     protected boolean step() {
         double sliderValue = operatorInterface.getSliderValue();
         boolean atHeight = lift.isAtHeight();
-        boolean movementInitiatedByCommand = lift.isMovementInitiatedByCommand();
 
-        if (atHeight && movementInitiatedByCommand) {
-            double abs = Math.abs(lift.getCurrentHeight() - lift.sliderToHeight(sliderValue));
-            //logger.info("Abs {} Tolerance?: {}", abs, config.sliderTolerance);
-            if (abs < config.sliderTolerance) {
-                logger.info("Clearing movement flag");
-                lift.clearForceMovementFlag();
+        if (atHeight && lift.isHeightForced()) {
+            double knobDelta = Math.abs(lift.getDesiredHeight() - lift.sliderToHeight(sliderValue));
+            //logger.info("Abs {} Tolerance?: {}", knobDelta, config.sliderTolerance);
+            if (knobDelta < config.sliderTolerance) {
+                lift.clearForceHeightFlag();
             }
         }
 
-        if(movementInitiatedByCommand && !lastMovementInitiator) {
+        if (lift.isHeightForced() && !lastMovementInitiator) {
             lift.saveCurrentHeight();
-            logger.info("Saving height {}", lift.getCurrentHeight());
         }
 
         desiredHeight = lift.getDesiredHeight();
@@ -56,21 +53,24 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
         double currentAngle = lift.getCurrentPivotAngle();
         boolean isTeleop = robot.getState() == RobotState.TELEOP;
-        boolean allowSlider = !lift.isMovementInitiatedByCommand() && isTeleop;
-        if (allowSlider && Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue)) > config.sliderThreshold) {
+        boolean allowSlider = !lift.isHeightForced() && isTeleop;
+        double sliderDelta = Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue));
+        if (allowSlider && sliderDelta > config.sliderThreshold) {
             lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
             desiredHeight = lift.getDesiredHeight();
         }
-        if (isTeleop && !lift.isRotationInitiatedByCommand()) {
-            double pivotAngle = operatorInterface.getPivotKnob() * 90;
-            if (Math.abs(pivotAngle) < 2) {
-                pivotAngle = 0;
-            }
-            if(Math.abs(pivotAngle - lift.getCurrentPivotAngle()) < config.knobTolerance) {
-                lift.clearForceRotationFlag();
-            }
 
-            lift.setDesiredPivotAngle(pivotAngle, false);
+        double knobAngle = operatorInterface.getPivotKnob() * 90;
+        if (Math.abs(knobAngle) < 2) {
+            knobAngle = 0;
+        }
+        if(lift.isRotationForced() &&
+                Math.abs(knobAngle - lift.getDesiredHeight()) < config.knobTolerance) {
+            lift.clearForceRotationFlag();
+        }
+        boolean allowKnob = isTeleop && !lift.isRotationForced();
+        if (allowKnob) {
+            lift.setDesiredPivotAngle(knobAngle, false);
             desiredPivotAngle = lift.getDesiredPivotAngle();
         }
         if (desiredPivotAngle != centerAngle && locking) {
@@ -135,7 +135,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         //Set the lift target height to the desired height
         lift.setTargetHeight(desiredHeight);
 
-        lastMovementInitiator = lift.isMovementInitiatedByCommand();
+        lastMovementInitiator = lift.isHeightForced();
         return false;
     }
 

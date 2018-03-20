@@ -53,8 +53,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private Config config;
 
-    private boolean isMovementInitiatedByCommand = false;
-    private boolean isRotationInitiatedByCommand = false;
+    private boolean heightForced = false;
+    private boolean rotationForced = false;
     private double savedHeight;
 
     public Lift() {
@@ -98,7 +98,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             @Override
             public void update(double delta) {
                 SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
-                SmartDashboard.putBoolean("move", Lift.this.isMovementInitiatedByCommand());
+                SmartDashboard.putBoolean("move", Lift.this.isHeightForced());
             }
         };
     }
@@ -127,7 +127,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     /**
      * @param desiredHeight height in inches
      */
-    public void setDesiredHeight(double desiredHeight, boolean commandInitiated) {
+    public void setDesiredHeight(double desiredHeight, boolean force) {
         if (desiredHeight < config.heightController.minPosition) {
             logger.warn("Lift desired height exceeded bottom height limit ({} < {})", desiredHeight,
                     config.heightController.minPosition);
@@ -138,15 +138,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             desiredHeight = config.heightController.maxPosition;
         }
 
-        if (isMovementInitiatedByCommand && !commandInitiated) {
+        if (heightForced && !force) {
             return;
         }
 //        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
-        if(commandInitiated) {
+        if (force) {
             logger.info("Setting desired lift height to {}", desiredHeight);
         }
         this.desiredHeight = desiredHeight;
-        isMovementInitiatedByCommand = commandInitiated;
+        heightForced = force;
 //        } else {
 //            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
 //        }
@@ -207,17 +207,17 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return desiredPivotAngle;
     }
 
-    public void setDesiredPivotAngle(double desiredAngle, boolean commandInitiated) {
+    public void setDesiredPivotAngle(double desiredAngle, boolean force) {
 //        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
-        if (isRotationInitiatedByCommand && !commandInitiated) {
+        if (rotationForced && !force) {
             return;
         }
         if (desiredPivotAngle != desiredAngle) {
-            if(commandInitiated) {
+            if (force) {
                 logger.info("Setting desired pivot angle {}", desiredAngle);
             }
             this.desiredPivotAngle = desiredAngle;
-            this.isRotationInitiatedByCommand = commandInitiated;
+            this.rotationForced = force;
         }
 //        } else {
 //            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
@@ -344,16 +344,31 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotLockSolenoid.set(lock);
     }
 
-    public void clearForceMovementFlag() {
-        this.isMovementInitiatedByCommand = false;
+    public void clearForceHeightFlag() {
+        logger.debug("Clearing force height flag");
+        this.heightForced = false;
     }
 
-    public boolean isMovementInitiatedByCommand() {
-        return isMovementInitiatedByCommand;
+    public boolean isHeightForced() {
+        return heightForced;
     }
 
-    public boolean isRotationInitiatedByCommand() {
-        return isRotationInitiatedByCommand;
+    public void clearForceRotationFlag() {
+        logger.debug("Clearing force rotation flag");
+        rotationForced = false;
+    }
+
+    public void saveCurrentHeight() {
+        logger.info("Saving height {}", getCurrentHeight());
+        this.savedHeight = getCurrentHeight();
+    }
+
+    public void recallHeight() {
+        setDesiredHeight(savedHeight, true);
+    }
+
+    public boolean isRotationForced() {
+        return rotationForced;
     }
 
     public boolean isAtHeight() {
@@ -497,18 +512,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public List<Updatable> getMotorUpdatables() {
         return Arrays.asList(liftMotorUpdater, pivotMotorUpdater);
-    }
-
-    public void clearForceRotationFlag() {
-        isRotationInitiatedByCommand = false;
-    }
-
-    public void saveCurrentHeight() {
-        this.savedHeight = getCurrentHeight();
-    }
-
-    public void recallHeight() {
-        setDesiredHeight(savedHeight, true);
     }
 
     public enum HeightPreset {
