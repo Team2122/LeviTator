@@ -40,7 +40,7 @@ gunnerSecondary:
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
   2: start afterHeld ElevatorsDeploy
-  3: toggle whenPressed ElevatorsLiftLeft
+  3: start whenPressed LiftRecall
   4: toggle whenPressed PickerPick
   5: start whenPressed PickerRetract
   6: start whenPressed BumpPivotLeft

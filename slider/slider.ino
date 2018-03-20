@@ -261,7 +261,7 @@ void loop() {
   int knobV = knob.read();
   Joystick.Y((knobV / CPR + .5) * 1023);
   int powerSlider = analogRead(POWER_SLIDER);
-  Serial.println(powerSlider);
+  //Serial.println(powerSlider);
   Joystick.Z(((INPUT_CONVERSION_FACTOR - powerSlider) / INPUT_CONVERSION_FACTOR) * 1023);
   Joystick.send_now();
   lastTime = micros();

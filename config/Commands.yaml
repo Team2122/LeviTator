@@ -93,6 +93,7 @@ LiftContinuous:
   lockedPeriod: 0.1
   sliderTolerance: 2
   sliderThreshold: 1
+  knobTolerance: 5.0
 $TestDrive:
 #  - { class: DriveStraight, angle: 0.0, distance: -144.0, endSpeed: 60.0 }
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }

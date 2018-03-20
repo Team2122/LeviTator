@@ -40,7 +40,7 @@ public class SliderApp {
                 String in = scanner.nextLine();
                 System.out.println(in);
                 if (in.startsWith("~2122~")) {
-                    System.out.printf("Slider version %s\n", in.split("~")[1]);
+                    System.out.printf("Slider version %s\n", in.split("~\\^")[1]);
                     slider = p;
                     break;
                 }
@@ -61,8 +61,8 @@ public class SliderApp {
         System.out.println("Connecting to NetworkTables");
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
-//        inst.startClientTeam(2122);
-        inst.startClient("localhost");
+        inst.startClientTeam(2122);
+//        inst.startClient("localhost");
         NetworkTable smartDashboard = inst.getTable("SmartDashboard");
 
 
@@ -71,16 +71,16 @@ public class SliderApp {
         }*/
 
         System.out.println("Connected to NetworkTables!");
-
 //        while (true) {
             NetworkTableEntry pos = smartDashboard.getEntry("liftTarget");
+            NetworkTableEntry move = smartDashboard.getEntry("move");
             pos.addListener(entryNotification -> {
-
                 double num = pos.getNumber(-1).doubleValue();
+                boolean shouldMove = move.getBoolean(false);
                 //System.out.println(num);
-                if (num != -1 && lastTargetHeight != num) {
+                if (num != -1 && lastTargetHeight != num && shouldMove) {
                     System.out.printf("Target height changed, was %.3f now %.3f\n", lastTargetHeight, num);
-                    byte[] bytes = generateSliderUpdatePacket(num);
+                    byte[] bytes = generateSliderUpdatePacket(num / 83.0);
                     System.out.println(new String(bytes));
                     int result = slider.writeBytes(bytes, bytes.length);
                     System.out.printf("Sent bytes %s\n", result == bytes.length ? "sucessfully" : "unsucessfully");
@@ -96,7 +96,7 @@ public class SliderApp {
 
     private static byte[] generateSliderUpdatePacket(double d) {
         String sb = "" + SliderPacketType.UPDATE_SLIDER;
-        sb += d;
+        sb += String.format("%.6f",d);
         sb += 'a';
         return sb.getBytes();
     }

@@ -54,6 +54,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private Config config;
 
     private boolean isMovementInitiatedByCommand = false;
+    private boolean isRotationInitiatedByCommand = false;
+    private double savedHeight;
 
     public Lift() {
         super("Lift");
@@ -96,6 +98,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             @Override
             public void update(double delta) {
                 SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
+                SmartDashboard.putBoolean("move", Lift.this.isMovementInitiatedByCommand());
             }
         };
     }
@@ -139,7 +142,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             return;
         }
 //        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
-        logger.info("Setting desired lift height to {}", desiredHeight);
+        if(commandInitiated) {
+            logger.info("Setting desired lift height to {}", desiredHeight);
+        }
         this.desiredHeight = desiredHeight;
         isMovementInitiatedByCommand = commandInitiated;
 //        } else {
@@ -202,11 +207,17 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return desiredPivotAngle;
     }
 
-    public void setDesiredPivotAngle(double desiredAngle) {
+    public void setDesiredPivotAngle(double desiredAngle, boolean commandInitiated) {
 //        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
+        if (isRotationInitiatedByCommand && !commandInitiated) {
+            return;
+        }
         if (desiredPivotAngle != desiredAngle) {
-            logger.info("Setting desired pivot angle {}", desiredAngle);
+            if(commandInitiated) {
+                logger.info("Setting desired pivot angle {}", desiredAngle);
+            }
             this.desiredPivotAngle = desiredAngle;
+            this.isRotationInitiatedByCommand = commandInitiated;
         }
 //        } else {
 //            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
@@ -214,7 +225,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
-        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle));
+        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle), true);
     }
 
     public double getAnglePreset(AnglePreset anglePreset) {
@@ -284,11 +295,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void bumpPivotRight() {
-        setDesiredPivotAngle(getDesiredPivotAngle() + config.bumpPivotValue);
+        setDesiredPivotAngle(getDesiredPivotAngle() + config.bumpPivotValue, true);
     }
 
     public void bumpPivotLeft() {
-        setDesiredPivotAngle(getDesiredPivotAngle() - config.bumpPivotValue);
+        setDesiredPivotAngle(getDesiredPivotAngle() - config.bumpPivotValue, true);
     }
 
     public void setPivotPower(double pivotPower) {
@@ -339,6 +350,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public boolean isMovementInitiatedByCommand() {
         return isMovementInitiatedByCommand;
+    }
+
+    public boolean isRotationInitiatedByCommand() {
+        return isRotationInitiatedByCommand;
     }
 
     public boolean isAtHeight() {
@@ -482,6 +497,18 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     public List<Updatable> getMotorUpdatables() {
         return Arrays.asList(liftMotorUpdater, pivotMotorUpdater);
+    }
+
+    public void clearForceRotationFlag() {
+        isRotationInitiatedByCommand = false;
+    }
+
+    public void saveCurrentHeight() {
+        this.savedHeight = getCurrentHeight();
+    }
+
+    public void recallHeight() {
+        setDesiredHeight(savedHeight, true);
     }
 
     public enum HeightPreset {
