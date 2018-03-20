@@ -37,6 +37,10 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return slider.getRawAxisValue(1);
     }
 
+    public double getReleasePower() {
+        return slider.getRawAxisValue(2);
+    }
+
     @Override
     public void configure(Config config) {
         super.configure();

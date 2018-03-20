@@ -48,6 +48,13 @@ $PickerReleaseMedium:
 PickerReleaseSoft:
   { class: PickerRelease, powers: { left: -0.4, right: -0.4 } }
 
+PickerSmartDeploy:
+  class: PickerSmartDeploy
+  powers:
+    SOFT: { kickPower: 0.4, timeBeforeKick: 0.3, timeBeforeRetract: 0.8, timeToKick: 1.0 }
+    MEDIUM: { kickPower: 0.6, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.8 }
+    HARD: { kickPower: 0.8, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.6 }
+
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
 PivotHalfLeft: { class: PivotAnglePreset, preset: HALF_LEFT }
 PivotCenter: { class: PivotAnglePreset, preset: CENTER }

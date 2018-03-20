@@ -30,6 +30,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("PickerPick", () -> new PickerPick(robot));
         commandStore.registerCommand("PickerRelease", () -> new PickerRelease(robot));
         commandStore.registerCommand("PickerQuickDeploy", () -> new PickerQuickDeploy(robot));
+        commandStore.registerCommand("PickerSmartDeploy", () -> new PickerSmartDeploy(robot));
         commandStore.registerCommand("PickerRegrip", () -> new PickerRegrip(robot));
         commandStore.putCommand("WaitForCube", new WaitForCube(robot));
         commandStore.putCommand("PickerExtend", Commands.instant(picker::extend));

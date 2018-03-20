@@ -55,10 +55,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setRollerPowers(0.0, 0.0);
     }
 
-    public void setPickerExtended(boolean isExtended) {
-        extensionSolenoid.set(isExtended);
-    }
-
     public boolean isCubeDetected() {
         return cubeDetectSensor.get();
     }
@@ -79,6 +75,15 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         return cubeDetectSensor.get() || upperCubeSensor.get() || lowerCubeSensor.get();
     }
 
+    public void setPickerExtended(boolean isExtended) {
+        extensionSolenoid.set(isExtended);
+    }
+
+    public boolean isExtended() {
+        return extensionSolenoid.get();
+    }
+
+
     public void extend(){
         setPickerExtended(true);
     }
@@ -88,7 +93,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
     public void toggleExtension() {
-        if (extensionSolenoid.get()) {
+        if (isExtended()) {
             retract();
         } else {
             extend();
@@ -105,7 +110,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     public void setDefaultExtended(boolean defaultExtended) {
         this.defaultExtended = defaultExtended;
-        if (extensionSolenoid.get() != defaultExtended) {
+        if (isExtended() != defaultExtended) {
             extendDefault();
         }
     }
