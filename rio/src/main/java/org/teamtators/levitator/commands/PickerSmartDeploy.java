@@ -40,8 +40,10 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
         powerConfig = config.deployPowers.get(powerName);
         if (picker.isExtended()) {
             logger.info("Picker is extended, doing long deploy with kickPower {}", powerName);
+            isQuick = false;
         } else {
             logger.info("Picker is retracted, doing quick deploy with kickPower {}", powerName);
+            isQuick = true;
         }
     }
 
@@ -73,8 +75,12 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
         picker.setRollerPower(0.0);
-        if (!Double.isNaN(powerConfig.timeBeforeRetract)) {
-            picker.setPickerExtended(false);
+        if (isQuick) {
+            if (!Double.isNaN(powerConfig.timeBeforeRetract)) {
+                picker.setPickerExtended(false);
+            }
+        } else {
+            picker.extendDefault();
         }
     }
 
