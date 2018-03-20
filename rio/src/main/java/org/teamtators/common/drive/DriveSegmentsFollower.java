@@ -137,7 +137,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         DriveSegment currentSegment = getCurrentSegment();
         Pose2d pose = currentSegment.isReverse() ? currentPose.invertYaw() : currentPose;
         lookaheadReport = currentSegment.getLookaheadReport(pose, lookahead);
-        while (Epsilon.isEpsilonNegative(lookaheadReport.remainingDistance)) {
+        while (Epsilon.isEpsilonNegativeOrZero(lookaheadReport.remainingDistance)) {
             currentSegmentIdx++;
             if (!hasSegment()) {
                 report.isFinished = true;

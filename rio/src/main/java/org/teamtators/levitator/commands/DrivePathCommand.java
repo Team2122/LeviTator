@@ -3,6 +3,7 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.drive.DrivePath;
 import org.teamtators.common.drive.DriveSegments;
+import org.teamtators.common.drive.PathPoint;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -44,7 +45,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     public void configure(Config config) {
         this.drivePath = new DrivePath();
         for (int i = 0; i < config.path.size(); i++) {
-            DrivePath.Point point = config.path.get(i);
+            PathPoint point = config.path.get(i);
             boolean isLast = i == config.path.size() - 1;
             if (Double.isNaN(point.getRadius())) {
                 point.setRadius(config.radius);
@@ -77,6 +78,6 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
         public double arcSpeed;
         public double radius;
         public boolean reverse = false;
-        public List<DrivePath.Point> path;
+        public List<PathPoint> path;
     }
 }

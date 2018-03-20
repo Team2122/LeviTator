@@ -232,9 +232,9 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
         double output = holdPower;
 
-        if (Epsilon.isEpsilonPositive(calculator.getVelocity())) {
+        if (Epsilon.isEpsilonPositiveOrZero(calculator.getVelocity())) {
             output += config.kMinOutput;
-        } else if (Epsilon.isEpsilonNegative(calculator.getVelocity())) {
+        } else if (Epsilon.isEpsilonNegativeOrZero(calculator.getVelocity())) {
             output -= config.kMinOutput;
         } else if (Epsilon.isEpsilonZero(calculator.getAcceleration()) &&
                 Epsilon.isEpsilonZero(positionError, config.tolerance)) {
