@@ -15,6 +15,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Lift lift;
     private double desiredHeight;
     private double desiredPivotAngle;
+    private boolean lastMovementInitiator;
     private boolean locking;
     private double sweepTarget;
     private Timer sweepTimer = new Timer();
@@ -35,6 +36,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         double sliderValue = operatorInterface.getSliderValue();
         boolean atHeight = lift.isAtHeight();
         boolean movementInitiatedByCommand = lift.isMovementInitiatedByCommand();
+
         if (atHeight && movementInitiatedByCommand) {
             double abs = Math.abs(lift.getCurrentHeight() - lift.sliderToHeight(sliderValue));
             //logger.info("Abs {} Tolerance?: {}", abs, config.sliderTolerance);
@@ -43,6 +45,12 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 lift.clearForceMovementFlag();
             }
         }
+
+        if(movementInitiatedByCommand && !lastMovementInitiator) {
+            lift.saveCurrentHeight();
+            logger.info("Saving height {}", lift.getCurrentHeight());
+        }
+
         desiredHeight = lift.getDesiredHeight();
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
@@ -53,12 +61,17 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
             desiredHeight = lift.getDesiredHeight();
         }
-        if (isTeleop) {
+        if (isTeleop && !lift.isRotationInitiatedByCommand()) {
             double pivotAngle = operatorInterface.getPivotKnob() * 90;
             if (Math.abs(pivotAngle) < 2) {
                 pivotAngle = 0;
             }
-            lift.setDesiredPivotAngle(pivotAngle);
+            if(Math.abs(pivotAngle - lift.getCurrentPivotAngle()) < config.knobTolerance) {
+                lift.clearForceRotationFlag();
+            }
+
+            lift.setDesiredPivotAngle(pivotAngle, false);
+            desiredPivotAngle = lift.getDesiredPivotAngle();
         }
         if (desiredPivotAngle != centerAngle && locking) {
             locking = false;
@@ -121,6 +134,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         }
         //Set the lift target height to the desired height
         lift.setTargetHeight(desiredHeight);
+
+        lastMovementInitiator = lift.isMovementInitiatedByCommand();
         return false;
     }
 
@@ -137,5 +152,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         public double lockedPeriod;
         public double sliderTolerance;
         public double sliderThreshold;
+        public double knobTolerance;
     }
 }

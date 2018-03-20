@@ -50,6 +50,8 @@ const double PWM_MAX = ((1 << WRITE_RESOLUTION) - 1);
 
 const double OUTPUT_CONVERSION_FACTOR = PWM_MAX;
 
+const double INPUT_CONVERSION_FACTOR = ((1 << READ_RESOLUTION) - 1);
+
 double setpoint;
 double serialSetpoint;
 double detentSetpoint;
@@ -134,7 +136,7 @@ void loop() {
     Joystick.button(i, digitalRead(BUTTON_PORTS[i]));
   }
   double sliderValRaw = analogRead(LIFT_SLIDER);
-  double sliderVal = sliderValRaw / ((1 << READ_RESOLUTION) - 1);
+  double sliderVal = sliderValRaw / INPUT_CONVERSION_FACTOR;
 
   if(true /*and more future conditions*/) {
       //Serial.println("Possible move to detent!");
@@ -259,7 +261,8 @@ void loop() {
   int knobV = knob.read();
   Joystick.Y((knobV / CPR + .5) * 1023);
   int powerSlider = analogRead(POWER_SLIDER);
-  Joystick.Z((powerSlider / OUTPUT_CONVERSION_FACTOR) * 1023);
+  //Serial.println(powerSlider);
+  Joystick.Z(((INPUT_CONVERSION_FACTOR - powerSlider) / INPUT_CONVERSION_FACTOR) * 1023);
   Joystick.send_now();
   lastTime = micros();
   delay(5);

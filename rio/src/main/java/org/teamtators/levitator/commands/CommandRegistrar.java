@@ -47,6 +47,7 @@ public class CommandRegistrar {
         commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
         commandStore.registerCommand("WaitForHeight", () -> new WaitForHeight(robot));
         commandStore.putCommand("WaitForLock", new WaitForLock(robot));
+        commandStore.putCommand("LiftRecall", new LiftRecall(robot));
 
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
