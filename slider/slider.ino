@@ -10,6 +10,7 @@ AUTHOR: Avery Bainbridge
 DATE: 3/17/2018
 
 ************************************************************/
+#define VERSION 1.10
 
 #define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
@@ -28,7 +29,6 @@ DATE: 3/17/2018
 //#define DEBUG
 #ifdef DEBUG
 #define ENABLE_LOGGING
-//#define SELF_TEST
 #endif
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
@@ -43,11 +43,14 @@ const int DETENTS_LENGTH = 5;
 //PID values
 const double kP = 95;
 const double kI = 0;
-const double kD = 0;
+const double kD = -1;
+const double maxOutput = 0.75;
 
-const double maxOutput = ((1 << WRITE_RESOLUTION) - 1);
+const double PWM_MAX = ((1 << WRITE_RESOLUTION) - 1);
 
-const double OUTPUT_CONVERSION_FACTOR = maxOutput;
+const double OUTPUT_CONVERSION_FACTOR = PWM_MAX;
+
+const double INPUT_CONVERSION_FACTOR = ((1 << READ_RESOLUTION) - 1);
 
 double setpoint;
 double serialSetpoint;
@@ -57,14 +60,22 @@ double totalError;
 double lastError;
 double lastPosition;
 
-const int TEST_ITER = 10;
+int TEST_ITER = 10;
 int tests = 0;
 boolean enabled = true;
-boolean finished;
+boolean testing = false;
 
 long lastTime;
 
+long testStarted;
+
 Encoder knob(ENCODER_PIN_1, ENCODER_PIN_2);
+
+enum PACKET_TYPE {
+    Ping = 'p',
+    UpdateSlider = 's',
+    RunSelfTest = 't'
+};
 
 void setup() {
   Joystick.useManualSend(false);
@@ -92,20 +103,30 @@ void loop() {
   int serialValue = Serial.read();
 
   if(serialValue != -1) {
-    //serialSetpoint = HEIGHT_PRESETS[serialValue - 48];
-    union { char serial[8]; double val; };
-    serial[7] = serialValue;
-
-    int serialBytesRecieved = 1;
-
-    while(serialBytesRecieved < 8) {
-      while(Serial.available() > 0) {
-        serial[++serialBytesRecieved] = Serial.read();
-      }
-    }
-    serialSetpoint = val;
-    enabled = true;
+  Serial.printf("Recieved packet: %c\n", serialValue);
+  PACKET_TYPE packet = (PACKET_TYPE)serialValue;
+  switch(packet) {
+        case Ping: {
+            Serial.printf("~2122~^%.2f\n", VERSION);  
+        }
+        break;
+        case UpdateSlider: {
+            double val = Serial.parseFloat();
+            serialSetpoint = val;
+            Serial.printf("setting setpoint to %f\n", val);
+            enabled = true;
+        }
+        break;
+        case RunSelfTest: {
+            int in = Serial.parseInt();
+            TEST_ITER = in == 0 ? 10 : in;
+            Serial.printf("Running self-test mode, %d iterations\n", TEST_ITER);
+            testing = !testing;
+        }
+        break;
+        
   }
+}
   double delta = (micros() - lastTime) / 1000000.0;
   #ifdef ENABLE_LOGGING
   Serial.printf("Delta: %.4f\n", delta);
@@ -115,7 +136,7 @@ void loop() {
     Joystick.button(i, digitalRead(BUTTON_PORTS[i]));
   }
   double sliderValRaw = analogRead(LIFT_SLIDER);
-  double sliderVal = sliderValRaw / ((1 << READ_RESOLUTION) - 1);
+  double sliderVal = sliderValRaw / INPUT_CONVERSION_FACTOR;
 
   if(true /*and more future conditions*/) {
       //Serial.println("Possible move to detent!");
@@ -169,7 +190,7 @@ void loop() {
     errorVal = 0;
   }
   
-  if(enabled && tests <= TEST_ITER) {
+  if(enabled) {
     double output = errorVal * kP;
 
     totalError += errorVal * delta;  
@@ -183,8 +204,32 @@ void loop() {
       totalError = 0;
     }
 
+    if (output > maxOutput) {
+      output = maxOutput;
+    }
+    if (output < -maxOutput) {
+      output = -maxOutput;
+    }
+
     if(abs(errorVal) <= 0.003) {
       output = 0;
+      if(testing) {
+      if(tests == TEST_ITER) {
+      Serial.printf("Test took %d micros\n",micros() - testStarted); 
+      testing = false;
+      tests = 0;
+      testStarted = -1;
+      }
+      if(testStarted != -1 && tests != 0) {
+        Serial.printf("Test took %d micros\n",micros() - testStarted); 
+      }
+      if(testing)
+      Serial.printf("Running test #%d\n", ++tests);
+      serialSetpoint = random(0, OUTPUT_CONVERSION_FACTOR) / OUTPUT_CONVERSION_FACTOR;
+      enabled = true;
+      testStarted = micros();
+      }
+      
     }
     
 #ifdef ENABLE_LOGGING
@@ -194,13 +239,8 @@ void loop() {
   } else {
     totalError = 0;
     driveMotor(0);
-#ifdef SELF_TEST
-    setpoint = random(0, OUTPUT_CONVERSION_FACTOR) / OUTPUT_CONVERSION_FACTOR;
-    enabled = true;
-    tests++;
-#endif
-    lastError = errorVal;
   }
+    lastError = errorVal;
 
   lastValue = sliderVal;
   lastPosition = sliderVal;
@@ -220,6 +260,9 @@ void loop() {
   */
   int knobV = knob.read();
   Joystick.Y((knobV / CPR + .5) * 1023);
+  int powerSlider = analogRead(POWER_SLIDER);
+  Serial.println(powerSlider);
+  Joystick.Z(((INPUT_CONVERSION_FACTOR - powerSlider) / INPUT_CONVERSION_FACTOR) * 1023);
   Joystick.send_now();
   lastTime = micros();
   delay(5);
@@ -241,3 +284,5 @@ void driveMotor(double speed) {
 bool signOf(double value) {
   return value > 0 ? 1 : value < 0 ? -1 : 0;
 }
+
+
