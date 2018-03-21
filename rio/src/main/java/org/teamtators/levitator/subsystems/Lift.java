@@ -463,7 +463,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         pivotUpdater = null; //so the GC catches these bad boys
     }
 
-    private double getSafePivotAngle(double desiredAngle) {
+    public double getSafePivotAngle(double desiredAngle) {
         double currentLiftHeight = getCurrentHeight();
         double centerAngle = getAnglePreset(AnglePreset.CENTER);
         if (Epsilon.isEpsilonLessThan(currentLiftHeight,

@@ -69,19 +69,26 @@ WaitForCenter: { class: WaitForAngle, preset: CENTER, tolerance: 20.0 }
 WaitForHeight: { tolerance: 1 }
 LiftHome: { class: LiftHeightPreset, preset: HOME }
 $LiftHome:
-  - $PrepareLiftMovement
+  - LiftSave
+  - PickerRetract
+  - PivotCenter
+  - WaitForCenter
   - LiftHome
-$LiftPick:
-  - $PrepareLiftMovement
-  - { class: LiftHeightPreset, preset: PICK }
+#$LiftPick:
+#  - $PrepareLiftMovement
+#  - { class: LiftHeightPreset, preset: PICK }
 $LiftSwitch:
   - $PrepareLiftMovement
   - { class: LiftHeightPreset, preset: SWITCH }
 $LiftScaleLow:
-  - $PrepareLiftMovement
+#  - PickerRetract
+  - PivotCenter
+  - WaitForCenter
   - { class: LiftHeightPreset, preset: SCALE_LOW }
 $LiftScaleHigh:
-  - $PrepareLiftMovement
+#  - PickerRetract
+  - PivotCenter
+  - WaitForCenter
   - { class: LiftHeightPreset, preset: SCALE_HIGH }
 $LiftSwitchLow:
   - $PrepareLiftMovement

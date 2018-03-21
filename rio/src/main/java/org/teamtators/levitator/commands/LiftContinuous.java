@@ -15,7 +15,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Lift lift;
     private double desiredHeight;
     private double desiredPivotAngle;
-    private boolean lastMovementInitiator;
     private boolean locking;
     private double sweepTarget;
     private Timer sweepTimer = new Timer();
@@ -44,10 +43,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             }
         }
 
-        if (lift.isHeightForced() && !lastMovementInitiator) {
-            lift.saveCurrentHeight();
-        }
-
         desiredHeight = lift.getDesiredHeight();
         desiredPivotAngle = lift.getDesiredPivotAngle();
         double centerAngle = lift.getAnglePreset(Lift.AnglePreset.CENTER);
@@ -61,11 +56,11 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         }
 
         double knobAngle = operatorInterface.getPivotKnob() * 90;
-        if (Math.abs(knobAngle) < 2) {
+        if (Math.abs(knobAngle) < 4) {
             knobAngle = 0;
         }
         if(lift.isRotationForced() &&
-                Math.abs(knobAngle - lift.getDesiredHeight()) < config.knobTolerance) {
+                Math.abs(knobAngle - lift.getDesiredPivotAngle()) < config.knobTolerance) {
             lift.clearForceRotationFlag();
         }
         boolean allowKnob = isTeleop && !lift.isRotationForced();
@@ -73,7 +68,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             lift.setDesiredPivotAngle(knobAngle, false);
             desiredPivotAngle = lift.getDesiredPivotAngle();
         }
-        if (desiredPivotAngle != centerAngle && locking) {
+        double safePivotAngle = lift.getSafePivotAngle(desiredPivotAngle);
+        if (safePivotAngle != centerAngle && locking) {
             locking = false;
             logger.debug("Moving away from center, disengaging lock");
         }
@@ -109,7 +105,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             //Retract the solenoid
             lift.setPivotLockSolenoid(false);
             //If we want to go to center and we're within the range of locking
-            if (desiredPivotAngle == centerAngle) {
+            if (safePivotAngle == centerAngle) {
                 if (currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle) {
                     logger.debug("Pivot moving center, will engage lock");
                     //Start locking
@@ -135,7 +131,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         //Set the lift target height to the desired height
         lift.setTargetHeight(desiredHeight);
 
-        lastMovementInitiator = lift.isHeightForced();
         return false;
     }
 
