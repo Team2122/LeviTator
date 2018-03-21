@@ -5,7 +5,6 @@ import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
-import org.teamtators.levitator.subsystems.Elevators;
 import org.teamtators.levitator.subsystems.Lift;
 import org.teamtators.levitator.subsystems.Picker;
 
@@ -61,16 +60,12 @@ public class CommandRegistrar {
         // FMS Data commands
         commandStore.putCommand("WaitForData", new WaitForData(robot));
 
-        //Elevators commands
-        Elevators elevators = robot.getSubsystems().getElevators();
-        commandStore.registerCommand("ElevatorsDeploy", () -> new ElevatorsDeploy(robot));
-        commandStore.registerCommand("ElevatorsLiftLeft", () -> new ElevatorsLiftLeft(robot));
-        commandStore.putCommand("ElevatorsLiftRight", Commands.instant(elevators::liftRightElevator));
-
-
         commandStore.putCommand("PrintPose", Commands.instant(() ->
                 TatorRobotBase.logger.info("Pose: " + drive.getPose())));
         commandStore.registerCommand("SetPose", () -> new SetPose(robot));
         commandStore.registerCommand("WaitForPath", () -> new WaitForPath(robot));
+
+
+        commandStore.registerCommand("ClimberMoveToHeight", () -> new ClimberMoveToHeight(robot));
     }
 }

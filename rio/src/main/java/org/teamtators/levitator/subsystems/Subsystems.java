@@ -29,7 +29,7 @@ public class Subsystems extends SubsystemsBase
     private Lift lift;
     private Auto auto;
     private Vision vision;
-    private Elevators elevators;
+    private Climber climber;
     //private YourSubsystem yourSubsystem;
 
     public Subsystems(TatorRobot robot) {
@@ -39,9 +39,9 @@ public class Subsystems extends SubsystemsBase
         lift = new Lift();
         auto = new Auto(robot);
         vision = new Vision(drive);
-        elevators = new Elevators();
+        climber = new Climber();
         //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, elevators /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, climber /*, yourSubsystem */);
 
         updatables = new ArrayList<>();
         motorUpdatables = new ArrayList<>();
@@ -82,14 +82,13 @@ public class Subsystems extends SubsystemsBase
         lift.configure(config.lift);
         auto.configure(config.auto);
         vision.configure(config.vision);
-        elevators.configure(config.elevators);
+        climber.configure(config.climber);
 
         updatables.addAll(drive.getUpdatables());
         updatables.addAll(lift.getUpdatables());
 
         motorUpdatables.addAll(picker.getMotorUpdatables());
         motorUpdatables.addAll(lift.getMotorUpdatables());
-        motorUpdatables.addAll(elevators.getMotorUpdatables());
     }
 
     @Override
@@ -101,7 +100,7 @@ public class Subsystems extends SubsystemsBase
         lift.deconfigure();
         auto.deconfigure();
         vision.deconfigure();
-        elevators.deconfigure();
+        climber.deconfigure();
 
         updatables.clear();
         motorUpdatables.clear();
@@ -123,10 +122,6 @@ public class Subsystems extends SubsystemsBase
         return oi;
     }
 
-    public Elevators getElevators() {
-        return elevators;
-    }
-
     @Override
     public List<Controller<?, ?>> getControllers() {
         return oi.getAllControllers();
@@ -145,6 +140,8 @@ public class Subsystems extends SubsystemsBase
         return vision;
     }
 
+    public Climber getClimber() {return climber;}
+
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;
@@ -152,6 +149,6 @@ public class Subsystems extends SubsystemsBase
         public Lift.Config lift;
         public Auto.Config auto;
         public Vision.Config vision;
-        public Elevators.Config elevators;
+        public Climber.Config climber;
     }
 }

@@ -1,5 +1,6 @@
 package org.teamtators.common.config.helpers;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import org.teamtators.common.Robot;
 import org.teamtators.common.config.ConfigException;
@@ -14,6 +15,7 @@ public class CtreMotorControllerConfig {
     public double openLoopRamp = 0.0; // # of seconds from 0 to full output, or 0 to disable
     public double voltageCompensationSaturation = Double.NaN;
     public boolean logTiming = false;
+    public FeedbackDevice feedbackDevice = FeedbackDevice.None;
 
     protected void validate() {
         if (id == -1) {
@@ -33,6 +35,7 @@ public class CtreMotorControllerConfig {
         } else {
             motor.enableVoltageCompensation(false);
         }
+        motor.configSelectedFeedbackSensor(feedbackDevice, 0, CONFIG_TIMEOUT);
     }
 
     protected void checkVersion(com.ctre.phoenix.motorcontrol.can.BaseMotorController motor, int requiredVersion) {
