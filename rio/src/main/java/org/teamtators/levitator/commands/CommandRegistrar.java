@@ -4,10 +4,7 @@ import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
-import org.teamtators.levitator.subsystems.Climber;
-import org.teamtators.levitator.subsystems.Drive;
-import org.teamtators.levitator.subsystems.Lift;
-import org.teamtators.levitator.subsystems.Picker;
+import org.teamtators.levitator.subsystems.*;
 
 public class CommandRegistrar {
     private final TatorRobot robot;
@@ -44,17 +41,20 @@ public class CommandRegistrar {
         Lift lift = robot.getSubsystems().getLift();
         commandStore.registerCommand("LiftContinuous", () -> new LiftContinuous(robot));
         commandStore.registerCommand("LiftHeightPreset", () -> new LiftHeightPreset(robot));
-        commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
-        commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
         commandStore.registerCommand("WaitForHeight", () -> new WaitForHeight(robot));
-        commandStore.putCommand("WaitForLock", new WaitForLock(robot));
         commandStore.putCommand("LiftRecall", new LiftRecall(robot));
         commandStore.putCommand("LiftSave", Commands.instant(lift::saveCurrentHeight));
 
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
-        commandStore.putCommand("BumpPivotRight", Commands.instant(lift::bumpPivotRight));
-        commandStore.putCommand("BumpPivotLeft", Commands.instant(lift::bumpPivotLeft));
+
+        Pivot pivot = robot.getSubsystems().getPivot();
+        commandStore.registerCommand("PivotAnglePreset", () -> new PivotAnglePreset(robot));
+        commandStore.registerCommand("WaitForAngle", () -> new WaitForAngle(robot));
+        commandStore.putCommand("WaitForLock", new WaitForLock(robot));
+
+        commandStore.putCommand("BumpPivotRight", Commands.instant(pivot::bumpPivotRight));
+        commandStore.putCommand("BumpPivotLeft", Commands.instant(pivot::bumpPivotLeft));
 
         commandStore.registerCommand("AutoSelector", () -> new AutoSelector(robot));
 

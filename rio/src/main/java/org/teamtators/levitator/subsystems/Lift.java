@@ -1,15 +1,11 @@
 package org.teamtators.levitator.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
-import org.teamtators.common.hw.AnalogPotentiometer;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.math.Epsilon;
@@ -24,37 +20,25 @@ import java.util.List;
 import java.util.Map;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
+    private Pivot pivot;
 
     private SpeedControllerGroup liftMotor;
     private MotorPowerUpdater liftMotorUpdater;
     private Encoder liftEncoder;
     private DigitalSensor limitSensorTop;
     private DigitalSensor limitSensorBottom;
-    private SpeedController pivotMotor;
-    private MotorPowerUpdater pivotMotorUpdater;
-    private Updater pivotUpdater;
-    private AnalogPotentiometer pivotEncoder;
-    private Solenoid pivotLockSolenoid;
-    private DigitalSensor pivotLockSensor;
 
-    private double desiredPivotAngle;
     private double desiredHeight;
     private double targetHeight;
     private double lastAttemptedHeight;
-    private double targetAngle;
-    private double lastAttemptedAngle;
 
     private TrapezoidalProfileFollower liftController;
-    private /*TrapezoidalProfileFollower*/ StupidController pivotController;
-    private InputDerivative pivotVelocity;
-    private Updatable holdPowerApplier;
-    private Updatable networkTablesUpdater;
-
+    private PreUpdatable preUpdatable;
+    private NetworkTablesUpdater networkTablesUpdater;
 
     private Config config;
 
     private boolean heightForced = false;
-    private boolean rotationForced = false;
     private double savedHeight;
 
     public Lift() {
@@ -66,41 +50,21 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.setOutputConsumer(this::setLiftPower);
         liftController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
-        pivotVelocity = new InputDerivative("pivotAngleDerivative", this::getCurrentPivotAngle);
-        pivotController = new /*TrapezoidalProfileFollower*/StupidController("pivotController");
-//        pivotController.setPositionProvider(this::getCurrentPivotAngle);
-//        pivotController.setVelocityProvider(pivotVelocity);
-        pivotController.setInputProvider(this::getCurrentPivotAngle);
-        pivotController.setOutputConsumer(this::setPivotPower);
-//        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
-        holdPowerApplier = new Updatable() {
-            @Override
-            public String getName() {
-                return "holdPowerApplier";
-            }
+        preUpdatable = new PreUpdatable();
+        networkTablesUpdater = new NetworkTablesUpdater();
+    }
 
-            @Override
-            public void update(double delta) {
-                if (Lift.this.getCurrentHeight() < 1) {
-                    Lift.this.liftController.setHoldPower(-0.1);
-                } else {
+    public Pivot getPivot() {
+        return pivot;
+    }
 
-                    Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
-                }
-            }
-        };
-        networkTablesUpdater = new Updatable() {
-            @Override
-            public String getName() {
-                return "networkTablesUpdater";
-            }
+    public void setPivot(Pivot pivot) {
+        this.pivot = pivot;
+    }
 
-            @Override
-            public void update(double delta) {
-                SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
-                SmartDashboard.putBoolean("move", Lift.this.isHeightForced());
-            }
-        };
+    public void linkTo(Pivot pivot) {
+        pivot.setLift(this);
+        this.setPivot(pivot);
     }
 
     /**
@@ -137,19 +101,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                     config.heightController.maxPosition);
             desiredHeight = config.heightController.maxPosition;
         }
-
         if (heightForced && !force) {
             return;
         }
-//        if (getSafeLiftHeight(desiredHeight) == desiredHeight) {
         if (force) {
             logger.info("Setting desired lift height to {}", desiredHeight);
         }
         this.desiredHeight = desiredHeight;
         heightForced = force;
-//        } else {
-//            logger.warn("Cannot move lift to desired height {} when picker is rotated at {}!!", desiredHeight, pivotEncoder.get());
-//        }
     }
 
     public void setDesiredHeightPreset(HeightPreset desiredHeight) {
@@ -173,8 +132,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             if (targetHeight == safeHeight && lastAttemptedHeight == height) {
                 return;
             } else {
-                logger.warn("Target height is unsafe with current picker conditions (angle: {}): {}. Moving to {}", getCurrentPivotAngle(),
-                        height, safeHeight);
+                logger.warn("Target height is unsafe with current picker conditions (angle: {}): {}. Moving to {}",
+                        pivot.getCurrentPivotAngle(), height, safeHeight);
                 lastAttemptedHeight = height;
                 height = safeHeight;
             }
@@ -190,83 +149,16 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.moveToPosition(height);
     }
 
-    private void enableLiftController() {
+    public void enableLiftController() {
         targetHeight = getCurrentHeight();
         liftController.moveToPosition(targetHeight);
         liftController.start();
+        preUpdatable.start();
     }
 
-    private void disableLiftController() {
+    public void disableLiftController() {
         liftController.stop();
-    }
-
-    public double getCurrentPivotAngle() {
-        return pivotEncoder.get();
-    }
-
-    public double getDesiredPivotAngle() {
-        return desiredPivotAngle;
-    }
-
-    public void setDesiredPivotAngle(double desiredAngle, boolean force) {
-//        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
-        if (rotationForced && !force) {
-            return;
-        }
-        if (desiredPivotAngle != desiredAngle) {
-            if (force) {
-                logger.info("Setting desired pivot angle {}", desiredAngle);
-            }
-            this.desiredPivotAngle = desiredAngle;
-            this.rotationForced = force;
-        }
-//        } else {
-//            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
-//        }
-    }
-
-    public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
-        setDesiredPivotAngle(getAnglePreset(desiredPivotAngle), true);
-    }
-
-    public double getAnglePreset(AnglePreset anglePreset) {
-        return config.anglePresets.get(anglePreset);
-    }
-
-    public double getTargetAngle() {
-        return targetAngle;
-    }
-
-    public void setTargetAngle(double angle) {
-        double safeAngle = getSafePivotAngle(angle);
-        if (safeAngle != angle) {
-            if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
-                return;
-            } else {
-                logger.warn("Target angle is unsafe with current lift conditions: {}. Moving to {}", angle, safeAngle);
-                lastAttemptedAngle = angle;
-                angle = safeAngle;
-            }
-        } else {
-            if (targetAngle == angle) {
-                return;
-            }
-        }
-        double distance = angle - getCurrentPivotAngle();
-        logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
-                angle, distance));
-        targetAngle = angle;
-        pivotController./*moveToPosition*/setSetpoint(angle);
-        pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
-    }
-
-    private void enablePivotController() {
-        setTargetAngle(0);
-        pivotController.start();
-    }
-
-    private void disablePivotController() {
-        pivotController.stop();
+        preUpdatable.stop();
     }
 
     public boolean isAtBottomLimit() {
@@ -296,21 +188,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         setDesiredHeight(getDesiredHeight() - config.bumpHeightValue, true);
     }
 
-    public void bumpPivotRight() {
-        setDesiredPivotAngle(getDesiredPivotAngle() + config.bumpPivotValue, true);
-    }
-
-    public void bumpPivotLeft() {
-        setDesiredPivotAngle(getDesiredPivotAngle() - config.bumpPivotValue, true);
-    }
-
-    public void setPivotPower(double pivotPower) {
-        if (!isPivotLocked()) {
-            pivotMotorUpdater.set(pivotPower);
-        } else {
-            pivotMotorUpdater.set(0);
-        }
-    }
 
     public boolean isAtDesiredHeight() {
         return liftController.isOnTarget();
@@ -324,26 +201,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return liftController;
     }
 
-    public Updatable getPivotController() {
-        return pivotController;
-    }
-
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(holdPowerApplier, pivotVelocity, pivotController, liftController, networkTablesUpdater);
-    }
-
-    public boolean isPivotLocked() {
-        return !pivotLockSensor.get();
-    }
-
-    public boolean isPivotInCenter() {
-        return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
-                getAnglePreset(AnglePreset.CENTER),
-                config.centerTolerance);
-    }
-
-    public void setPivotLockSolenoid(boolean lock) {
-        pivotLockSolenoid.set(lock);
+        return Arrays.asList(preUpdatable, liftController, networkTablesUpdater);
     }
 
     public void clearForceHeightFlag() {
@@ -355,13 +214,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return heightForced;
     }
 
-    public void clearForceRotationFlag() {
-        logger.debug("Clearing force rotation flag");
-        rotationForced = false;
-    }
 
     public void saveCurrentHeight() {
-        logger.info("Saving height {}", getCurrentHeight());
+        logger.debug("Saving height {}", getCurrentHeight());
         this.savedHeight = getCurrentHeight();
     }
 
@@ -369,12 +224,49 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         setDesiredHeight(savedHeight, true);
     }
 
-    public boolean isRotationForced() {
-        return rotationForced;
+    public boolean isAtHeight(double height) {
+        return Math.abs(getCurrentHeight() - height) < config.heightTolerance;
+    }
+
+    public boolean isAtHeight(HeightPreset preset) {
+        return isAtHeight(getHeightPreset(preset));
     }
 
     public boolean isAtHeight() {
-        return Math.abs(getCurrentHeight() - getDesiredHeight()) < config.heightTolerance;
+        return isAtHeight(getDesiredHeight());
+    }
+
+    public boolean isBelowHeight(double height) {
+        return getCurrentHeight() - height < config.heightTolerance;
+    }
+
+    public boolean isBelowHeight(HeightPreset preset) {
+        return isBelowHeight(getHeightPreset(preset));
+    }
+
+    public double getSafeLiftHeight(double desiredHeight) {
+        double currentLiftHeight = getCurrentHeight();
+        double needLockHeight = getHeightPreset(HeightPreset.NEED_LOCK);
+        double needCenterHeight = getHeightPreset(HeightPreset.NEED_CENTER);
+        if (!pivot.isPivotLocked()) { // if the pivot is not locked
+            if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
+                return needLockHeight; // then descend to the minimum height at which we can be unlocked
+            }
+        }
+        if (!pivot.isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
+            if (Epsilon.isEpsilonLessThan(currentLiftHeight, needCenterHeight,
+                    config.heightTolerance)) { // if we are not above the elevators
+                return getCurrentHeight(); // don't move
+            }
+            if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
+                return needCenterHeight; // then descend to the minimum height at which we can rotate
+            }
+        }
+        return desiredHeight; // if picker is all good, go wherever we need to
+    }
+
+    public List<Updatable> getMotorUpdatables() {
+        return Arrays.asList(liftMotorUpdater);
     }
 
     @Override
@@ -383,13 +275,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             case AUTONOMOUS:
             case TELEOP:
                 setDesiredHeight(getCurrentHeight(), true);
-                setDesiredAnglePreset(AnglePreset.CENTER);
-                setTargetAngle(getAnglePreset(AnglePreset.CENTER));
-                pivotController.start();
                 enableLiftController();
                 break;
             case DISABLED:
-                pivotController.stop();
                 disableLiftController();
                 break;
         }
@@ -402,13 +290,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         tests.addTest(new EncoderTest("liftEncoder", liftEncoder));
         tests.addTest(new DigitalSensorTest("limitSensorTop", limitSensorTop));
         tests.addTest(new DigitalSensorTest("limitSensorBottom", limitSensorBottom));
-        tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
-        tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
-        tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
-        tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
         tests.addTest(new MotionCalibrationTest(liftController));
-        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController, 90.0));
 
         tests.addTest(new LiftTest());
 
@@ -424,27 +307,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.liftEncoder = config.liftEncoder.create();
         this.limitSensorTop = config.limitSensorTop.create();
         this.limitSensorBottom = config.limitSensorBottom.create();
-        this.pivotMotor = config.pivotMotor.create();
-        this.pivotEncoder = config.pivotEncoder.create();
-        this.pivotLockSolenoid = config.pivotLockSolenoid.create();
-        this.pivotLockSensor = config.pivotLockSensor.create();
 
         this.liftController.configure(config.heightController);
-        this.pivotController.configure(config.pivotController);
 
         liftMotor.setName("Lift", "liftMotor");
         liftEncoder.setName("Lift", "liftEncoder");
         limitSensorTop.setName("Lift", "limitSensorTop");
         limitSensorBottom.setName("Lift", "limitSensorBottom");
-        ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
-        pivotEncoder.setName("Lift", "pivotEncoder");
 
-        pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
         liftMotorUpdater = new MotorPowerUpdater(liftMotor);
-
-        pivotUpdater = new Updater(pivotMotorUpdater);
-
-        pivotUpdater.start();
     }
 
     @Override
@@ -455,61 +326,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftEncoder.free();
         limitSensorTop.free();
         limitSensorBottom.free();
-        SpeedControllerConfig.free(pivotMotor);
-        pivotEncoder.free();
-        pivotLockSolenoid.free();
-        pivotLockSensor.free();
-
-        pivotUpdater.stop();
-
-        pivotUpdater = null; //so the GC catches these bad boys
-    }
-
-    public double getSafePivotAngle(double desiredAngle) {
-        double currentLiftHeight = getCurrentHeight();
-        double centerAngle = getAnglePreset(AnglePreset.CENTER);
-        if (currentLiftHeight < getHeightPreset(HeightPreset.NEED_LOCK)) {
-            return centerAngle;
-        }
-        if (currentLiftHeight < getHeightPreset(HeightPreset.NEED_CENTER)) {
-            double maxAngle = centerAngle + config.centerTolerance;
-            double minAngle = centerAngle - config.centerTolerance;
-            return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
-        }
-        return desiredAngle;
-    }
-
-    public double getSafeLiftHeight(double desiredHeight) {
-        double currentLiftHeight = getCurrentHeight();
-        double needLockHeight = getHeightPreset(HeightPreset.NEED_LOCK);
-        double needCenterHeight = getHeightPreset(HeightPreset.NEED_CENTER);
-        if (!isPivotLocked()) { // if the pivot is not locked
-            if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
-                return needLockHeight; // then descend to the minimum height at which we can be unlocked
-            }
-        }
-        if (!isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
-            if (Epsilon.isEpsilonLessThan(currentLiftHeight, needCenterHeight,
-                    config.heightTolerance)) { // if we are not above the elevators
-                return getCurrentHeight(); // don't move
-            }
-            if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
-                return needCenterHeight; // then descend to the minimum height at which we can rotate
-            }
-        }
-        return desiredHeight; // if picker is all good, go wherever we need to
-    }
-
-    public void setPivotControllerEnabled(boolean enabled) {
-        if (enabled) {
-            pivotController.start();
-        } else {
-            pivotController.stop();
-        }
-    }
-
-    public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(liftMotorUpdater, pivotMotorUpdater);
     }
 
     public enum HeightPreset {
@@ -523,37 +339,26 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         SCALE_HIGH;
     }
 
-    public enum AnglePreset {
-        LEFT,
-        HALF_LEFT,
-        CENTER,
-        HALF_RIGHT,
-        RIGHT;
-    }
-
     public static class Config {
         public SpeedControllerGroupConfig liftMotor;
         public EncoderConfig liftEncoder;
         public DigitalSensorConfig limitSensorTop;
         public DigitalSensorConfig limitSensorBottom;
-        public SpeedControllerConfig pivotMotor;
-        public AnalogPotentiometerConfig pivotEncoder;
-        public SolenoidConfig pivotLockSolenoid;
-        public DigitalSensorConfig pivotLockSensor;
 
         public TrapezoidalProfileFollower.Config heightController;
-        public /*TrapezoidalProfileFollower*/ StupidController.Config pivotController;
-        public double pivotHoldPower;
 
-        public Map<AnglePreset, Double> anglePresets;
         public Map<HeightPreset, Double> heightPresets;
 
         public double bumpHeightValue;
-        public double bumpPivotValue;
 
         public double heightTolerance;
-        public double angleTolerance;
-        public double centerTolerance;
+        public double homePower;
+        public double homeTolerance;
+    }
+
+    private void updateHeight() {
+        //Set the lift target height to the desired height
+        this.setTargetHeight(desiredHeight);
     }
 
     private class LiftTest extends ManualTest {
@@ -566,9 +371,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void start() {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
-            logger.info("Press B to set pivot target to joystick value. Hold Y to enable pivot profiler");
             disableLiftController();
-            disablePivotController();
         }
 
         @Override
@@ -579,17 +382,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                             * ((axisValue + 1) / 2) + config.heightController.minPosition;
                     setTargetHeight(height);
                     break;
-                case B:
-                    double angle = (config.pivotController./*maxPosition*/maxSetpoint - config.pivotController./*minPosition*/minSetpoint)
-                            * ((axisValue + 1) / 2) + config.pivotController./*minPosition*/minSetpoint;
-                    logger.info("Moving pivot to angle {}", angle);
-                    pivotController./*moveToPosition*/setSetpoint(angle);
-                    break;
                 case X:
                     enableLiftController();
-                    break;
-                case Y:
-                    enablePivotController();
                     break;
             }
         }
@@ -599,9 +393,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             switch (button) {
                 case X:
                     disableLiftController();
-                    break;
-                case Y:
-                    disablePivotController();
                     break;
             }
         }
@@ -614,8 +405,36 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void stop() {
             disableLiftController();
-            disablePivotController();
         }
     }
 
+    private class PreUpdatable extends AbstractUpdatable {
+        @Override
+        public String getName() {
+            return "Lift.preUpdatable";
+        }
+
+        @Override
+        protected void doUpdate(double delta) {
+            if (Lift.this.getCurrentHeight() < config.homeTolerance) {
+                Lift.this.liftController.setHoldPower(config.homePower);
+            } else {
+                Lift.this.liftController.setHoldPower(Lift.this.config.heightController.kHoldPower);
+            }
+            Lift.this.updateHeight();
+        }
+    }
+
+    private class NetworkTablesUpdater implements Updatable {
+        @Override
+        public String getName() {
+            return "Lift.networkTablesUpdater";
+        }
+
+        @Override
+        public void update(double delta) {
+            SmartDashboard.putNumber("liftTarget", Lift.this.getTargetHeight());
+            SmartDashboard.putBoolean("move", Lift.this.isHeightForced());
+        }
+    }
 }

@@ -3,20 +3,20 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
-import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.Pivot;
 
 public class PivotAnglePreset extends Command implements Configurable<PivotAnglePreset.Config> {
     private Config config;
-    private Lift lift;
+    private Pivot pivot;
 
     public PivotAnglePreset(TatorRobot robot) {
         super("PivotAnglePreset");
-        lift = robot.getSubsystems().getLift();
+        pivot = robot.getSubsystems().getPivot();
     }
 
     @Override
     protected void initialize() {
-        lift.setDesiredAnglePreset(config.preset);
+        pivot.setDesiredAnglePreset(config.preset);
     }
 
     @Override
@@ -35,6 +35,6 @@ public class PivotAnglePreset extends Command implements Configurable<PivotAngle
     }
 
     public static class Config {
-        public Lift.AnglePreset preset;
+        public Pivot.AnglePreset preset;
     }
 }

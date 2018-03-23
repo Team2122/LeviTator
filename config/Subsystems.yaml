@@ -64,6 +64,7 @@ lift:
   liftEncoder: { aChannel: 4, bChannel: 5, reverse: false, distancePerPulse: 0.05249 }
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
+<<<<<<< HEAD
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
@@ -72,6 +73,8 @@ lift:
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
+=======
+>>>>>>> Separated pivot and lift
 
   heightController:
     kpP: 0.3
@@ -91,6 +94,32 @@ lift:
     travelVelocity: 80.0
     endVelocity: 0.0
 #    logData: true
+
+  pivotHoldPower: 0.15
+
+  heightPresets:
+    HOME: 0
+    PICK: 0
+    NEED_LOCK: 6
+    SWITCH_LOW: 12
+    NEED_CENTER: 46
+    SWITCH: 46
+    SCALE_LOW: 58
+    SCALE_HIGH: 70
+
+  bumpHeightValue: 5
+  heightTolerance: 2.0
+  homeTolerance: 1.0
+  homePower: -0.1
+pivot:
+  pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
+  pivotEncoder: {
+    channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
+    averageBits: 4, oversampleBits: 4,
+    offset: -3.8
+  }
+  pivotLockSolenoid: { channel: 1 }
+  pivotLockSensor: { channel: 16, type: PNP }
 
   pivotController:
 #    kpP: 0.04 # 0.04
@@ -115,28 +144,15 @@ lift:
     endRamp: 20.0
 #    logData: true
 
-  pivotHoldPower: 0.15
-
   anglePresets:
     LEFT: -88
     HALF_LEFT: -45
     CENTER: 0
     HALF_RIGHT: 45
     RIGHT: 85
-  heightPresets:
-    HOME: 0
-    PICK: 0
-    NEED_LOCK: 6
-    SWITCH_LOW: 12
-    NEED_CENTER: 46
-    SWITCH: 46
-    SCALE_LOW: 58
-    SCALE_HIGH: 70
 
-  bumpHeightValue: 5
   bumpPivotValue: 15
 
-  heightTolerance: 2.0
   angleTolerance: 4.0
   centerTolerance: 15.0
 auto:

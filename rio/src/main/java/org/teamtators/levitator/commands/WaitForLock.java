@@ -2,23 +2,23 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
-import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.Pivot;
 
 public class WaitForLock extends Command {
-    private Lift lift;
+    private Pivot pivot;
 
     public WaitForLock(TatorRobot robot) {
         super("WaitForLock");
-        this.lift = robot.getSubsystems().getLift();
+        this.pivot = robot.getSubsystems().getPivot();
     }
 
     @Override
     protected void initialize() {
-        logger.info("Waiting for center");
+        logger.info("Waiting for pivot to lock");
     }
 
     @Override
     protected boolean step() {
-        return lift.isPivotLocked();
+        return pivot.isPivotLocked();
     }
 }

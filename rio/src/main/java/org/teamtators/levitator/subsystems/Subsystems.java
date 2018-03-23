@@ -27,6 +27,7 @@ public class Subsystems extends SubsystemsBase
     private Drive drive;
     private Picker picker;
     private Lift lift;
+    private Pivot pivot;
     private Auto auto;
     private Vision vision;
     private Climber climber;
@@ -36,10 +37,12 @@ public class Subsystems extends SubsystemsBase
         drive = new Drive();
         picker = new Picker();
         lift = new Lift();
+        pivot = new Pivot();
+        lift.linkTo(pivot);
         auto = new Auto(robot);
         vision = new Vision(drive);
         climber = new Climber();
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, climber);
+        subsystems = Arrays.asList(oi, drive, picker, lift, pivot, auto, vision, climber);
 
         updatables = new ArrayList<>();
         motorUpdatables = new ArrayList<>();
@@ -78,15 +81,18 @@ public class Subsystems extends SubsystemsBase
         drive.configure(config.drive);
         picker.configure(config.picker);
         lift.configure(config.lift);
+        pivot.configure(config.pivot);
         auto.configure(config.auto);
         vision.configure(config.vision);
         climber.configure(config.climber);
 
         updatables.addAll(drive.getUpdatables());
+        updatables.addAll(pivot.getUpdatables());
         updatables.addAll(lift.getUpdatables());
 
         motorUpdatables.addAll(picker.getMotorUpdatables());
         motorUpdatables.addAll(lift.getMotorUpdatables());
+        motorUpdatables.addAll(pivot.getMotorUpdatables());
         motorUpdatables.addAll(climber.getMotorUpdatables());
     }
 
@@ -97,6 +103,7 @@ public class Subsystems extends SubsystemsBase
         drive.deconfigure();
         picker.deconfigure();
         lift.deconfigure();
+        pivot.deconfigure();
         auto.deconfigure();
         vision.deconfigure();
         climber.deconfigure();
@@ -115,6 +122,10 @@ public class Subsystems extends SubsystemsBase
 
     public Lift getLift() {
         return lift;
+    }
+
+    public Pivot getPivot() {
+        return pivot;
     }
 
     public OperatorInterface getOI() {
@@ -146,6 +157,7 @@ public class Subsystems extends SubsystemsBase
         public Drive.Config drive;
         public Picker.Config picker;
         public Lift.Config lift;
+        public Pivot.Config pivot;
         public Auto.Config auto;
         public Vision.Config vision;
         public Climber.Config climber;

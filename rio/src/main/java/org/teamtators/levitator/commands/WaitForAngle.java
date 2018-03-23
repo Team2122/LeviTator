@@ -3,15 +3,15 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
-import org.teamtators.levitator.subsystems.Lift;
+import org.teamtators.levitator.subsystems.Pivot;
 
 public class WaitForAngle extends Command implements Configurable<WaitForAngle.Config> {
-    private Lift lift;
+    private Pivot pivot;
     private Config config;
 
     public WaitForAngle(TatorRobot robot) {
         super("WaitForCenter");
-        this.lift = robot.getSubsystems().getLift();
+        this.pivot = robot.getSubsystems().getPivot();
     }
 
     @Override
@@ -21,11 +21,11 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
 
     @Override
     protected boolean step() {
-        double desiredAngle = lift.getDesiredPivotAngle();
+        double desiredAngle = pivot.getDesiredPivotAngle();
         if (config.preset != null) {
-            desiredAngle = lift.getAnglePreset(config.preset);
+            desiredAngle = pivot.getAnglePreset(config.preset);
         }
-        return Math.abs(lift.getCurrentPivotAngle() - desiredAngle) <= config.tolerance;
+        return Math.abs(pivot.getCurrentPivotAngle() - desiredAngle) <= config.tolerance;
     }
 
     @Override
@@ -35,6 +35,6 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
 
     public static class Config {
         public double tolerance;
-        public Lift.AnglePreset preset;
+        public Pivot.AnglePreset preset;
     }
 }
