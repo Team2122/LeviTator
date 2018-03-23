@@ -1,8 +1,6 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.BooleanSampler;
-import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.levitator.TatorRobot;
@@ -15,8 +13,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private TatorRobot robot;
     private Lift lift;
     private Pivot pivot;
-    private double desiredHeight;
-    private double desiredPivotAngle;
     private Config config;
     private OperatorInterface operatorInterface;
 
@@ -40,16 +36,13 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     protected boolean step() {
         boolean isTeleop = robot.getState() == RobotState.TELEOP;
         if (isTeleop) {
-            updateSlider(operatorInterface.getSliderValue());
-            updateKnob(operatorInterface.getPivotKnob() * 90);
+            updateSlider(operatorInterface.getSliderHeight());
+            updateKnob(operatorInterface.getPivotKnob());
         }
         return false;
     }
 
     private void updateKnob(double knobAngle) {
-        if (Math.abs(knobAngle) < 4) {
-            knobAngle = 0;
-        }
         if(pivot.isRotationForced() &&
                 Math.abs(knobAngle - pivot.getDesiredPivotAngle()) < config.knobTolerance) {
             pivot.clearForceRotationFlag();
@@ -57,28 +50,23 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         boolean allowKnob = !pivot.isRotationForced();
         if (allowKnob) {
             pivot.setDesiredPivotAngle(knobAngle, false);
-            desiredPivotAngle = pivot.getDesiredPivotAngle();
         }
     }
 
-    private void updateSlider(double sliderValue) {
+    private void updateSlider(double sliderHeight) {
         boolean atHeight = lift.isAtHeight();
 
+        double heightDelta = Math.abs(lift.getDesiredHeight() - sliderHeight);
         if (atHeight && lift.isHeightForced()) {
-            double knobDelta = Math.abs(lift.getDesiredHeight() - lift.sliderToHeight(sliderValue));
-            //logger.info("Abs {} Tolerance?: {}", knobDelta, config.sliderTolerance);
-            if (knobDelta < config.sliderTolerance) {
+            //logger.info("Abs {} Tolerance?: {}", heightDelta, config.sliderTolerance);
+            if (heightDelta < config.sliderTolerance) {
                 lift.clearForceHeightFlag();
             }
         }
 
-        desiredHeight = lift.getDesiredHeight();
-        desiredPivotAngle = pivot.getDesiredPivotAngle();
         boolean allowSlider = !lift.isHeightForced();
-        double sliderDelta = Math.abs(lift.getTargetHeight() - lift.sliderToHeight(sliderValue));
-        if (allowSlider && sliderDelta > config.sliderThreshold) {
-            lift.setDesiredHeight(lift.sliderToHeight(sliderValue), false);
-            desiredHeight = lift.getDesiredHeight();
+        if (allowSlider && heightDelta > config.sliderThreshold) {
+            lift.setDesiredHeight(sliderHeight, false);
         }
     }
 

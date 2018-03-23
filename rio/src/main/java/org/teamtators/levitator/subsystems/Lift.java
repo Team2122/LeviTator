@@ -193,10 +193,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return liftController.isOnTarget();
     }
 
-    public double sliderToHeight(double slider) {
-        return ((slider + 1) / 2) * config.heightController.maxPosition;
-    }
-
     public TrapezoidalProfileFollower getLiftController() {
         return liftController;
     }

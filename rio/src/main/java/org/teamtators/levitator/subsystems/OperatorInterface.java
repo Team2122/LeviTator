@@ -2,6 +2,7 @@ package org.teamtators.levitator.subsystems;
 
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.controllers.*;
+import org.teamtators.common.math.LinearInterpolationFunction;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
@@ -15,6 +16,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
     private RawController gunnerSecondary = new RawController("gunnerSecondary");
     private RawController slider = new RawController("slider");
     private List<Controller<?, ?>> controllers;
+    private Config config;
 
     public OperatorInterface() {
         super("Operator Interface");
@@ -29,12 +31,24 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return -driverJoystick.getAxisValue(LogitechF310.Axis.RIGHT_STICK_Y);
     }
 
-    public double getSliderValue() {
+    public double getSliderValueRaw() {
         return slider.getRawAxisValue(0);
     }
 
-    public double getPivotKnob() {
+    public double getSliderHeight() {
+        return config.sliderFunction.calculate(getSliderValueRaw());
+    }
+
+    public double getPivotKnobRaw() {
         return slider.getRawAxisValue(1);
+    }
+
+    public double getPivotKnob() {
+        double knobAngle = getPivotKnobRaw() * config.knobRange;
+        if (Math.abs(knobAngle) < config.knobDeadzone) {
+            return 0;
+        }
+        return knobAngle;
     }
 
     public double getReleasePower() {
@@ -44,6 +58,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
     @Override
     public void configure(Config config) {
         super.configure();
+        this.config = config;
         driverJoystick.configure(config.driverJoystick);
         gunnerJoystick.configure(config.gunnerJoystick);
         gunnerSecondary.configure(config.gunnerSecondary);
@@ -81,6 +96,9 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         public ButtonBoardFingers.Config gunnerJoystick;
         public RawController.Config gunnerSecondary;
         public RawController.Config slider;
+        public double knobRange;
+        public double knobDeadzone;
+        public LinearInterpolationFunction sliderFunction;
     }
 
     private class OITest extends ManualTest {

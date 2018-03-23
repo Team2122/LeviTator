@@ -3,6 +3,9 @@ operatorInterface:
   gunnerJoystick: { port: 1 }
   gunnerSecondary: { port: 2 }
   slider: { port: 3 }
+  knobRange: 90
+  knobDeadzone: 4
+  sliderFunction: { minX: -1, minY: 0, maxX: 1, maxY: 85 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
   leftEncoder: { aChannel: 0, bChannel: 1, reverse: true, distancePerPulse: .0471238898}
