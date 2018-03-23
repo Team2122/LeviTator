@@ -25,18 +25,22 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     private SpeedController pivotMotor;
     private MotorPowerUpdater pivotMotorUpdater;
-    private Updater pivotUpdater;
+    private AbstractUpdatable pivotUpdatable;
     private AnalogPotentiometer pivotEncoder;
     private Solenoid pivotLockSolenoid;
     private DigitalSensor pivotLockSensor;
 
     private /*TrapezoidalProfileFollower*/ StupidController pivotController;
     private InputDerivative pivotVelocity;
+    private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
     private double desiredPivotAngle;
     private double targetAngle;
     private double lastAttemptedAngle;
     private boolean rotationForced = false;
+    private boolean locking;
+    private double sweepTarget;
+    private Timer sweepTimer = new Timer();
 
     private Config config;
 
@@ -50,6 +54,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotController.setInputProvider(this::getCurrentPivotAngle);
         pivotController.setOutputConsumer(this::setPivotPower);
 //        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
+
+        pivotUpdatable = new PivotUpdatable();
     }
 
     public Lift getLift() {
@@ -122,10 +128,12 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void enablePivotController() {
         pivotController.start();
+        pivotUpdatable.start();
     }
 
     public void disablePivotController() {
         pivotController.stop();
+        pivotUpdatable.stop();
     }
 
     public void bumpPivotRight() {
@@ -150,17 +158,26 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(pivotVelocity, pivotController);
+        return Arrays.asList(pivotVelocity, pivotUpdatable, pivotController);
+    }
+
+    public boolean isPivotLockedRaw() {
+        return !pivotLockSensor.get();
     }
 
     public boolean isPivotLocked() {
-        return !pivotLockSensor.get();
+        return locked.get();
     }
 
     public boolean isPivotInCenter() {
         return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
                 getAnglePreset(AnglePreset.CENTER),
                 config.centerTolerance);
+    }
+
+    public boolean isLockable() {
+        double currentAngle = getCurrentPivotAngle();
+        return currentAngle > -config.lockAngle && currentAngle < config.lockAngle;
     }
 
     public void setPivotLockSolenoid(boolean lock) {
@@ -171,6 +188,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         logger.debug("Clearing force rotation flag");
         rotationForced = false;
     }
+
     public boolean isRotationForced() {
         return rotationForced;
     }
@@ -235,14 +253,12 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         this.pivotController.configure(config.pivotController);
 
+        locked.setPeriod(config.lockedPeriod);
+
         ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
         pivotEncoder.setName("Lift", "pivotEncoder");
 
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
-
-        pivotUpdater = new Updater(pivotMotorUpdater);
-
-        pivotUpdater.start();
     }
 
     @Override
@@ -253,12 +269,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotEncoder.free();
         pivotLockSolenoid.free();
         pivotLockSensor.free();
-
-        pivotUpdater.stop();
-
-        pivotUpdater = null; //so the GC catches these bad boys
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
         public AnalogPotentiometerConfig pivotEncoder;
@@ -274,8 +287,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         public double angleTolerance;
         public double centerTolerance;
+
+        public double pivotSweepPower;
+        public double startSweepAngle;
+        public double sweepTimeoutSeconds;
+        public double lockedPeriod;
+        public double lockAngle;
     }
 
+    @SuppressWarnings("unused")
     public enum AnglePreset {
         LEFT,
         HALF_LEFT,
@@ -329,6 +349,81 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         @Override
         public void stop() {
             disablePivotController();
+        }
+    }
+
+    private class PivotUpdatable extends AbstractUpdatable {
+        PivotUpdatable() {
+            super("Pivot.pivotUpdatable");
+        }
+
+        @Override
+        public void doUpdate(double delta) {
+            Pivot pivot = Pivot.this;
+            double centerAngle = pivot.getAnglePreset(AnglePreset.CENTER);
+            double currentAngle = pivot.getCurrentPivotAngle();
+            double safePivotAngle = pivot.getSafePivotAngle(desiredPivotAngle);
+            boolean isWithinLockAngle = isLockable();
+            if ((safePivotAngle != centerAngle || !isWithinLockAngle) && locking) {
+                locking = false;
+                logger.debug("Moving away from center, disengaging lock");
+            }
+            if (locking) {
+                //Extend the solenoid to lock
+                pivot.setPivotLockSolenoid(true);
+                if (sweepTarget == 0) {
+                    pivot.setPivotPower(0.0);
+                } else {
+                    //Check if this is the first step of locking or we overshot our target
+                    if (sweepTarget > 0 ? (currentAngle >= sweepTarget) : (currentAngle <= sweepTarget)) {
+                        logger.warn("Pivot sweep missed lock, sweeping other direction");
+                        sweepTarget = -sweepTarget;
+                    }
+                    //Apply the configured power with a sign that is the same as our target (i.e. positive power moves right, increasing angle)
+                    pivot.setPivotPower(config.pivotSweepPower * Math.signum(sweepTarget));
+                    //If our solenoid is locked in or the timer ran out
+                }
+                if (sweepTarget != 0) {
+                    if (locked.get()) {
+                        //Reset sweep target
+                        logger.debug("Pivot locked");
+                        sweepTarget = 0;
+                    } else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
+                        logger.warn("Pivot could not lock, timeout elapsed");
+                    }
+                } else {
+                    if (!pivot.isPivotLocked()) {
+                        sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
+                    }
+                }
+            } else {
+                //Retract the solenoid
+                pivot.setPivotLockSolenoid(false);
+                //If we want to go to center and we're within the range of locking
+                if (safePivotAngle == centerAngle) {
+                    boolean isWithinSweepAngle = currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle;
+                    if (isWithinSweepAngle) {
+                        logger.debug("Pivot moving center, will engage lock");
+                        //Start locking
+                        locking = true;
+                        sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
+                        //Disable PID
+                        pivot.disablePivotController();
+                        //Start the timer
+                        sweepTimer.restart();
+                    } else {
+                        pivot.enablePivotController();
+                        pivot.setTargetAngle(0);
+                    }
+                }
+                //If we want to go somewhere other than the center
+                else {
+                    //Enable the PID Controller
+                    pivot.enablePivotController();
+                    //Set the pivot target angle to the desired angle
+                    pivot.setTargetAngle(desiredPivotAngle);
+                }
+            }
         }
     }
 }

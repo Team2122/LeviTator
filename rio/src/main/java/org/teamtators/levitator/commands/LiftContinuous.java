@@ -17,11 +17,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Pivot pivot;
     private double desiredHeight;
     private double desiredPivotAngle;
-    private boolean locking;
-    private double sweepTarget;
-    private Timer sweepTimer = new Timer();
     private Config config;
-    private BooleanSampler locked = new BooleanSampler(() -> pivot.isPivotLocked());
     private OperatorInterface operatorInterface;
 
     public LiftContinuous(TatorRobot robot) {
@@ -37,6 +33,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     protected void initialize() {
         super.initialize();
         lift.enableLiftController();
+        pivot.enablePivotController();
     }
 
     @Override
@@ -46,7 +43,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             updateSlider(operatorInterface.getSliderValue());
             updateKnob(operatorInterface.getPivotKnob() * 90);
         }
-        updatePivot();
         return false;
     }
 
@@ -86,93 +82,21 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         }
     }
 
-    private void updatePivot() {
-        double centerAngle = pivot.getAnglePreset(Pivot.AnglePreset.CENTER);
-        double currentAngle = pivot.getCurrentPivotAngle();
-        double safePivotAngle = pivot.getSafePivotAngle(desiredPivotAngle);
-        boolean isWithinLockAngle = currentAngle > -config.lockAngle && currentAngle < config.lockAngle;
-        if ((safePivotAngle != centerAngle || !isWithinLockAngle) && locking) {
-            locking = false;
-            logger.debug("Moving away from center, disengaging lock");
-        }
-        if (locking) {
-            //Extend the solenoid to lock
-            pivot.setPivotLockSolenoid(true);
-            if (sweepTarget == 0) {
-                pivot.setPivotPower(0.0);
-            } else {
-                //Check if this is the first step of locking or we overshot our target
-                if (sweepTarget > 0 ? (currentAngle >= sweepTarget) : (currentAngle <= sweepTarget)) {
-                    logger.warn("Pivot sweep missed lock, sweeping other direction");
-                    sweepTarget = -sweepTarget;
-                }
-                //Apply the configured power with a sign that is the same as our target (i.e. positive power moves right, increasing angle)
-                pivot.setPivotPower(config.pivotSweepPower * Math.signum(sweepTarget));
-                //If our solenoid is locked in or the timer ran out
-            }
-            if (sweepTarget != 0) {
-                if (locked.get()) {
-                    //Reset sweep target
-                    logger.debug("Pivot locked");
-                    sweepTarget = 0;
-                } else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
-                    logger.warn("Pivot could not lock, timeout elapsed");
-                }
-            } else {
-                if (!pivot.isPivotLocked()) {
-                    sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
-                }
-            }
-        } else {
-            //Retract the solenoid
-            pivot.setPivotLockSolenoid(false);
-            //If we want to go to center and we're within the range of locking
-            if (safePivotAngle == centerAngle) {
-                boolean isWithinSweepAngle = currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle;
-                if (isWithinSweepAngle) {
-                    logger.debug("Pivot moving center, will engage lock");
-                    //Start locking
-                    locking = true;
-                    sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
-                    //Disable PID
-                    pivot.disablePivotController();
-                    //Start the timer
-                    sweepTimer.restart();
-                } else {
-                    pivot.enablePivotController();
-                    pivot.setTargetAngle(0);
-                }
-            }
-            //If we want to go somewhere other than the center
-            else {
-                //Enable the PID Controller
-                pivot.enablePivotController();
-                //Set the pivot target angle to the desired angle
-                pivot.setTargetAngle(desiredPivotAngle);
-            }
-        }
-    }
-
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
         lift.disableLiftController();
+        pivot.disablePivotController();
     }
 
     @Override
     public void configure(Config config) {
         this.config = config;
-        locked.setPeriod(config.lockedPeriod);
     }
 
     public static class Config {
-        public double pivotSweepPower;
-        public double startSweepAngle;
-        public double sweepTimeoutSeconds;
-        public double lockedPeriod;
         public double sliderTolerance;
         public double sliderThreshold;
         public double knobTolerance;
-        public double lockAngle;
     }
 }
