@@ -67,17 +67,6 @@ lift:
   liftEncoder: { aChannel: 4, bChannel: 5, reverse: false, distancePerPulse: 0.05249 }
   limitSensorTop: { channel: 11, type: NPN }
   limitSensorBottom: { channel: 10, type: NPN }
-<<<<<<< HEAD
-  pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: {
-    channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
-    averageBits: 4, oversampleBits: 4,
-    offset: 98
-  }
-  pivotLockSolenoid: { channel: 1 }
-  pivotLockSensor: { channel: 16, type: PNP }
-=======
->>>>>>> Separated pivot and lift
 
   heightController:
     kpP: 0.3
@@ -119,7 +108,7 @@ pivot:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: -3.8
+    offset: 98
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
