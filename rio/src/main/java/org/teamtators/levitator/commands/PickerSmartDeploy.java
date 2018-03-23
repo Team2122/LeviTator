@@ -4,6 +4,7 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
+import org.teamtators.levitator.subsystems.Lift;
 import org.teamtators.levitator.subsystems.OperatorInterface;
 import org.teamtators.levitator.subsystems.Picker;
 
@@ -17,12 +18,14 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     private boolean isQuick;
     private DeployPower powerName;
     private Config.PowerConfig powerConfig;
+    private Lift lift;
 
     public PickerSmartDeploy(TatorRobot robot) {
         super("PickerSmartDeploy");
         this.picker = robot.getSubsystems().getPicker();
         this.oi = robot.getSubsystems().getOI();
         requires(picker);
+        this.lift = robot.getSubsystems().getLift();
     }
 
     @Override
@@ -44,7 +47,10 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
         int powerIdx = (int) (((sliderValue + 1.0) / 2.0) * numPowers);
         powerIdx = Math.max(0, Math.min(numPowers - 1, powerIdx));
         DeployPower powerName = DeployPower.values()[powerIdx];
-        if (this.powerName != powerName) {
+        if (lift.getCurrentHeight() <= config.minHeight) {
+            powerConfig = config.switchPower;
+        }
+        if (this.powerName != powerName && powerConfig != config.switchPower) {
             this.powerName = powerName;
             powerConfig = config.powers.get(powerName);
             if (isQuick) {
@@ -106,6 +112,9 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
             public double timeToKick;
             public double timeBeforeRetract;
         }
+        public PowerConfig switchPower;
         public Map<DeployPower, PowerConfig> powers;
+        public double minHeight;
     }
+
 }
