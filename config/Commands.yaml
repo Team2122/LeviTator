@@ -103,6 +103,7 @@ $PrepareLiftMovement:
 LiftContinuous:
   pivotSweepPower: 0.2
   startSweepAngle: 5.0
+  lockAngle: 30
   sweepTimeoutSeconds: 5.0
   lockedPeriod: 0.1
   sliderTolerance: 2

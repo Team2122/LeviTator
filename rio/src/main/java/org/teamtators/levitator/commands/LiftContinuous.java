@@ -69,7 +69,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             desiredPivotAngle = lift.getDesiredPivotAngle();
         }
         double safePivotAngle = lift.getSafePivotAngle(desiredPivotAngle);
-        if (safePivotAngle != centerAngle && locking) {
+        boolean isWithinLockAngle = currentAngle > -config.lockAngle && currentAngle < config.lockAngle;
+        if ((safePivotAngle != centerAngle || !isWithinLockAngle) &&  locking) {
             locking = false;
             logger.debug("Moving away from center, disengaging lock");
         }
@@ -106,7 +107,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             lift.setPivotLockSolenoid(false);
             //If we want to go to center and we're within the range of locking
             if (safePivotAngle == centerAngle) {
-                if (currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle) {
+                boolean isWithinSweepAngle = currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle;
+                if (isWithinSweepAngle) {
                     logger.debug("Pivot moving center, will engage lock");
                     //Start locking
                     locking = true;
@@ -148,5 +150,6 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         public double sliderTolerance;
         public double sliderThreshold;
         public double knobTolerance;
+        public double lockAngle;
     }
 }

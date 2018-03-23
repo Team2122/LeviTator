@@ -15,7 +15,8 @@ public class LiftRecall extends Command {
     public void initialize() {
         logger.info("Recalling pivot");
         lift.clearForceRotationFlag();
-        lift.recallHeight();
+        lift.clearForceHeightFlag();
+//        lift.recallHeight();
     }
 
     @Override

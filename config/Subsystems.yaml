@@ -110,7 +110,7 @@ lift:
     target: { within: 3.0 }
     minSetpoint: -90.0
     maxSetpoint: 90.0
-    maxAcceleration: 0.8
+    maxAcceleration: 1.2
     movePower: 0.4
     endRamp: 20.0
 #    logData: true
@@ -138,7 +138,7 @@ lift:
 
   heightTolerance: 2.0
   angleTolerance: 4.0
-  centerTolerance: 20.0
+  centerTolerance: 15.0
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
   defaultChoice: "LineCrossAuto"

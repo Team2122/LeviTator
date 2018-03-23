@@ -168,9 +168,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setTargetHeight(double height) {
-        if (targetHeight == height) {
-            return;
-        }
         double safeHeight = getSafeLiftHeight(height);
         if (safeHeight != height) {
             if (targetHeight == safeHeight && lastAttemptedHeight == height) {
@@ -180,6 +177,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                         height, safeHeight);
                 lastAttemptedHeight = height;
                 height = safeHeight;
+            }
+        } else {
+            if (targetHeight == height) {
+                return;
             }
         }
         double distance = height - getCurrentHeight();
@@ -237,9 +238,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public void setTargetAngle(double angle) {
-        if (targetAngle == angle) {
-            return;
-        }
         double safeAngle = getSafePivotAngle(angle);
         if (safeAngle != angle) {
             if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
@@ -248,6 +246,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 logger.warn("Target angle is unsafe with current lift conditions: {}. Moving to {}", angle, safeAngle);
                 lastAttemptedAngle = angle;
                 angle = safeAngle;
+            }
+        } else {
+            if (targetAngle == angle) {
+                return;
             }
         }
         double distance = angle - getCurrentPivotAngle();
@@ -466,14 +468,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     public double getSafePivotAngle(double desiredAngle) {
         double currentLiftHeight = getCurrentHeight();
         double centerAngle = getAnglePreset(AnglePreset.CENTER);
-        if (Epsilon.isEpsilonLessThan(currentLiftHeight,
-                getHeightPreset(HeightPreset.NEED_LOCK),
-                config.heightTolerance)) {
+        if (currentLiftHeight < getHeightPreset(HeightPreset.NEED_LOCK)) {
             return centerAngle;
         }
-        if (Epsilon.isEpsilonLessThan(currentLiftHeight,
-                getHeightPreset(HeightPreset.NEED_CENTER),
-                config.heightTolerance)) {
+        if (currentLiftHeight < getHeightPreset(HeightPreset.NEED_CENTER)) {
             double maxAngle = centerAngle + config.centerTolerance;
             double minAngle = centerAngle - config.centerTolerance;
             return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
