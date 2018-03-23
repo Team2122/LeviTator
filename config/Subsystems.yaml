@@ -147,6 +147,12 @@ pivot:
 
   angleTolerance: 4.0
   centerTolerance: 15.0
+
+  pivotSweepPower: 0.2
+  startSweepAngle: 5.0
+  lockAngle: 30
+  sweepTimeoutSeconds: 5.0
+  lockedPeriod: 0.1
 auto:
   autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
   defaultChoice: "LineCrossAuto"
