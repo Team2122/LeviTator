@@ -25,7 +25,7 @@ DATE: 3/17/2018
 
 #define TOUCH_SENSOR 3
 #define LIFT_SLIDER 5
-#define POWER_SLIDER 17
+#define POWER_SLIDER 18
 //#define DEBUG
 #ifdef DEBUG
 #define ENABLE_LOGGING
@@ -33,11 +33,11 @@ DATE: 3/17/2018
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
 #define ERROR_MARGIN 0.003
-#define CPR 96.0
+#define CPR 48[]\.0
 
 const int BUTTON_PORTS[] = {};
 const int NUM_BUTTONS = 0;
-const double DETENTS[] = {0, 0.145, 0.554, 0.699, 0.843};
+const double DETENTS[] = {0, 0.145, 0.58, 0.699, 0.843};
 const int DETENTS_LENGTH = 5;
 
 //PID values
@@ -91,6 +91,7 @@ void setup() {
   analogWriteResolution(WRITE_RESOLUTION);
 
   lastTime = micros();
+  serialSetpoint = 1.0 / 0.0;
   knob.write(0);
 }
 
@@ -149,7 +150,7 @@ void loop() {
           nearestDetent = i;
           bestDistance = abs(distance);
         }
-        if(abs(distance) < 0.02) {
+        if(abs(distance) < 0.015) {
           setDetent = true;
         }
       }
@@ -270,13 +271,13 @@ void loop() {
 
 
 void driveMotor(double speed) {
-  if(speed >= 0) {
-    digitalWrite(AI1, HIGH);
-    digitalWrite(AI2, LOW);
-    analogWrite(PWMA, speed * OUTPUT_CONVERSION_FACTOR);
-  } else {
+  if (speed >= 0) {
     digitalWrite(AI1, LOW);
     digitalWrite(AI2, HIGH);
+    analogWrite(PWMA, speed * OUTPUT_CONVERSION_FACTOR);
+  } else {
+    digitalWrite(AI1, HIGH);
+    digitalWrite(AI2, LOW);
     analogWrite(PWMA, -speed * OUTPUT_CONVERSION_FACTOR);
   }
 }
