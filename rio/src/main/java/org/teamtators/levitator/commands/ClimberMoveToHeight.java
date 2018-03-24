@@ -11,27 +11,27 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
 
     public ClimberMoveToHeight(TatorRobot robot) {
         super("ClimberMoveToHeight");
-        this.climber=robot.getSubsystems().getClimber();
+        this.climber = robot.getSubsystems().getClimber();
     }
 
     @Override
     protected boolean step() {
-        climber.setClimberMotorPower(config.power);
-        return Math.abs(climber.getClimberPosition()-config.height)>= config.heightTolerance;
+        climber.setPower(config.power);
+        return climber.isAtTopLimit() || Math.abs(climber.getPosition() - config.height) >= config.heightTolerance;
     }
 
     @Override
     public void configure(Config config) {
-        this.config=config;
+        this.config = config;
     }
 
-    public void finish(boolean interrupted){
+    public void finish(boolean interrupted) {
         super.finish(interrupted);
-        climber.setClimberMotorPower(0);
+        climber.setPower(0);
 
     }
 
-    public static class Config{
+    public static class Config {
         public double height;
         public double power;
         public double heightTolerance;

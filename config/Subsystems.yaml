@@ -157,9 +157,8 @@ vision:
   distanceCalculator: { a: 137.87, b: 150.78, c: 71.129 }
   fovX: 30
   yawOffset: -4.0
-elevators:
-    rightElevatorSolenoid: { channel: 4 }
-    releaser: { channel: 2 }
-    elevatorSlideSolenoid: { forwardChannel: 5, reverseChannel: 6 }
-    leftFlap: { type: VICTOR_SPX, config: { id: 6, inverted: true } }
-    leftFlapSensor: { channel: 15, type: NPN }
+climber:
+  climberMotor:
+    id:
+
+  distancePerPulse: .0666666667

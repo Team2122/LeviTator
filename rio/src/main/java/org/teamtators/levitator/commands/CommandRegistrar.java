@@ -67,5 +67,6 @@ public class CommandRegistrar {
 
 
         commandStore.registerCommand("ClimberMoveToHeight", () -> new ClimberMoveToHeight(robot));
+        commandStore.registerCommand("ClimberHome", () -> new ClimberHome(robot));
     }
 }
