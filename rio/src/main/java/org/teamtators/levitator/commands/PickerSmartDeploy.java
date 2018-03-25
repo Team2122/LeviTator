@@ -42,7 +42,8 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     }
 
     private void updatePower() {
-        if (lift.getCurrentHeight() < config.maxSwitchHeight) {
+        if (lift.getCurrentHeight() < config.maxSwitchHeight &&
+                powerConfig != config.switchPower) {
             powerConfig = config.switchPower;
             logger.info("Lift below height, using switch deploy");
         }

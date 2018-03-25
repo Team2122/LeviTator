@@ -87,18 +87,25 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
             releaseRequirements(selected.getRequirements());
             if (selected.isRunning()) {
                 if (selected.getContext() == this && selected.checkRequirements()) {
+                    logger.trace("Command was already initialized");
                     initialized = true;
                 } else {
+                    logger.trace("Command was already running, canceling");
                     selected.cancel();
                     return false;
                 }
             } else if (selected.startRun(this)) {
+                logger.trace("Command initialized");
                 initialized = true;
             }
         }
-        boolean finished = selected.step();
-        if (finished) {
-            return true;
+        if (initialized) {
+            boolean finished = selected.step();
+            if (finished) {
+                return true;
+            }
+        } else {
+            logger.trace("Command was not initialized");
         }
         if (cancel) {
             selected.finishRun(true);

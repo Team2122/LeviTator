@@ -39,7 +39,7 @@ public abstract class Command implements CommandRunContext {
 
     public void setName(String name) {
         this.name = name;
-        String loggerName = String.format("%s(%s)", this.getClass().getName(), name);
+        String loggerName = String.format("%s.(%s)", this.getClass().getName(), name);
         this.logger = LoggerFactory.getLogger(loggerName);
     }
 

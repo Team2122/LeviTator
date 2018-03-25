@@ -43,15 +43,25 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     @Override
     public void configure(Config config) {
         this.drivePath = new DrivePath();
-        for (DrivePath.Point point : config.path) {
+        for (int i = 0; i < config.path.size(); i++) {
+            DrivePath.Point point = config.path.get(i);
+            boolean isLast = i == config.path.size() - 1;
             if (Double.isNaN(point.getRadius())) {
                 point.setRadius(config.radius);
             }
             if (Double.isNaN(point.getSpeed())) {
-                point.setSpeed(config.speed);
+                if (isLast) {
+                    point.setSpeed(0);
+                } else {
+                    point.setSpeed(config.speed);
+                }
             }
             if (Double.isNaN(point.getArcSpeed())) {
-                point.setArcSpeed(config.arcSpeed);
+                if (isLast) {
+                    point.setArcSpeed(0);
+                } else {
+                    point.setArcSpeed(config.arcSpeed);
+                }
             }
             if (point.isReverse() == null) {
                 point.setReverse(config.reverse);

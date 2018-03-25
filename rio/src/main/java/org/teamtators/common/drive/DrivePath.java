@@ -178,6 +178,9 @@ public class DrivePath {
             Translation2d trans2 = null;
             double length2 = 0;
             boolean isStraight = false;
+            if (i >= numPoints - 1) {
+                isStraight = true;
+            }
             if (isRadius) {
                 DrivePath.Point point3 = points.get(i + 2);
                 trans2 = point3.getTranslation().sub(point2.getTranslation());

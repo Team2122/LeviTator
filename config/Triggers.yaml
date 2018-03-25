@@ -14,9 +14,9 @@ driver:
 #  POV_LEFT: start whenPressed BumpPivotLeft
 #  POV_RIGHT: start whenPressed BumpPivotRight
   A: start whenPressed $LiftHome
-#  START: start whenPressed PrintPose
+  START: start whenPressed PrintPose
   BACK: toggle whenPressed $TestDrive
-  START: start whenPressed $LiftScaleLow
+#  START: start whenPressed $LiftScaleLow
 #  BACK: start whenPressed $PickerReleaseMedium
 #  B: start whenPressed $LiftSwitchLow
 #  STICK_LEFT: start whenPressed PickerSwitchDeploy

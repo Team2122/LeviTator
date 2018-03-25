@@ -2,7 +2,7 @@ DriveTank:
   modifiers: { deadzone: 0.1, exponent: 2.0 }
 
 PickerPick:
-  pickPowers: { left: 1.0, right: 0.5 }
+  pickPowers: { left: 0.8, right: 0.8 }
   unjamPowers: { left: 0.25, right: -0.25 }
   holdPowers: { left: 0.15, right: 0.15 }
   jamDetectPeriod: 0.1
@@ -191,7 +191,7 @@ SetPoseRight:
 
 SetPoseCenter:
   class: SetPose
-  x: 0
+  x: 2
   y: 19
   yaw: 90
 
@@ -269,61 +269,117 @@ SlowDown:
 
 $CenterAuto:
   - SetPoseCenter
-  - { class: DriveStraight, distance: 12, speed: 100, endSpeed: 70.0 }
+  - { class: DriveStraight, distance: 12, speed: 100, endSpeed: 80.0 }
 #  - { parallel: true, name: $LiftSwitchLow }
   - { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $CenterAutoLSwitch, R: $CenterAutoRSwitch }
 
+#$CenterAutoLSwitch:
+#  - { class: DriveArc, arcLength: 55, angle: -45, speed: 100, endSpeed: 100.0 }
+#  - { class: DriveArc, arcLength: 50, angle: 0, speed: 100 }
+#  - PickerSwitchDeploy
+#  - { parallel: true, name: PickerPick }
+#  - { class: DriveStraight, angle: 0, distance: -48 }
+#  - { class: DriveRotate, angle: 60 }
+#  - { class: DriveStraight, angle: 60, distance: 44.0 }
+##  - { class: DriveArc, arcLength: -58, speed: 100, angle: 65 }
+##  - { class: DriveStraight, angle: 65, distance: 54.0 }
+#  - WaitForCube
+#  - { class: DriveStraight, angle: 60, distance: -4.0 }
+#  - { class: WaitFor, command: PickerPick }
+#  - { class: DriveStraight, angle: 60, distance: -40 }
+#  - { class: DriveRotate, angle: 0 }
+#  - { class: DriveStraight, angle: 0, distance: 50.0 }
+##  - { class: DriveStraight, angle: 65, distance: -50.0 }
+##  - { class: DriveArc, arcLength: 63, speed: 100, angle: 0 }
+#  - PickerSwitchDeploy
+#  - { parallel: true, name: PickerPick }
+##  - { class: DriveArc, arcLength: -58, speed: 100, angle: 65 }
+##  - { class: DriveStraight, angle: 65, distance: 54.0 }
+#  - { class: DriveStraight, angle: 0, distance: -36 }
+#  - { class: DriveRotate, angle: 60 }
+#  - { class: DriveStraight, angle: 60, distance: 46.0 }
+#
+#$CenterAutoRSwitch:
+#  - { class: DriveArc, arcLength: 55, angle: 48, speed: 100, endSpeed: 100.0 }
+#  - { class: DriveArc, arcLength: 55, angle: 0, speed: 100 }
+#  - PickerSwitchDeploy
+#  - { parallel: true, name: PickerPick }
+#  - { class: DriveStraight, angle: 0, distance: -48 }
+#  - { class: DriveRotate, angle: -60 }
+#  - { class: DriveStraight, angle: -60, distance: 44.0 }
+##  - { class: DriveArc, arcLength: -53, speed: 100, angle: -65 }
+##  - { class: DriveStraight, angle: -65, distance: 50.0 }
+#  - WaitForCube
+#  - { class: DriveStraight, angle: -60, distance: -4.0 }
+#  - { class: WaitFor, command: PickerPick }
+#  - { class: DriveStraight, angle: -60, distance: -40 }
+#  - { class: DriveRotate, angle: 0 }
+#  - { class: DriveStraight, angle: 0, distance: 50.0 }
+##  - { class: DriveStraight, angle: -65, distance: -50.0 }
+##  - { class: DriveArc, arcLength: 60, speed: 100, angle: 0 }
+#  - PickerSwitchDeploy
+#  - { parallel: true, name: PickerPick }
+##  - { class: DriveArc, arcLength: -53, speed: 100, angle: -65 }
+##  - { class: DriveStraight, angle: -65, distance: 50.0 }
+#  - { class: DriveStraight, angle: 0, distance: -36 }
+#  - { class: DriveRotate, angle: -60 }
+#  - { class: DriveStraight, angle: -60, distance: 42.0 }
+
 $CenterAutoLSwitch:
-  - { class: DriveArc, arcLength: 55, angle: -45, speed: 100, endSpeed: 100.0 }
-  - { class: DriveArc, arcLength: 50, angle: 0, speed: 100 }
+  - class: DrivePath
+    speed: 100
+    radius: 48
+    path:
+#      - { x: 2, y: 19 }
+      - { x: 2, y: 31 }
+      - { x: 2, y: 57 }
+      - { x: -34, y: 90 }
+      - { x: -34, y: 124 }
+  - { class: DriveStraight, angle: 0, distance: 3, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -48 }
-  - { class: DriveRotate, angle: 60 }
+  - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: 60, maxAcceleration: 600 }
   - { class: DriveStraight, angle: 60, distance: 44.0 }
-#  - { class: DriveArc, arcLength: -58, speed: 100, angle: 65 }
-#  - { class: DriveStraight, angle: 65, distance: 54.0 }
   - WaitForCube
   - { class: DriveStraight, angle: 60, distance: -4.0 }
   - { class: WaitFor, command: PickerPick }
-  - { class: DriveStraight, angle: 60, distance: -40 }
-  - { class: DriveRotate, angle: 0 }
-  - { class: DriveStraight, angle: 0, distance: 50.0 }
-#  - { class: DriveStraight, angle: 65, distance: -50.0 }
-#  - { class: DriveArc, arcLength: 63, speed: 100, angle: 0 }
+  - { class: DriveStraight, angle: 60, distance: -36, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: 0, maxAcceleration: 600 }
+  - { class: DriveStraight, angle: 0, distance: 54.0, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-#  - { class: DriveArc, arcLength: -58, speed: 100, angle: 65 }
-#  - { class: DriveStraight, angle: 65, distance: 54.0 }
-  - { class: DriveStraight, angle: 0, distance: -36 }
-  - { class: DriveRotate, angle: 60 }
-  - { class: DriveStraight, angle: 60, distance: 46.0 }
+  - { class: DriveStraight, angle: 0, distance: -34, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: 60, maxAcceleration: 600 }
+  - { class: DriveStraight, angle: 60, distance: 34.0 }
 
 $CenterAutoRSwitch:
-  - { class: DriveArc, arcLength: 55, angle: 48, speed: 100, endSpeed: 100.0 }
-  - { class: DriveArc, arcLength: 55, angle: 0, speed: 100 }
+  - class: DrivePath
+    speed: 100
+    radius: 48
+    path:
+#      - { x: 2, y: 19 }
+      - { x: 2, y: 31 }
+      - { x: 2, y: 50 }
+      - { x: 32, y: 100 }
+      - { x: 38, y: 124 }
+  - { class: DriveStraight, angle: 0, distance: 3, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -48 }
-  - { class: DriveRotate, angle: -60 }
-  - { class: DriveStraight, angle: -60, distance: 44.0 }
-#  - { class: DriveArc, arcLength: -53, speed: 100, angle: -65 }
-#  - { class: DriveStraight, angle: -65, distance: 50.0 }
+  - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: -60, maxAcceleration: 600 }
+  - { class: DriveStraight, angle: -60, distance: 36.0 }
   - WaitForCube
   - { class: DriveStraight, angle: -60, distance: -4.0 }
   - { class: WaitFor, command: PickerPick }
-  - { class: DriveStraight, angle: -60, distance: -40 }
-  - { class: DriveRotate, angle: 0 }
-  - { class: DriveStraight, angle: 0, distance: 50.0 }
-#  - { class: DriveStraight, angle: -65, distance: -50.0 }
-#  - { class: DriveArc, arcLength: 60, speed: 100, angle: 0 }
+  - { class: DriveStraight, angle: -60, distance: -32, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: 0, maxAcceleration: 600 }
+  - { class: DriveStraight, angle: 0, distance: 54.0, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-#  - { class: DriveArc, arcLength: -53, speed: 100, angle: -65 }
-#  - { class: DriveStraight, angle: -65, distance: 50.0 }
-  - { class: DriveStraight, angle: 0, distance: -36 }
-  - { class: DriveRotate, angle: -60 }
-  - { class: DriveStraight, angle: -60, distance: 42.0 }
+  - { class: DriveStraight, angle: 0, distance: -34, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: -60, maxAcceleration: 600 }
+  - { class: DriveStraight, angle: -60, distance: 34.0 }
 
 $LiftSequenceScaleLowLeft:
   - { class: WaitFor, command: PickerPick }
@@ -538,7 +594,7 @@ $AutoStartRightScaleLeftScaleLeft:
     path:
       - { x: -82, y: 226, speed: 30 }
       - { x: -82, y: 238, radius: 36, speed: 30.0 }
-      - { x: -102, y: 284, speed: 0 }
+      - { x: -102, y: 284 }
   - WaitForLeft
   - PickerAutoDeploy
   - PivotCenter
@@ -552,7 +608,7 @@ $AutoStartLeftScaleRightScaleRight:
     path:
       - { x: 82, y: 232, speed: 30.0 }
       - { x: 82, y: 244, radius: 36, speed: 20.0 }
-      - { x: 102, y: 284, speed: 0 }
+      - { x: 102, y: 284 }
   - WaitForRight
   - PickerAutoDeploy
   - PivotCenter
