@@ -102,6 +102,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
         if (initialized) {
             boolean finished = selected.step();
             if (finished) {
+                selected.finishRun(false);
                 return true;
             }
         } else {
