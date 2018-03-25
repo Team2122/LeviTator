@@ -39,15 +39,13 @@ gunner:
   RIGHT_INDEX: start whenPressed $LiftSwitchLow
   RIGHT_MIDDLE: start whenPressed $LiftScaleLow
   RIGHT_RING: toggle whenPressed PickerSmartDeploy
-#  RIGHT_PINKY: start afterHeld ElevatorsDeploy
+  RIGHT_PINKY:
+    - start whenPressed ClimberRelease
+    - start whenReleased ClimberUnrelease
 gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
-#  2: start whenPressed $TestDrive
-#  3: start whenPressed PrintPose
-#  2: start whenPressed BumpLiftUp
-#  3: start whenPressed BumpLiftDown
-  2: start whenPressed ClimberHome
-  3: start whenPressed LiftRecall
+  2: toggle whenPressed ClimberOverBar
+  3: toggle whenPressed ClimberSubBar
   4: toggle whenPressed PickerPick
   5: start whenPressed PickerRetract
   6: start whenPressed BumpPivotLeft

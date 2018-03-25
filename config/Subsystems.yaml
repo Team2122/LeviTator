@@ -87,8 +87,6 @@ lift:
     endVelocity: 0.0
 #    logData: true
 
-  pivotHoldPower: 0.15
-
   heightPresets:
     HOME: 0
     PICK: 0
@@ -135,7 +133,7 @@ pivot:
     movePower: 0.4
     endRamp: 20.0
 #    logData: true
-
+  pivotHoldPower: 0.15
   anglePresets:
     LEFT: -88
     HALF_LEFT: -45

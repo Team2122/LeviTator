@@ -4,22 +4,27 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.MotorPowerUpdater;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
+import org.teamtators.common.scheduler.Command;
+import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
+import org.teamtators.levitator.TatorRobot;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
+    private final TatorRobot robot;
     private WPI_TalonSRX climberMotor;
     private WPI_VictorSPX slaveMotor;
 //    private MotorPowerUpdater climberMotorUpdater;
@@ -27,9 +32,11 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private DigitalSensor bottomLimit;
     private Solenoid releaser;
     private Config config;
+    private boolean homed;
 
-    public Climber() {
+    public Climber(TatorRobot robot) {
         super("Climber");
+        this.robot = robot;
     }
 
     public void setPower(double power) {
@@ -66,12 +73,22 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         releaser.set(true);
     }
 
-    public void retract() {
+    public void unrelease() {
         releaser.set(false);
     }
 
     public List<MotorPowerUpdater> getMotorUpdatables() {
         return Arrays.asList(/*climberMotorUpdater*/);
+    }
+
+    @Override
+    public void onEnterRobotState(RobotState state) {
+//        if (!homed) {
+//            Command homeCommand = robot.getCommandStore().getCommand("ClimberHome");
+//            if (homeCommand != null) {
+//                robot.getScheduler().startCommand(homeCommand);
+//            }
+//        }
     }
 
     @Override
@@ -89,6 +106,8 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         topLimit.setName("Climber", "topLimit");
         bottomLimit.setName("Climber", "bottomLimit");
         releaser.setName("Climber", "releaser");
+
+        homed = false;
     }
 
     @Override

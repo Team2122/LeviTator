@@ -146,7 +146,7 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
         driverStation = DriverStation.getInstance();
 
         LiveWindow.add(pdp);
-        LiveWindow.disableTelemetry(pdp);
+//        LiveWindow.disableTelemetry(pdp);
 
         SubsystemsBase subsystems = getSubsystemsBase();
         logger.debug("Configuring subsystems");

@@ -41,7 +41,7 @@ public class Subsystems extends SubsystemsBase
         lift.linkTo(pivot);
         auto = new Auto(robot);
         vision = new Vision(drive);
-        climber = new Climber();
+        climber = new Climber(robot.getCommandStore());
         subsystems = Arrays.asList(oi, drive, picker, lift, pivot, auto, vision, climber);
 
         updatables = new ArrayList<>();

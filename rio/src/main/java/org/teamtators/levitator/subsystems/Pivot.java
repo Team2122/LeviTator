@@ -255,8 +255,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         locked.setPeriod(config.lockedPeriod);
 
-        ((Sendable) pivotMotor).setName("Lift", "pivotMotor");
-        pivotEncoder.setName("Lift", "pivotEncoder");
+        ((Sendable) pivotMotor).setName("Pivot", "pivotMotor");
+        pivotEncoder.setName("Pivot", "pivotEncoder");
+        pivotLockSolenoid.setName("Pivot", "pivotLockSolenoid");
+        pivotLockSensor.setName("Pivot", "pivotLockSensor");
 
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
     }
