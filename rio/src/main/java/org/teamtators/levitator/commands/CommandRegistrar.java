@@ -4,6 +4,7 @@ import org.teamtators.common.TatorRobotBase;
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.scheduler.Commands;
 import org.teamtators.levitator.TatorRobot;
+import org.teamtators.levitator.subsystems.Climber;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Lift;
 import org.teamtators.levitator.subsystems.Picker;
@@ -65,8 +66,10 @@ public class CommandRegistrar {
         commandStore.registerCommand("SetPose", () -> new SetPose(robot));
         commandStore.registerCommand("WaitForPath", () -> new WaitForPath(robot));
 
-
+        Climber climber = robot.getSubsystems().getClimber();
         commandStore.registerCommand("ClimberMoveToHeight", () -> new ClimberMoveToHeight(robot));
         commandStore.registerCommand("ClimberHome", () -> new ClimberHome(robot));
+        commandStore.putCommand("ClimberReleaseBuddyLift", Commands.instant(climber::release));
+        commandStore.putCommand("ClimberRetractBuddyLift", Commands.instant(climber::retract));
     }
 }

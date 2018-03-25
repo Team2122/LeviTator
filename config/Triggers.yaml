@@ -18,8 +18,13 @@ driver:
 #  BACK: toggle whenPressed $TestDrive
   START: start whenPressed $LiftScaleLow
   BACK: start whenPressed $PickerReleaseMedium
-  B: start whenPressed $LiftSwitchLow
-  STICK_LEFT: start whenPressed PickerSwitchDeploy
+#  B: start whenPressed $LiftSwitchLow
+#  STICK_LEFT: start whenPressed PickerSwitchDeploy
+#  B: start whenPressed $LiftSwitchLow
+  B: start whenPressed ClimberClimb
+  X: start whenPressed ClimberSubBar
+  Y: start whenPressed ClimberOverBar
+  STICK_LEFT: start whenPressed $LiftHome
   STICK_RIGHT: start whenPressed PickerExtendToggle
 
 gunner:
@@ -34,14 +39,14 @@ gunner:
   RIGHT_INDEX: start whenPressed $LiftSwitchLow
   RIGHT_MIDDLE: start whenPressed $LiftScaleLow
   RIGHT_RING: toggle whenPressed PickerSmartDeploy
-  RIGHT_PINKY: start afterHeld ElevatorsDeploy
+#  RIGHT_PINKY: start afterHeld ElevatorsDeploy
 gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
 #  2: start whenPressed $TestDrive
 #  3: start whenPressed PrintPose
 #  2: start whenPressed BumpLiftUp
 #  3: start whenPressed BumpLiftDown
-#  2: start afterHeld ElevatorsDeploy
+  2: start whenPressed ClimberHome
   3: start whenPressed LiftRecall
   4: toggle whenPressed PickerPick
   5: start whenPressed PickerRetract

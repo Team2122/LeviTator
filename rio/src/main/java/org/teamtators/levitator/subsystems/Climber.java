@@ -3,10 +3,9 @@ package org.teamtators.levitator.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import edu.wpi.first.wpilibj.Solenoid;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.DigitalSensorConfig;
-import org.teamtators.common.config.helpers.TalonSRXConfig;
-import org.teamtators.common.config.helpers.VictorSPXConfig;
+import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.MotorPowerUpdater;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
@@ -14,6 +13,7 @@ import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
 import java.util.Arrays;
@@ -22,9 +22,10 @@ import java.util.List;
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private WPI_TalonSRX climberMotor;
     private WPI_VictorSPX slaveMotor;
-    private MotorPowerUpdater climberMotorUpdater;
+//    private MotorPowerUpdater climberMotorUpdater;
     private DigitalSensor topLimit;
     private DigitalSensor bottomLimit;
+    private Solenoid releaser;
     private Config config;
 
     public Climber() {
@@ -41,11 +42,12 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
             logger.warn("Attempted to give climber power {} at bottom limit", power);
             pow = 0;
         }
-        climberMotorUpdater.set(pow);
+        climberMotor.set(pow);
+        slaveMotor.follow(climberMotor);
     }
 
     public double getPosition() {
-        return climberMotor.getSelectedSensorPosition(0) * config.distancePerPulse;
+        return climberMotor.getSensorCollection().getQuadraturePosition() / 1024.0 * config.distancePerPulse;
     }
 
     public boolean isAtBottomLimit() {
@@ -53,15 +55,23 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public boolean isAtTopLimit() {
-        return topLimit.get();
+        return !topLimit.get();
     }
 
     public void resetPosition() {
-        climberMotor.setSelectedSensorPosition(0, 0, 0);
+        climberMotor.getSensorCollection().setQuadraturePosition(0, 0);
+    }
+
+    public void release() {
+        releaser.set(true);
+    }
+
+    public void retract() {
+        releaser.set(false);
     }
 
     public List<MotorPowerUpdater> getMotorUpdatables() {
-        return Arrays.asList(climberMotorUpdater);
+        return Arrays.asList(/*climberMotorUpdater*/);
     }
 
     @Override
@@ -71,10 +81,23 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         slaveMotor = config.slaveMotor.create();
         topLimit = config.topLimit.create();
         bottomLimit = config.bottomLimit.create();
-        slaveMotor.set(ControlMode.Follower, config.climberMotor.id);
+        releaser = config.releaser.create();
+//        climberMotorUpdater = new MotorPowerUpdater(climberMotor);
 
-        climberMotorUpdater = new MotorPowerUpdater(climberMotor);
+        climberMotor.setName("Climber", "climberMotor");
+        slaveMotor.setName("Climber", "slaveMotor");
+        topLimit.setName("Climber", "topLimit");
+        bottomLimit.setName("Climber", "bottomLimit");
+        releaser.setName("Climber", "releaser");
+    }
 
+    @Override
+    public void deconfigure() {
+        SpeedControllerConfig.free(climberMotor);
+        SpeedControllerConfig.free(slaveMotor);
+        topLimit.free();
+        bottomLimit.free();
+        releaser.free();
     }
 
     @Override
@@ -82,8 +105,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         ManualTestGroup group = super.createManualTests();
         group.addTest(new ClimberEncoderTest());
         group.addTest(new SpeedControllerTest("climberMotor", climberMotor));
+        group.addTest(new SpeedControllerTest("slaveMotor", slaveMotor));
         group.addTest(new DigitalSensorTest("topLimit", topLimit));
         group.addTest(new DigitalSensorTest("bottomLimit", bottomLimit));
+        group.addTest(new SolenoidTest("releaser", releaser));
         return group;
     }
 
@@ -93,7 +118,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         public double distancePerPulse;
         public DigitalSensorConfig topLimit;
         public DigitalSensorConfig bottomLimit;
-
+        public SolenoidConfig releaser;
     }
 
     public class ClimberEncoderTest extends ManualTest {
@@ -105,6 +130,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         public void start() {
             super.start();
             printTestInstructions("Press A to read the encoder value. Press B to reset the encoder value.");
+            setPower(0.0);
         }
 
         @Override
@@ -116,7 +142,30 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
                 case B:
                     printTestInfo("Reset encoder.");
                     resetPosition();
+                    break;
+                case X:
+                    setPower(1.0);
+                    break;
+                case Y:
+                    setPower(-1.0);
+                    break;
             }
+        }
+
+        @Override
+        public void onButtonUp(LogitechF310.Button button) {
+
+            switch (button) {
+                case X:
+                case Y:
+                    setPower(0.0);
+                    break;
+            }
+        }
+
+        @Override
+        public void stop() {
+            setPower(0.0);
         }
     }
 }
