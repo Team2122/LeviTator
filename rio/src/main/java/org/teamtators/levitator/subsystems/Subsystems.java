@@ -30,7 +30,6 @@ public class Subsystems extends SubsystemsBase
     private Auto auto;
     private Vision vision;
     private Climber climber;
-    //private YourSubsystem yourSubsystem;
 
     public Subsystems(TatorRobot robot) {
         oi = new OperatorInterface();
@@ -40,8 +39,7 @@ public class Subsystems extends SubsystemsBase
         auto = new Auto(robot);
         vision = new Vision(drive);
         climber = new Climber();
-        //your subsystems here
-        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, climber /*, yourSubsystem */);
+        subsystems = Arrays.asList(oi, drive, picker, lift, auto, vision, climber);
 
         updatables = new ArrayList<>();
         motorUpdatables = new ArrayList<>();
@@ -89,6 +87,7 @@ public class Subsystems extends SubsystemsBase
 
         motorUpdatables.addAll(picker.getMotorUpdatables());
         motorUpdatables.addAll(lift.getMotorUpdatables());
+        motorUpdatables.addAll(climber.getMotorUpdatables());
     }
 
     @Override

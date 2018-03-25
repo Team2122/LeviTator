@@ -8,6 +8,7 @@ import org.teamtators.levitator.subsystems.Climber;
 public class ClimberMoveToHeight extends Command implements Configurable<ClimberMoveToHeight.Config> {
     private final Climber climber;
     private Config config;
+    private double direction;
 
     public ClimberMoveToHeight(TatorRobot robot) {
         super("ClimberMoveToHeight");
@@ -15,9 +16,30 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
     }
 
     @Override
+    protected void initialize() {
+        direction = Math.signum(config.height - climber.getPosition());
+        logger.info("Going to {} (direction is {})", config.height, direction == 1 ? "positive" : direction == -1 ? "negative" : "0");
+    }
+
+    @Override
     protected boolean step() {
-        climber.setPower(config.power);
-        return climber.isAtTopLimit() || Math.abs(climber.getPosition() - config.height) >= config.heightTolerance;
+        double position = climber.getPosition();
+
+        boolean atHeight = direction == 1 ? position >= config.height : position <= config.height;
+        boolean limitTripped = direction == 1 ? climber.isAtTopLimit() : climber.isAtBottomLimit();
+
+        if (atHeight) {
+            logger.info("At height {} (target was {})", position, config.height);
+            return true;
+        }
+
+        if (limitTripped) {
+            logger.warn("Limit tripped");
+            return true;
+        }
+
+        climber.setPower(config.power * direction);
+        return false;
     }
 
     @Override
@@ -28,12 +50,10 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
     public void finish(boolean interrupted) {
         super.finish(interrupted);
         climber.setPower(0);
-
     }
 
     public static class Config {
         public double height;
         public double power;
-        public double heightTolerance;
     }
 }

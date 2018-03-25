@@ -149,11 +149,6 @@ $PickerAutoPick:
 #  rotationSpeed: 30
 #  maxAcceleration: 30
 
-ElevatorsDeploy:
-  retractTime: .2
-ElevatorsLiftLeft:
-  flapPower: 1.0
-
 ^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
