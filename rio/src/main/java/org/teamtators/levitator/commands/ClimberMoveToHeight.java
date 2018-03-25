@@ -17,6 +17,11 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
 
     @Override
     protected void initialize() {
+        if (!climber.isHomed()) {
+            logger.error("Climber is not homed!");
+            this.cancel();
+            return;
+        }
         direction = Math.signum(config.height - climber.getPosition());
         logger.info("Going to {} (direction is {})", config.height, direction == 1 ? "positive" : direction == -1 ? "negative" : "0");
     }

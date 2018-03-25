@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.13555787278415016,
+  "dividerPosition": 0.13564668769716087,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -308,7 +308,7 @@
             "content": {
               "_type": "PDP",
               "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[0]",
-              "_title": "/LiveWindow/Ungrouped/PowerDistributionPanel[0]",
+              "_title": "PDP",
               "showIndicatorText": true
             }
           }

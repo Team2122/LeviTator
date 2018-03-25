@@ -1,10 +1,8 @@
 package org.teamtators.levitator.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Solenoid;
-import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.MotorPowerUpdater;
@@ -37,6 +35,14 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     public Climber(TatorRobot robot) {
         super("Climber");
         this.robot = robot;
+    }
+
+    public void setHomed(boolean homed) {
+        this.homed = homed;
+    }
+
+    public boolean isHomed() {
+        return homed;
     }
 
     public void setPower(double power) {
@@ -83,12 +89,12 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
 
     @Override
     public void onEnterRobotState(RobotState state) {
-//        if (!homed) {
-//            Command homeCommand = robot.getCommandStore().getCommand("ClimberHome");
-//            if (homeCommand != null) {
-//                robot.getScheduler().startCommand(homeCommand);
-//            }
-//        }
+        if (!homed) {
+            Command homeCommand = robot.getCommandStore().getCommand("ClimberHome");
+            if (homeCommand != null && !homeCommand.isRunning()) {
+                robot.getScheduler().startCommand(homeCommand);
+            }
+        }
     }
 
     @Override
