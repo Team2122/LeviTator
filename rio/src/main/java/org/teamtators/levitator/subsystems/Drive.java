@@ -410,12 +410,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
                 rotationOutput = Double.NaN;
             }
             if (mode != OutputMode.None && !Double.isNaN(left) && !Double.isNaN(right)) {
-                setLeftMotorPower(left);
-                setRightMotorPower(right);
+                setPowers(left, right);
                 //logger.trace("driving at powers {}, {}", left, right);
             } else {
-                setLeftMotorPower(0.0);
-                setRightMotorPower(0.0);
+                setPowers(0, 0);
                 //logger.trace("not driving, something was NaN: {}, {}", left, right);
             }
         }

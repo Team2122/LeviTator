@@ -58,7 +58,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
 //        return drive.isArcOnTarget();
         return drive.isStraightProfileOnTarget();
     }

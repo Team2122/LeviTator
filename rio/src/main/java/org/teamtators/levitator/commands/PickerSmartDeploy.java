@@ -63,7 +63,7 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         updatePower();
         if (!isQuick) {
             picker.setRollerPower(-powerConfig.kickPower);

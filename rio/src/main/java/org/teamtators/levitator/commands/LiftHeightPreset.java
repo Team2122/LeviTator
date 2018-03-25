@@ -20,7 +20,7 @@ public class LiftHeightPreset extends Command implements Configurable<LiftHeight
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 

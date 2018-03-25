@@ -21,7 +21,7 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         report = drive.getDriveSegmentsFollower().getReport();
         if (report == null) {
             return false;

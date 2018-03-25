@@ -55,7 +55,7 @@ public class MotorEncoderTest extends AutomatedTest implements Configurable<Moto
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         if (before != null && !ready) {
             if (beforeTimer.hasPeriodElapsed(waitBefore)) {
                 setup();

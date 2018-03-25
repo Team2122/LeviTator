@@ -20,7 +20,7 @@ public class WaitForHeight extends Command implements Configurable<WaitForHeight
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return lift.getCurrentHeight() + config.tolerance > lift.getDesiredHeight() && lift.getCurrentHeight() - config.tolerance < lift.getDesiredHeight();
     }
 

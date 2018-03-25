@@ -20,7 +20,7 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         double desiredAngle = pivot.getDesiredPivotAngle();
         if (config.preset != null) {
             desiredAngle = pivot.getAnglePreset(config.preset);

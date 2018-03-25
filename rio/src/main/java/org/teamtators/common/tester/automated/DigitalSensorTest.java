@@ -29,7 +29,7 @@ public class DigitalSensorTest extends AutomatedTest implements Configurable<Dig
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         if (skipped()) {
             sendMessage("Digital sensor value didn't change, test skipped", AutomatedTestMessage.Level.ERROR);
             return true;

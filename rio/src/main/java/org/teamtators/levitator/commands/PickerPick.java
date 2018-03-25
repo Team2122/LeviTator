@@ -40,7 +40,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         this.cubePresent = picker.isCubeDetected();
         this.cubeLeft = picker.isCubeDetectedLeft();
         this.cubeRight = picker.isCubeDetectedRight();

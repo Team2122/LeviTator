@@ -5,12 +5,16 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
+import org.teamtators.common.scheduler.SequentialCommand;
 import org.teamtators.common.util.FieldSide;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Auto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AutoSelector extends Command implements Configurable<AutoSelector.Config> {
     private final Auto auto;
@@ -20,6 +24,8 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     private Command selected;
     private boolean hasStarted;
     private ConfigCommandStore commandStore;
+    private boolean initialized;
+    private boolean cancel;
 
     public AutoSelector(TatorRobot robot) {
         super("AutoSelector");
@@ -56,10 +62,11 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
                 toStart = config.right;
             }
         }
+        initialized = false;
+        cancel = false;
         try {
             selected = commandStore.getCommand(toStart);
-            logger.info("Starting chosen command: {}", selected.getName());
-            startWithContext(selected, this);
+            logger.info("Running chosen command: {}", selected.getName());
         } catch (IllegalArgumentException e) {
             logger.warn("Chosen command not found", e);
             selected = null;
@@ -67,14 +74,55 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     }
 
     @Override
-    protected boolean step() {
-        if (selected != null) {
-            if (selected.isRunning()) {
-                hasStarted = true;
-            }
-            return hasStarted && !selected.isRunning();
+    public boolean step() {
+        if (selected == null) {
+            return true;
         }
-        return true;
+        if (cancel) {
+            selected.finishRun(true);
+            this.cancel();
+            return true;
+        }
+        if (!initialized) {
+            releaseRequirements(selected.getRequirements());
+            if (selected.isRunning()) {
+                if (selected.getContext() == this && selected.checkRequirements()) {
+                    initialized = true;
+                } else {
+                    selected.cancel();
+                    return false;
+                }
+            } else if (selected.startRun(this)) {
+                initialized = true;
+            }
+        }
+        boolean finished = selected.step();
+        if (finished) {
+            return true;
+        }
+        if (cancel) {
+            selected.finishRun(true);
+            this.cancel();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void finish(boolean interrupted) {
+        super.finish(interrupted);
+        if (interrupted && selected != null && selected.isRunning()) {
+            selected.finishRun(true);
+        }
+    }
+
+    @Override
+    public void cancelCommand(Command command) {
+        if (command == selected) {
+            cancel = true;
+        } else {
+            super.cancelCommand(command);
+        }
     }
 
     @Override

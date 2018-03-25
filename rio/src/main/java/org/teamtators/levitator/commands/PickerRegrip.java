@@ -21,7 +21,7 @@ public class PickerRegrip extends Command implements Configurable<PickerRegrip.C
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         picker.setRollerPower(config.gripPower);
         return picker.isCubeInPicker();
     }

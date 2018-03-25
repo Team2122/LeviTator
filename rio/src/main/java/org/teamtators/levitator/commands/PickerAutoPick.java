@@ -31,7 +31,7 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         DetectedObject detected = vision.getLastDetectedObject();
         Double angle = vision.getNewRobotAngle(detected);
         Double distance = vision.getDistance(detected);

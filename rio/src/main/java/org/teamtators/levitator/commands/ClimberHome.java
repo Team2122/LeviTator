@@ -15,7 +15,7 @@ public class ClimberHome extends Command implements Configurable<ClimberHome.Con
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         climber.setPower(config.power);
         return climber.isAtBottomLimit();
     }

@@ -36,7 +36,7 @@ public class LogCommand extends Command implements Configurable<LogCommand.Confi
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 

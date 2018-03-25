@@ -18,7 +18,7 @@ public class WaitForLock extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return pivot.isPivotLocked();
     }
 }

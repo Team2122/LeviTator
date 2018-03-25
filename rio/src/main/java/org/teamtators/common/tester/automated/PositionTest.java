@@ -36,7 +36,7 @@ public class PositionTest extends AutomatedTest implements Configurable<Position
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         double position = encoder.getAsDouble();
         if ((position - config.targetPosition) * Math.signum(config.power) >= 0) {
             sendMessage("Encoder measured correct position of " + position

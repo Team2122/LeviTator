@@ -25,7 +25,7 @@ public class SetPose extends Command implements Configurable<SetPose.Config> {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 

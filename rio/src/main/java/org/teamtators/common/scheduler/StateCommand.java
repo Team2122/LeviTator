@@ -28,7 +28,7 @@ public class StateCommand<S> extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return stepper.step(state);
     }
 

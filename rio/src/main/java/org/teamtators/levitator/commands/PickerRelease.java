@@ -22,7 +22,7 @@ public class PickerRelease extends Command implements Configurable<PickerRelease
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         picker.setRollerPowers(config.powers);
         return false;
     }

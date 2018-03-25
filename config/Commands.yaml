@@ -431,11 +431,12 @@ $StartRightScaleRight:
   - { parallel: true, name: PickerPick }
   - class: DrivePath
     parallel: true
-    speed: 80
+    speed: 100
+    radius: 36
     path:
-      - { x: 115, y: 312, speed: 100.0 }
-      - { x: 115, y: 280, radius: 36, speed: 100.0 }
-      - { x: 100, y: 250, radius: 36, speed: 40.0 }
+      - { x: 115, y: 312 }
+      - { x: 115, y: 288 }
+      - { x: 90, y: 250, speed: 40.0 }
       - { x: 78, y: 220 }
   - WaitForCube
 

@@ -30,7 +30,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return drive.isDriveSegmentsFollowerFinished();
     }
 

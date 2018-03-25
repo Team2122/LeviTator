@@ -27,7 +27,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         double position = climber.getPosition();
 
         boolean atHeight = direction == 1 ? position >= config.height : position <= config.height;

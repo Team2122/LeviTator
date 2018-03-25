@@ -19,7 +19,7 @@ public class SolenoidTest extends AutomatedTest {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         if (lastButton == LogitechF310.Button.TRIGGER_RIGHT)
             solenoid.setExtended(true);
         if (lastButton == LogitechF310.Button.Y) {

@@ -20,7 +20,7 @@ public class PivotAnglePreset extends Command implements Configurable<PivotAngle
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 

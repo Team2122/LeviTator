@@ -21,7 +21,7 @@ public class WaitForCube extends Command implements Configurable<WaitForCube.Con
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return picker.isCubeDetected();
     }
 

@@ -44,7 +44,7 @@ public class AutomatedTest extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return false;
     }
 

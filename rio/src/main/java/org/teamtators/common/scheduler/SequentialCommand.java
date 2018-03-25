@@ -96,7 +96,7 @@ public class SequentialCommand extends Command implements CommandRunContext {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         if (sequence.size() == 0) return true;
         boolean finished;
         do {

@@ -29,7 +29,7 @@ public class LiftRecall extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 }

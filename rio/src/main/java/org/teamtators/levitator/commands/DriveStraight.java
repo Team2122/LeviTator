@@ -36,7 +36,7 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return drive.isStraightProfileOnTarget();
     }
 

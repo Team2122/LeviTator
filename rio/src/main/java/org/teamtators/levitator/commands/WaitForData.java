@@ -13,7 +13,7 @@ public class WaitForData extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return auto.getData() != null;
     }
 }

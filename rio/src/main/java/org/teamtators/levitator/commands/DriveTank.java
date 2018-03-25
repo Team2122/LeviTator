@@ -24,7 +24,7 @@ public class DriveTank extends Command implements Configurable<DriveTank.Config>
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         double left = oi.getDriveLeft();
         double right = oi.getDriveRight();
 

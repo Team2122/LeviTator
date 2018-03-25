@@ -31,7 +31,7 @@ public abstract class DriveRotateBase extends Command {
         drive.driveRotationProfile(angle);
     }
 
-    protected boolean step() {
+    public boolean step() {
         return drive.isRotationProfileOnTarget();
     }
 

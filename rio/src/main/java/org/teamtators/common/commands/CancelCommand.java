@@ -18,7 +18,7 @@ public class CancelCommand extends Command implements Configurable<CancelCommand
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         if (command.isRunning()) {
             command.cancel();
         } else {

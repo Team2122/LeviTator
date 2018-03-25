@@ -27,7 +27,7 @@ public class WaitForCommand extends Command implements Configurable<WaitForComma
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return !command.isRunning();
     }
 

@@ -33,7 +33,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         boolean isTeleop = robot.getState() == RobotState.TELEOP;
         if (isTeleop) {
             updateSlider(operatorInterface.getSliderHeight());

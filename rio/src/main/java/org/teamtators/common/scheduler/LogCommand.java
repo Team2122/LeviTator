@@ -18,7 +18,7 @@ public class LogCommand extends Command {
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         return true;
     }
 

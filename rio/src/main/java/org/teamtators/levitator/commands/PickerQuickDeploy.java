@@ -30,7 +30,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
     }
 
     @Override
-    protected boolean step() {
+    public boolean step() {
         boolean canStart = timer.hasPeriodElapsed(config.timeBeforeKick);
         boolean startRetracting = timer.hasPeriodElapsed(config.timeBeforeRetract);
         boolean endKick = timer.hasPeriodElapsed(config.timeToKick);

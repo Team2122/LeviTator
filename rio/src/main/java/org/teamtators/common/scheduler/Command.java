@@ -23,7 +23,7 @@ public abstract class Command implements CommandRunContext {
         logger.info("{} initializing", getName());
     }
 
-    protected abstract boolean step();
+    public abstract boolean step();
 
     protected void finish(boolean interrupted) {
         if (interrupted) {
@@ -145,9 +145,10 @@ public abstract class Command implements CommandRunContext {
                 subsystem.setRequiringCommand(this);
                 continue;
             }
-            logger.trace("Potential requiring command for subsystem {}: {}", subsystem.getName(), requiringCommand.getName());
+//            logger.trace("Potential requiring command for subsystem {}: {}", subsystem.getName(), requiringCommand.getName());
             if (isRequiring(subsystem, context))
                 continue;
+            logger.trace("Command needs subsystem requirement to start {}: {}", subsystem.getName(), requiringCommand.getName());
             anyRequiring = true;
             requiringCommand.cancel();
         }
@@ -162,7 +163,7 @@ public abstract class Command implements CommandRunContext {
         return takeRequirements(this.requirements, context);
     }
 
-    boolean startRun(CommandRunContext context) {
+    public boolean startRun(CommandRunContext context) {
         if (isRunning() || !takeRequirements(context))
             return false;
         setContext(context);
@@ -170,7 +171,7 @@ public abstract class Command implements CommandRunContext {
         return true;
     }
 
-    void finishRun(boolean cancelled) {
+    public void finishRun(boolean cancelled) {
         if (isRunning()) {
             finish(cancelled);
             setContext(null);
@@ -178,7 +179,7 @@ public abstract class Command implements CommandRunContext {
         releaseRequirements();
     }
 
-    void releaseRequirements(Set<Subsystem> requirements) {
+    protected void releaseRequirements(Set<Subsystem> requirements) {
         if (requirements == null)
             return;
         for (Subsystem subsystem : requirements) {
