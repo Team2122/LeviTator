@@ -385,6 +385,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double heightTolerance;
         public double homePower;
         public double homeTolerance;
+        public double homingPower;
+        public double homingTimeout;
     }
 
     private void updateHeight() {
@@ -393,7 +395,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 homeTimer.start();
             }
             boolean homeTimeout = false;
-            if (homeTimer.hasPeriodElapsed(5.0)) {
+            if (homeTimer.hasPeriodElapsed(config.homingTimeout)) {
                 homeTimeout = true;
                 logger.warn("Homing timed out");
             }
@@ -402,7 +404,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 setLiftPower(0.0);
                 return;
             }
-            setLiftPower(-0.2);
+            setLiftPower(config.homingPower);
             if (!isAtBottomLimit() && false && !homeTimeout) {
                 return;
             }

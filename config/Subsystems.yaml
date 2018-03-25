@@ -101,6 +101,8 @@ lift:
   heightTolerance: 2.0
   homeTolerance: 1.0
   homePower: -0.1
+  homingTimeout: 2.0
+  homingPower: -0.2
 pivot:
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: {
