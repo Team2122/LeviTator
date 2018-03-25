@@ -189,11 +189,11 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
             lastAxisCount = axisCount;
             lastButtonCount = buttonCount;
             if (axisCount < getAxisCount()) {
-                logger.warn("Joystick {} does not have enough axes ({} < {})",
+                logger.error("Joystick {} does not have enough axes ({} < {})",
                         hid.getPort(), axisCount, getAxisCount());
             }
             if (buttonCount < getButtonCount()) {
-                logger.warn("Joystick {} does not have enough buttons ({} < {})",
+                logger.error("Joystick {} does not have enough buttons ({} < {})",
                         hid.getPort(), buttonCount, getButtonCount());
             }
         }
