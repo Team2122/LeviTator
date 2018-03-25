@@ -31,7 +31,7 @@ deploy {
             directory = 'config'
             postdeploy << { DeployContext ctx ->
                 ctx.execute("chmod 755 .; chown lvuser .")
-                ctx.execute("sync")
+//                ctx.execute("sync")
             }
         }
         artifact('dependencies', FileCollectionArtifact) {
