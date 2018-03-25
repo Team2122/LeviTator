@@ -106,25 +106,26 @@ LiftContinuous:
   sliderTolerance: 2
   sliderThreshold: 1
   knobTolerance: 5.0
+
 $TestDrive:
-#  - { class: DriveStraight, angle: 0.0, distance: -144.0, endSpeed: 60.0 }
+  - { class: DriveStraight, angle: 0.0, distance: 144.0, endSpeed: 0.0 }
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
-  - class: SetPose
-    x: 0.0
-    y: 0.0
-    yaw: -90
-  - class: DrivePath
-    speed: 140
-    arcSpeed: 60
-    radius: 36
-    reverse: true
-    path:
-      - { x: 0, y: 0 }
-      - { x: 0, y: 78 }
-      - { x: 78, y: 78 }
-      - { x: 78, y: 0 }
-      - { x: 0, y: 0 }
+#  - class: SetPose
+#    x: 0.0
+#    y: 0.0
+#    yaw: -90
+#  - class: DrivePath
+#    speed: 140
+#    arcSpeed: 60
+#    radius: 36
+#    reverse: true
+#    path:
+#      - { x: 0, y: 0 }
+#      - { x: 0, y: 78 }
+#      - { x: 78, y: 78 }
+#      - { x: 78, y: 0 }
+#      - { x: 0, y: 0 }
 
 PickerAutoPick:
   velocity: 0.4
@@ -421,7 +422,7 @@ $StartRightScaleRight:
     path:
 #      - { x: 115, y: 19 }
       - { x: 115, y: 109 }
-      - { x: 115, y: 300 }
+      - { x: 115, y: 312 }
   - WaitForRight
   - PickerAutoDeploy
   - PivotCenter
@@ -432,9 +433,9 @@ $StartRightScaleRight:
     parallel: true
     speed: 80
     path:
-      - { x: 115, y: 300, speed: 100.0 }
+      - { x: 115, y: 312, speed: 100.0 }
       - { x: 115, y: 280, radius: 36, speed: 100.0 }
-      - { x: 90, y: 250, radius: 36, speed: 40.0 }
+      - { x: 100, y: 250, radius: 36, speed: 40.0 }
       - { x: 78, y: 220 }
   - WaitForCube
 
@@ -482,8 +483,8 @@ $AutoStartRightScaleRightScaleRight:
     speed: 40
     path:
       - { x: 78, y: 220 }
-      - { x: 90, y: 240, radius: 36 }
-      - { x: 110, y: 280 }
+      - { x: 85, y: 250, radius: 36 }
+      - { x: 108, y: 280 }
   - WaitForRight
   - PickerAutoDeploy
   - PivotCenter

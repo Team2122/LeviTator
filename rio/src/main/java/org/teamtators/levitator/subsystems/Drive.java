@@ -52,8 +52,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
         rotationController.setInputProvider(this::getYawAngle);
         rotationController.setOutputConsumer((double output) -> {
-            setLeftMotorPower(speed + output);
-            setRightMotorPower(speed - output);
+            setPowers(speed + output, speed - output);
         });
 
 
@@ -104,8 +103,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         outputController.setMode(OutputMode.None);
         driveSegmentsFollower.stop();
 
-        setRightMotorPower(rightPower);
-        setLeftMotorPower(leftPower);
+        setPowers(leftPower, rightPower);
     }
 
     public void driveStraightProfile(double heading, double distance) {
@@ -198,6 +196,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     @Override
     public void setPowers(double left, double right) {
+        logger.trace("setPowers({}, {})", left, right);
         setLeftMotorPower(left);
         setRightMotorPower(right);
     }
@@ -284,6 +283,21 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         tests.addTests(new ADXRS453Test("gyro", gyro));
         tests.addTests(new ControllerTest(rotationController, 180));
         tests.addTests(new PoseEstimatorTest(poseEstimator));
+        tests.addTest(new MotionCalibrationTest(straightMotionFollower) {
+            @Override
+            public void start() {
+                super.start();
+                outputController.start();
+                outputController.setMode(OutputMode.StraightOnly);
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                outputController.stop();
+                outputController.setMode(OutputMode.None);
+            }
+        });
 
         return tests;
     }

@@ -247,6 +247,11 @@
                   "numTickMarks": 5.0
                 },
                 {
+                  "_type": "Text View",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder/Value",
+                  "_title": "pivotEncoder/Value"
+                },
+                {
                   "_type": "Toggle Button",
                   "_source0": "network_table:///LiveWindow/Pivot/pivotLockSolenoid/Value",
                   "_title": "pivotLockSolenoid/Value"
@@ -298,18 +303,6 @@
                   "colorWhenFalse": "#8B0000FF"
                 }
               ]
-            }
-          },
-          "6,4": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "PDP",
-              "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[0]",
-              "_title": "PDP",
-              "showIndicatorText": true
             }
           }
         }

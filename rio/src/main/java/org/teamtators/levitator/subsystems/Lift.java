@@ -40,6 +40,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private boolean heightForced = false;
     private boolean homed;
+    private Timer homeTimer = new Timer();
     private double savedHeight;
 
     public Lift() {
@@ -160,9 +161,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private void enableLiftController() {
-        targetHeight = getCurrentHeight();
-        liftController.moveToPosition(targetHeight);
-        liftController.start();
+        if (!liftController.isRunning()) {
+            targetHeight = getCurrentHeight();
+            liftController.moveToPosition(targetHeight);
+            liftController.start();
+        }
     }
 
     private void disableLiftController() {
@@ -244,20 +247,37 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public boolean isBelowHeight(double height) {
-        return getCurrentHeight() - height < config.heightTolerance;
+        return getCurrentHeight() < height;
     }
 
     public boolean isBelowHeight(HeightPreset preset) {
         return isBelowHeight(getHeightPreset(preset));
     }
 
+    public boolean isAtOrBelowHeight(double height) {
+        return isAtHeight(height) || isBelowHeight(height);
+    }
+
+    public boolean isAtOrBelowHeight(HeightPreset preset) {
+        return isAtOrBelowHeight(getHeightPreset(preset));
+    }
+
     public double getSafeLiftHeight(double desiredHeight) {
         double currentLiftHeight = getCurrentHeight();
         double needLockHeight = getHeightPreset(HeightPreset.NEED_LOCK);
         double needCenterHeight = getHeightPreset(HeightPreset.NEED_CENTER);
+        if (currentLiftHeight < 0) {
+            currentLiftHeight = 0;
+        }
+        if (desiredHeight < 0) {
+            desiredHeight = 0;
+        }
+        if (desiredHeight > config.heightController.maxPosition) {
+            desiredHeight = config.heightController.maxPosition;
+        }
         if (!pivot.isPivotLocked()) { // if the pivot is not locked
-            if (isBelowHeight(needLockHeight) && // if we are already below NEED_LOCK
-                    pivot.isLockable()) { // and we are able to lock
+            if (isAtHeight(HeightPreset.HOME) && // if we are already below NEED_LOCK
+                    pivot.isWithinTab()) { // and we are able to lock
                 return currentLiftHeight; // then don't move
             }
             if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
@@ -283,15 +303,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     @Override
     public void onEnterRobotState(RobotState state) {
         switch (state) {
-            case AUTONOMOUS:
-            case TELEOP:
-                setDesiredHeight(getCurrentHeight(), true);
-                enable();
-                break;
             case DISABLED:
                 disable();
+                homeTimer.stop();
                 break;
         }
+        heightForced = true;
     }
 
     @Override
@@ -329,6 +346,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftMotorUpdater = new MotorPowerUpdater(liftMotor);
 
         homed = false;
+        homeTimer.stop();
     }
 
     @Override
@@ -371,18 +389,29 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private void updateHeight() {
         if (!homed) {
+            if (!homeTimer.isRunning()) {
+                homeTimer.start();
+            }
+            boolean homeTimeout = false;
+            if (homeTimer.hasPeriodElapsed(5.0)) {
+                homeTimeout = true;
+                logger.warn("Homing timed out");
+            }
             disableLiftController();
-            if (!pivot.isPivotLocked()) {
+            if (!pivot.isPivotLocked() && !homeTimeout) {
                 setLiftPower(0.0);
+                return;
             }
             setLiftPower(-0.2);
-            if (!isAtBottomLimit()) {
+            if (!isAtBottomLimit() && false && !homeTimeout) {
                 return;
             }
             logger.info("Lift homed");
             liftEncoder.reset();
             enableLiftController();
             homed = true;
+        } else {
+            enableLiftController();
         }
         //Set the lift target height to the desired height
         this.setTargetHeight(desiredHeight);
@@ -400,6 +429,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
             disable();
         }
+
+
 
         @Override
         public void onButtonDown(LogitechF310.Button button) {

@@ -126,14 +126,21 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
-    public void enablePivotController() {
-        pivotController.start();
+    public void enable() {
         pivotUpdatable.start();
     }
 
-    public void disablePivotController() {
+    public void disable() {
         pivotController.stop();
         pivotUpdatable.stop();
+    }
+
+    private void enablePivotController() {
+        pivotController.start();
+    }
+
+    private void disablePivotController() {
+        pivotController.stop();
     }
 
     public void bumpPivotRight() {
@@ -173,6 +180,12 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
                 getAnglePreset(AnglePreset.CENTER),
                 config.centerTolerance);
+    }
+
+    public boolean isWithinTab() {
+        return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
+                getAnglePreset(AnglePreset.CENTER),
+                5);
     }
 
     public boolean isLockable() {
@@ -219,10 +232,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             case TELEOP:
                 setDesiredAnglePreset(AnglePreset.CENTER);
                 setTargetAngle(getAnglePreset(AnglePreset.CENTER));
-                enablePivotController();
+                enable();
                 break;
             case DISABLED:
-                disablePivotController();
+                disable();
                 break;
         }
     }
@@ -316,7 +329,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         @Override
         public void start() {
             logger.info("Press B to set pivot target to joystick value. Hold Y to enable pivot profiler");
-            disablePivotController();
+            disable();
         }
 
         @Override
@@ -329,7 +342,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     pivotController./*moveToPosition*/setSetpoint(angle);
                     break;
                 case Y:
-                    enablePivotController();
+                    enable();
                     break;
             }
         }
@@ -338,7 +351,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public void onButtonUp(LogitechF310.Button button) {
             switch (button) {
                 case Y:
-                    disablePivotController();
+                    disable();
                     break;
             }
         }
@@ -350,13 +363,19 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         @Override
         public void stop() {
-            disablePivotController();
+            disable();
         }
     }
 
     private class PivotUpdatable extends AbstractUpdatable {
         PivotUpdatable() {
             super("Pivot.pivotUpdatable");
+        }
+
+        @Override
+        public synchronized void start() {
+            super.start();
+            sweepTimer.start();
         }
 
         @Override
