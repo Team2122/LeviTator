@@ -41,8 +41,8 @@ public class CtreMotorControllerConfig {
     protected void checkVersion(com.ctre.phoenix.motorcontrol.can.BaseMotorController motor, int requiredVersion) {
         int firmwareVersion = motor.getFirmwareVersion();
         if (firmwareVersion != requiredVersion) {
-            Robot.logger.warn(String.format("%s (id %d) has wrong firmware version: %d.%d",
-                    motor.getClass().getSimpleName(), id, firmwareVersion >> 2, firmwareVersion % 0xff));
+//            Robot.logger.warn(String.format("%s (id %d) has wrong firmware version: %d.%d",
+//                    motor.getClass().getSimpleName(), id, firmwareVersion >> 2, firmwareVersion % 0xff));
         }
     }
 }

@@ -20,16 +20,16 @@ public abstract class Command implements CommandRunContext {
     }
 
     protected void initialize() {
-        logger.info("{} initializing", getName());
+        logger.debug("{} initializing", getName());
     }
 
     public abstract boolean step();
 
     protected void finish(boolean interrupted) {
         if (interrupted) {
-            logger.info("{} interrupted", getName());
+            logger.debug("{} interrupted", getName());
         } else {
-            logger.info("{} ended", getName());
+            logger.debug("{} ended", getName());
         }
     }
 
