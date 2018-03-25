@@ -39,6 +39,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private Config config;
 
     private boolean heightForced = false;
+    private boolean homed;
     private double savedHeight;
 
     public Lift() {
@@ -149,16 +150,23 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         liftController.moveToPosition(height);
     }
 
-    public void enableLiftController() {
-        targetHeight = getCurrentHeight();
-        liftController.moveToPosition(targetHeight);
-        liftController.start();
+    public void enable() {
         preUpdatable.start();
     }
 
-    public void disableLiftController() {
+    public void disable() {
         liftController.stop();
         preUpdatable.stop();
+    }
+
+    private void enableLiftController() {
+        targetHeight = getCurrentHeight();
+        liftController.moveToPosition(targetHeight);
+        liftController.start();
+    }
+
+    private void disableLiftController() {
+        liftController.stop();
     }
 
     public boolean isAtBottomLimit() {
@@ -210,6 +218,9 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return heightForced;
     }
 
+    public boolean isHomed() {
+        return homed;
+    }
 
     public void saveCurrentHeight() {
         logger.debug("Saving height {}", getCurrentHeight());
@@ -245,6 +256,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         double needLockHeight = getHeightPreset(HeightPreset.NEED_LOCK);
         double needCenterHeight = getHeightPreset(HeightPreset.NEED_CENTER);
         if (!pivot.isPivotLocked()) { // if the pivot is not locked
+            if (isBelowHeight(needLockHeight) && // if we are already below NEED_LOCK
+                    pivot.isLockable()) { // and we are able to lock
+                return currentLiftHeight; // then don't move
+            }
             if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
                 return needLockHeight; // then descend to the minimum height at which we can be unlocked
             }
@@ -252,7 +267,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         if (!pivot.isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
             if (Epsilon.isEpsilonLessThan(currentLiftHeight, needCenterHeight,
                     config.heightTolerance)) { // if we are not above the elevators
-                return getCurrentHeight(); // don't move
+                return currentLiftHeight; // don't move
             }
             if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
                 return needCenterHeight; // then descend to the minimum height at which we can rotate
@@ -271,10 +286,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             case AUTONOMOUS:
             case TELEOP:
                 setDesiredHeight(getCurrentHeight(), true);
-                enableLiftController();
+                enable();
                 break;
             case DISABLED:
-                disableLiftController();
+                disable();
                 break;
         }
     }
@@ -312,6 +327,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         limitSensorBottom.setName("Lift", "limitSensorBottom");
 
         liftMotorUpdater = new MotorPowerUpdater(liftMotor);
+
+        homed = false;
     }
 
     @Override
@@ -353,6 +370,20 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private void updateHeight() {
+        if (!homed) {
+            disableLiftController();
+            if (!pivot.isPivotLocked()) {
+                setLiftPower(0.0);
+            }
+            setLiftPower(-0.2);
+            if (!isAtBottomLimit()) {
+                return;
+            }
+            logger.info("Lift homed");
+            liftEncoder.reset();
+            enableLiftController();
+            homed = true;
+        }
         //Set the lift target height to the desired height
         this.setTargetHeight(desiredHeight);
     }
@@ -367,7 +398,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         @Override
         public void start() {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
-            disableLiftController();
+            disable();
         }
 
         @Override
@@ -379,7 +410,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                     setTargetHeight(height);
                     break;
                 case X:
-                    enableLiftController();
+                    enable();
                     break;
             }
         }
@@ -388,7 +419,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public void onButtonUp(LogitechF310.Button button) {
             switch (button) {
                 case X:
-                    disableLiftController();
+                    disable();
                     break;
             }
         }
@@ -400,7 +431,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         @Override
         public void stop() {
-            disableLiftController();
+            disable();
         }
     }
 

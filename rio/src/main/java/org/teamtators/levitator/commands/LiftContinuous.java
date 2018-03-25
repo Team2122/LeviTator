@@ -28,7 +28,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     @Override
     protected void initialize() {
         super.initialize();
-        lift.enableLiftController();
+        lift.enable();
         pivot.enablePivotController();
     }
 
@@ -73,7 +73,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
-        lift.disableLiftController();
+        lift.disable();
         pivot.disablePivotController();
     }
 
