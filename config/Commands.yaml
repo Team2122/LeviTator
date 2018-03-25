@@ -54,6 +54,8 @@ PickerSmartDeploy:
     SOFT: { kickPower: 0.4, timeBeforeKick: 0.3, timeBeforeRetract: 0.8, timeToKick: 1.0 }
     MEDIUM: { kickPower: 0.6, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.8 }
     HARD: { kickPower: 0.8, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.6 }
+  switchPower: { kickPower: 0.8, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
+  maxSwitchHeight: 36.0
 
 PivotLeft: { class: PivotAnglePreset, preset: LEFT }
 PivotHalfLeft: { class: PivotAnglePreset, preset: HALF_LEFT }
@@ -244,7 +246,7 @@ ScaleSwitchStartRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, 
 StartLeftScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftScaleLeftSwitchLeft, R: $AutoStartLeftScaleLeftSwitchRight }
 StartLeftScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftScaleRightSwitchLeft, R: $AutoStartLeftScaleRightSwitchRight }
 StartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleLeftSwitchLeft, R: $AutoStartRightScaleLeftSwitchRight }
-StartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightSwitchLeft, R: $ AutoStartRightScaleRightSwitchRight }
+StartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightSwitchLeft, R: $AutoStartRightScaleRightSwitchRight }
 
 $SmartScaleLeft:
   - SetPoseLeft
@@ -437,8 +439,8 @@ $StartRightScaleRight:
     path:
       - { x: 115, y: 300, speed: 100.0 }
       - { x: 115, y: 280, radius: 36, speed: 100.0 }
-      - { x: 90, y: 230, radius: 36, speed: 40.0 }
-      - { x: 78, y: 200 }
+      - { x: 90, y: 250, radius: 36, speed: 40.0 }
+      - { x: 78, y: 220 }
   - WaitForCube
 
 $AutoStartLeftScaleLeftScaleLeft:
@@ -484,7 +486,7 @@ $AutoStartRightScaleRightScaleRight:
     reverse: true
     speed: 40
     path:
-      - { x: 78, y: 204 }
+      - { x: 78, y: 220 }
       - { x: 90, y: 240, radius: 36 }
       - { x: 110, y: 280 }
   - WaitForRight
@@ -524,7 +526,7 @@ $AutoStartRightScaleRightSwitchRight:
   - $StartRightScaleRight
   - { class: WaitFor, command: PickerPick }
   - { class: Wait, period: 1 }
-  - { class: DriveStraight, angle: 38, distance: 12 }
+  - { class: DriveStraight, angle: 10 , distance: 12 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleLeftScaleLeft:

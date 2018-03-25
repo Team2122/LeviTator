@@ -2,7 +2,7 @@ defaults: [ DriveTank, LiftContinuous ]
 
 driver:
   TRIGGER_RIGHT: toggle whenPressed PickerPick
-  TRIGGER_LEFT: start whenPressed PickerSwitchDeploy # toggle whenPressed PickerSmartDeploy
+  TRIGGER_LEFT: toggle whenPressed PickerSmartDeploy
   BUMPER_RIGHT: start whenPressed $LiftHome
   BUMPER_LEFT: start whenPressed $LiftSwitchLow
 #  POV_UP: start whenPressed PivotCenter
@@ -55,7 +55,5 @@ gunnerSecondary:
   8: start whenPressed $LiftSwitch
   9: start whenPressed $LiftScaleHigh
   10: start whenPressed PivotCenter
-#  11: start whenPressed ElevatorsLiftRight
-#  12: start whenPressed LiftRecall
-#  11: start whenPressed ElevatorsLiftRight
-  12: start whenPressed $PickerReleaseHard
+  12: start whenPressed LiftRecall
+#  12: start whenPressed $PickerReleaseHard
