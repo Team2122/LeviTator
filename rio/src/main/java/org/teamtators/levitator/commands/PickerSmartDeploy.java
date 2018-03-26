@@ -99,6 +99,7 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
         } else {
             picker.extendDefault();
         }
+        picker.unlockArms();
     }
 
     public enum DeployPower {

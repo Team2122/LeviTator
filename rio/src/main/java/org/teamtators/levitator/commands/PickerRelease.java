@@ -32,6 +32,7 @@ public class PickerRelease extends Command implements Configurable<PickerRelease
         super.finish(interrupted);
         picker.stopRollers();
         picker.extendDefault();
+        picker.unlockArms();
     }
 
     @Override

@@ -12,7 +12,7 @@ PickerPick:
 
 PickerRegrip:
   gripPower: 1
-  holdPower: 0.3
+  holdPower: 0.15
 
 PickerRelease:
   powers: { left: -0.7, right: -0.7 }

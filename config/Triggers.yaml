@@ -25,7 +25,7 @@ driver:
   X: start whenPressed ClimberSubBar
   Y: start whenPressed ClimberOverBar
   STICK_LEFT: start whenPressed $LiftHome
-  STICK_RIGHT: start whenPressed PickerExtendToggle
+  STICK_RIGHT: toggle whenPressed PickerRegrip
 
 gunner:
   LEFT_PINKY: start whenPressed PickerSwitchDeploy #whilePressed PickerReleaseSoft

@@ -37,6 +37,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         picker.setPickerExtended(true);
         unjamming = false;
         unjamRight = false;
+        picker.unlockArms();
     }
 
     @Override
@@ -76,6 +77,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
             picker.setRollerPower(0.0);
         } else {
             picker.setRollerPowers(config.holdPowers);
+            picker.lockArms();
         }
         picker.extendDefault();
     }

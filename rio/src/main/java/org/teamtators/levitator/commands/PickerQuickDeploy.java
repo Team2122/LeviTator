@@ -56,6 +56,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
         if (!Double.isNaN(config.timeBeforeRetract)) {
             picker.setPickerExtended(false);
         }
+        picker.unlockArms();
     }
 
     public static class Config {

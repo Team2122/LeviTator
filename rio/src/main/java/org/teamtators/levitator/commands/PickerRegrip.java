@@ -30,6 +30,7 @@ public class PickerRegrip extends Command implements Configurable<PickerRegrip.C
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
         picker.setRollerPower(config.holdPower);
+        picker.lockArms();
     }
 
     @Override

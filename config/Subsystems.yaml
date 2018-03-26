@@ -60,7 +60,7 @@ picker:
   cubeDetectSensor: { channel: 14, type: PNP }
   upperCubeSensor: { channel: 13, type: NPN }
   lowerCubeSensor: { channel: 12, type: NPN }
-  armLock: { channel: 3 }
+  armLock: { channel: 7 }
 lift:
   liftMotor:
     - { type: VICTOR_SPX, config: { id: 3, inverted: false } }
