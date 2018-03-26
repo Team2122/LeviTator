@@ -9,7 +9,6 @@ import org.teamtators.common.config.helpers.SolenoidConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.MotorPowerUpdater;
 import org.teamtators.common.control.Updatable;
-import org.teamtators.common.control.Updater;
 import org.teamtators.common.hw.DigitalSensor;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
@@ -19,7 +18,6 @@ import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
@@ -31,6 +29,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private DigitalSensor cubeDetectSensor;
     private DigitalSensor upperCubeSensor;
     private DigitalSensor lowerCubeSensor;
+    private Solenoid armLock;
 
     private boolean defaultExtended = false;
 
@@ -124,6 +123,22 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setDefaultExtended(false);
     }
 
+    public void setArmLocked(boolean locked) {
+        armLock.set(locked);
+    }
+
+    public void lockArms() {
+        setArmLocked(true);
+    }
+
+    public void unlockArms() {
+        setArmLocked(false);
+    }
+
+    public boolean isArmLocked() {
+        return armLock.get();
+    }
+
     @Override
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
@@ -133,6 +148,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         tests.addTest(new DigitalSensorTest("cubeDetectSensor", cubeDetectSensor));
         tests.addTest(new DigitalSensorTest("upperCubeSensor", upperCubeSensor));
         tests.addTest(new DigitalSensorTest("lowerCubeSensor", lowerCubeSensor));
+        tests.addTest(new SolenoidTest("armLock", armLock));
         return tests;
     }
 
@@ -145,6 +161,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         this.cubeDetectSensor = config.cubeDetectSensor.create();
         this.upperCubeSensor = config.upperCubeSensor.create();
         this.lowerCubeSensor = config.lowerCubeSensor.create();
+        this.armLock = config.armLock.create();
 
         ((Sendable) leftMotor).setName("Picker", "leftMotor");
         ((Sendable) rightMotor).setName("Picker", "rightMotor");
@@ -152,6 +169,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.setName("Picker", "cubeDetectSensor");
         upperCubeSensor.setName("Picker", "upperCubeSensor");
         lowerCubeSensor.setName("Picker", "lowerCubeSensor");
+        armLock.setName("Picker", "armLock");
 
         leftMotorUpdater = new MotorPowerUpdater(leftMotor);
         rightMotorUpdater = new MotorPowerUpdater(rightMotor);
@@ -173,12 +191,14 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         cubeDetectSensor.free();
         upperCubeSensor.free();
         lowerCubeSensor.free();
+        armLock.free();
     }
 
     public List<Updatable> getMotorUpdatables() {
         return Arrays.asList(leftMotorUpdater, rightMotorUpdater);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig leftMotor;
         public SpeedControllerConfig rightMotor;
@@ -186,6 +206,7 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         public DigitalSensorConfig cubeDetectSensor;
         public DigitalSensorConfig upperCubeSensor;
         public DigitalSensorConfig lowerCubeSensor;
+        public SolenoidConfig armLock;
     }
 
     public static class RollerPowers {
