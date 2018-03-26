@@ -31,7 +31,6 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
     //Not config
     private Logger logger = LoggerFactory.getLogger(SpeedControllerConfig.class);
 
-
     public void setPowerChannel(int[] powerChannels) {
         this.powerChannels = powerChannels;
     }

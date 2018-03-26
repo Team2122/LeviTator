@@ -1,13 +1,16 @@
 package org.teamtators.levitator.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Solenoid;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.SolenoidConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.MotorPowerUpdater;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
+import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
@@ -23,8 +26,8 @@ import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private final TatorRobot robot;
-    private WPI_TalonSRX climberMotor;
-    private WPI_VictorSPX slaveMotor;
+    private SpeedControllerGroup climberMotor;
+    private WPI_TalonSRX masterMotor;
 //    private MotorPowerUpdater climberMotorUpdater;
     private DigitalSensor topLimit;
     private DigitalSensor bottomLimit;
@@ -56,11 +59,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
             pow = 0;
         }
         climberMotor.set(pow);
-        slaveMotor.follow(climberMotor);
     }
 
     public double getPosition() {
-        return climberMotor.getSensorCollection().getQuadraturePosition() / 1024.0 * config.distancePerPulse;
+        return masterMotor.getSelectedSensorPosition(0) / 1024.0 * config.distancePerPulse;
     }
 
     public boolean isAtBottomLimit() {
@@ -72,7 +74,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public void resetPosition() {
-        climberMotor.getSensorCollection().setQuadraturePosition(0, 0);
+        masterMotor.setSelectedSensorPosition(0, 0, 0);
     }
 
     public void release() {
@@ -101,14 +103,14 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     public void configure(Config config) {
         this.config = config;
         climberMotor = config.climberMotor.create();
-        slaveMotor = config.slaveMotor.create();
+        masterMotor = (WPI_TalonSRX) climberMotor.getSpeedControllers()[0];
         topLimit = config.topLimit.create();
         bottomLimit = config.bottomLimit.create();
         releaser = config.releaser.create();
 //        climberMotorUpdater = new MotorPowerUpdater(climberMotor);
 
         climberMotor.setName("Climber", "climberMotor");
-        slaveMotor.setName("Climber", "slaveMotor");
+        masterMotor.setName("Climber", "masterMotor");
         topLimit.setName("Climber", "topLimit");
         bottomLimit.setName("Climber", "bottomLimit");
         releaser.setName("Climber", "releaser");
@@ -119,7 +121,6 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     @Override
     public void deconfigure() {
         SpeedControllerConfig.free(climberMotor);
-        SpeedControllerConfig.free(slaveMotor);
         topLimit.free();
         bottomLimit.free();
         releaser.free();
@@ -130,16 +131,15 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         ManualTestGroup group = super.createManualTests();
         group.addTest(new ClimberEncoderTest());
         group.addTest(new SpeedControllerTest("climberMotor", climberMotor));
-        group.addTest(new SpeedControllerTest("slaveMotor", slaveMotor));
         group.addTest(new DigitalSensorTest("topLimit", topLimit));
         group.addTest(new DigitalSensorTest("bottomLimit", bottomLimit));
         group.addTest(new SolenoidTest("releaser", releaser));
         return group;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
-        public TalonSRXConfig climberMotor;
-        public VictorSPXConfig slaveMotor;
+        public SpeedControllerGroupConfig climberMotor;
         public double distancePerPulse;
         public DigitalSensorConfig topLimit;
         public DigitalSensorConfig bottomLimit;
@@ -147,7 +147,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public class ClimberEncoderTest extends ManualTest {
-        public ClimberEncoderTest() {
+        ClimberEncoderTest() {
             super("ClimberEncoderTest");
         }
 
