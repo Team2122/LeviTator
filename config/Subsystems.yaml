@@ -182,8 +182,14 @@ climber:
       config:
         id: 7
         inverted: false
-#    - { type: TALON, channel: 2 }
-#    - { type: TALON, channel: 3 }
+    - type: TALON_SRX
+      config:
+        id: 8
+        inverted: true
+    - type: TALON_SRX
+      config:
+        id: 9
+        inverted: true
   topLimit: { channel: 17, type: NPN }
   bottomLimit: { channel: 15, type: NPN }
   releaser: { channel: 2 }

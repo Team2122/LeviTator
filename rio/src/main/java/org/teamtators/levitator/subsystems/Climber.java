@@ -1,7 +1,9 @@
 package org.teamtators.levitator.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
@@ -110,7 +112,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
 //        climberMotorUpdater = new MotorPowerUpdater(climberMotor);
 
         climberMotor.setName("Climber", "climberMotor");
-        masterMotor.setName("Climber", "masterMotor");
+        for (int i = 0; i < climberMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = climberMotor.getSpeedControllers()[i];
+            ((Sendable) speedController).setName("Climber", ("climberMotor(" + i + ")"));
+        }
         topLimit.setName("Climber", "topLimit");
         bottomLimit.setName("Climber", "bottomLimit");
         releaser.setName("Climber", "releaser");
@@ -131,6 +136,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         ManualTestGroup group = super.createManualTests();
         group.addTest(new ClimberEncoderTest());
         group.addTest(new SpeedControllerTest("climberMotor", climberMotor));
+        for (int i = 0; i < climberMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = climberMotor.getSpeedControllers()[i];
+            group.addTest(new SpeedControllerTest("climberMotor(" + i + ")", speedController));
+        }
         group.addTest(new DigitalSensorTest("topLimit", topLimit));
         group.addTest(new DigitalSensorTest("bottomLimit", bottomLimit));
         group.addTest(new SolenoidTest("releaser", releaser));

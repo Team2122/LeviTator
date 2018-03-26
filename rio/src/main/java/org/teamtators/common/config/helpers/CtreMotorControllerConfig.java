@@ -1,12 +1,11 @@
 package org.teamtators.common.config.helpers;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.*;
 import org.teamtators.common.Robot;
 import org.teamtators.common.config.ConfigException;
 
 public class CtreMotorControllerConfig {
-    public static int CONFIG_TIMEOUT = 0; // no wait/error checking
+    public static int CONFIG_TIMEOUT = 500;
 
     public int id = -1;
     public boolean inverted = false;
@@ -36,6 +35,10 @@ public class CtreMotorControllerConfig {
             motor.enableVoltageCompensation(false);
         }
         motor.configSelectedFeedbackSensor(feedbackDevice, 0, CONFIG_TIMEOUT);
+        motor.configForwardLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, CONFIG_TIMEOUT);
+        motor.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, CONFIG_TIMEOUT);
+        motor.configForwardSoftLimitEnable(false, CONFIG_TIMEOUT);
+        motor.configReverseSoftLimitEnable(false, CONFIG_TIMEOUT);
     }
 
     protected void checkVersion(com.ctre.phoenix.motorcontrol.can.BaseMotorController motor, int requiredVersion) {
