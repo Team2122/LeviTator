@@ -81,6 +81,8 @@ dependencies {
     compile wpilib()
 //    compile ctre()
     compile name: 'CTRE_Phoenix'
+    compile name: 'CTRE_Phoenix-sources'
+    compile name: 'CTRE_Phoenix-javadoc'
     nativeLib name: 'libCTRE_PhoenixCCI', ext: 'so'
     nativeLib name: 'libCTRLibDriver', ext: 'so'
     nativeLib name: 'libCTRLibDriver', ext: 'so.debug'
