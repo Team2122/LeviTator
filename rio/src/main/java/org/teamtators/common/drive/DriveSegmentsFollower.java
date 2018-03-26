@@ -41,7 +41,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         speedFollower = new TrapezoidalProfileFollower("DriveSegmentsFollower.speedFollower");
         speedFollower.setPositionProvider(this::getTraveledDistance);
         speedFollower.setVelocityProvider(() ->
-                report.isReverse ? -drive.getCenterRate() : drive.getCenterRate());
+                (report != null && report.isReverse) ? -drive.getCenterRate() : drive.getCenterRate());
         speedFollower.setOutputConsumer(this::setSpeedPower);
         speedFollower.setOnTargetPredicate(t -> false);
 

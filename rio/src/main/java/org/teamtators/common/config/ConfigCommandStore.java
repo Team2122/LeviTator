@@ -102,7 +102,7 @@ public class ConfigCommandStore extends CommandStore {
             JsonNode config = json.get(command.getName());
             configureCommand(command, config);
         }
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             for (Map.Entry<String, Command> commandEntry : commandsMapCopy.entrySet()) {
                 Command command = commandEntry.getValue();
                 command.updateRequirements();
