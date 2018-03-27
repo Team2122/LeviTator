@@ -4,7 +4,7 @@ operatorInterface:
   gunnerSecondary: { port: 2 }
   slider: { port: 3 }
   knobRange: 90
-  knobDeadzone: 4
+  knobDeadzone: 7
   sliderFunction: { minX: -1, minY: 0, maxX: 1, maxY: 85 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }
@@ -194,4 +194,4 @@ climber:
   topLimit: { channel: 17, type: NPN }
   bottomLimit: { channel: 15, type: NPN }
   releaser: { channel: 2 }
-  distancePerPulse: 0.0851851851851852
+  distancePerPulse: 0.08518518518518519

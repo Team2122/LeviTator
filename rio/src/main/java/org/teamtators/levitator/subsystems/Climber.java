@@ -64,7 +64,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public double getPosition() {
-        return masterMotor.getSelectedSensorPosition(0) / 1024.0 * config.distancePerPulse;
+        return masterMotor.getSelectedSensorPosition(0) / 4096.0 * config.distancePerPulse;
     }
 
     public boolean isAtBottomLimit() {

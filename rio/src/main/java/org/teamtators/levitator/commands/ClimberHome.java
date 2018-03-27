@@ -12,6 +12,7 @@ public class ClimberHome extends Command implements Configurable<ClimberHome.Con
     public ClimberHome(TatorRobot robot) {
         super("ClimberHome");
         this.climber = robot.getSubsystems().getClimber();
+        requires(climber);
     }
 
     @Override

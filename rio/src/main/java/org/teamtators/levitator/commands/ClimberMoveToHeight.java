@@ -13,6 +13,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
     public ClimberMoveToHeight(TatorRobot robot) {
         super("ClimberMoveToHeight");
         this.climber = robot.getSubsystems().getClimber();
+        requires(climber);
     }
 
     @Override
