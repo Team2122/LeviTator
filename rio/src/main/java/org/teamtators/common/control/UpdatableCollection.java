@@ -44,8 +44,12 @@ public class UpdatableCollection extends ArrayList<Updatable> implements Updatab
     @Override
     public void update(double delta) {
         profiler = new Profiler(name);
-        this.forEach(updatable ->{
-            profiler.start(updatable.getName());
+        this.forEach(updatable -> {
+            if (updatable.hasProfiler()) {
+                updatable.setProfiler(profiler.startNested(updatable.getName()));
+            } else {
+                profiler.start(updatable.getName());
+            }
             updatable.update(delta);
         });
         profiler.stop();

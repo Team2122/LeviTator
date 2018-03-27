@@ -1,5 +1,6 @@
 package org.teamtators.common.drive;
 
+import org.slf4j.profiler.Profiler;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.AbstractUpdatable;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
@@ -33,6 +34,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private Twist2d twist;
     private DriveOutputs driveOutputs;
     private boolean logData;
+    private Profiler profiler;
 
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
@@ -101,7 +103,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (!speedFollower.isRunning()) {
             speedFollower.start();
         }
-        logger.debug("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
+        logger.trace("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
     }
 
     void updatePursuitReport(Pose2d currentPose, double centerWheelRate) {
@@ -202,27 +204,56 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
     @Override
     protected void doUpdate(double delta) {
+        if (profiler == null) {
+            profiler = new Profiler(getName());
+        }
+        profiler.start("checkFinished");
         if (isFinished()) {
             drive.stop();
             stop();
+            profiler.stop();
             return;
         }
+        profiler.start("getPose");
         currentPose = drive.getPose();
         double centerWheelRate = drive.getCenterRate();
+        profiler.start("updatePursuitReport");
         updatePursuitReport(currentPose, centerWheelRate);
+        profiler.start("updateProfile");
         if (!isFinished() && report.updateProfile) {
             updateProfile();
         }
+        profiler.start("twist2d");
         twist = Twist2d.fromTangentArc(currentPose, report.lookaheadPoint.getTranslation());
         if (report.isReverse) {
             twist = new Twist2d(twist.getDeltaYaw(), -twist.getDeltaX());
         }
+        profiler.start("speedFollower");
         speedFollower.update(delta);
+        profiler.start("setOutputs");
         driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
         drive.setPowers(driveOutputs);
         if (isOnTarget()) {
             report.isFinished = true;
         }
+        profiler.stop();
+    }
+
+    @Override
+    public Profiler getProfiler() {
+        Profiler profiler = this.profiler;
+        this.profiler = null;
+        return profiler;
+    }
+
+    @Override
+    public void setProfiler(Profiler profiler) {
+        this.profiler = profiler;
+    }
+
+    @Override
+    public boolean hasProfiler() {
+        return true;
     }
 
     @Override

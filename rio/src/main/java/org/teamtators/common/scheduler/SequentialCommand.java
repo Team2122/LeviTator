@@ -80,7 +80,7 @@ public class SequentialCommand extends Command implements CommandRunContext {
         // A sequential command requires all subsystems required by all child commands
         sequence.forEach(run -> {
             run.command.updateRequirements();
-            if (run.command.getRequirements() != null && !run.parallel)
+            if (run.command.getRequirements() != null)
                 requiresAll(run.command.getRequirements());
         });
     }
@@ -118,16 +118,24 @@ public class SequentialCommand extends Command implements CommandRunContext {
                     releaseRequirements(run.command.getRequirements());
                     if (run.command.isRunning()) {
                         if (run.command.getContext() == this && run.command.checkRequirements()) {
+                            logger.trace("Command was already running with myself as parent: {}", run.command.getName());
                             run.initialized = true;
                         } else {
+                            logger.trace("Command was already running with other parent, cancelling: {}", run.command.getName());
                             run.command.cancel();
                             return false;
                         }
                     } else if (run.command.startRun(this)) {
                         run.initialized = true;
+                    } else {
+                        logger.trace("Command could not be initialized at this time: {}", run.command.getName());
                     }
                 }
-                finished = run.command.step();
+                if (run.initialized) {
+                    finished = run.command.step();
+                } else {
+                    finished = false;
+                }
             }
             if (run.cancel) {
                 cancelRun(run);

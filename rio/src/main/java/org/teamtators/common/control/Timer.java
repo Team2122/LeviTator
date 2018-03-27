@@ -16,7 +16,7 @@ public class Timer {
      * @return Current timestamp
      */
     public static double getTimestamp() {
-        return ((double) System.nanoTime()) / 1_000_000_000.0;
+        return edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
     }
 
     /**

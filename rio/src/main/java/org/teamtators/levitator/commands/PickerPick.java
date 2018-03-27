@@ -50,7 +50,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         boolean finished = this.finished.get();
 
         if (jammed && !unjamming && (!unjamTimer.isRunning() || unjamTimer.hasPeriodElapsed(config.afterUnjamWait))) {
-            logger.info("Jam detected, unjamming");
+            logger.trace("Jam detected, unjamming");
             unjamming = true;
             unjamTimer.start();
         }

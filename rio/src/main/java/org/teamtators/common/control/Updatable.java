@@ -23,4 +23,11 @@ public interface Updatable {
     default Profiler getProfiler() {
         return null;
     }
+
+    default void setProfiler(Profiler profiler) {
+    }
+
+    default boolean hasProfiler() {
+        return false;
+    }
 }
