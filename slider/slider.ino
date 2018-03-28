@@ -27,9 +27,15 @@ DATE: 3/17/2018
 #define LIFT_SLIDER 5
 #define POWER_SLIDER 18
 
-#define LED_R 5
-#define LED_G 6
-#define LED_B 7
+#define R_PIN 5
+#define G_PIN 7
+#define B_PIN 6
+
+#define  MIN_RGB_VALUE  10
+#define  MAX_RGB_VALUE  255
+
+#define  TRANSITION_DELAY  70
+#define  WAIT_DELAY        500
 
 //#define DEBUG
 #ifdef DEBUG
@@ -74,9 +80,80 @@ unsigned long lastTime;
 
 unsigned long testStarted;
 
-Encoder knob(ENCODER_PIN_1, ENCODER_PIN_2);
+int ledIter;
+int ledIterT;
+double delayLed;
 
-LED_MODE selected = Impress;
+typedef struct
+{
+  byte  x, y, z;
+} coord;
+
+static coord  v;
+int    v1, v2=0;
+
+const coord vertex[] =
+{
+//x  y  z      name
+  {0, 0, 0}, // A or 0
+  {0, 1, 0}, // B or 1
+  {0, 1, 1}, // C or 2
+  {0, 0, 1}, // D or 3
+  {1, 0, 0}, // E or 4
+  {1, 1, 0}, // F or 5
+  {1, 1, 1}, // G or 6
+  {1, 0, 1}  // H or 7
+};
+
+const byte path[] =
+{
+  //0x01, 0x23, 0x76, 0x54, 0x03, 0x21, 0x56, 0x74,  // trace the edges
+  0x13, 0x64, 0x16, 0x02, 0x75, 0x24, 0x35, 0x17, 0x25, 0x70,  // do the diagonals
+};
+
+#define  MAX_PATH_SIZE  (sizeof(path)/sizeof(path[0]))  // size of the array
+
+boolean firstRun = true;
+
+boolean traverse(int dx, int dy, int dz, double delta)
+// Move along the colour line from where we are to the next vertex of the cube.
+// The transition is achieved by applying the 'delta' value to the coordinate.
+// By definition all the coordinates will complete the transition at the same
+// time as we only have one loop index.
+{
+  if(ledIterT >= MAX_RGB_VALUE-MIN_RGB_VALUE) {
+    delayLed = WAIT_DELAY;
+    ledIterT = 0;
+    return true;
+  }
+  delayLed-=delta*10000;
+  Serial.printf("delayLed %.3f\n", delayLed);
+  Serial.printf("dx %d dy %d dz %d\n", dx, dy, dz);
+  Serial.printf("ledIter %d\n", ledIter);
+  if ((dx == 0) && (dy == 0) && (dz == 0)) {   // no point looping if we are staying in the same spot!
+    //return;
+  }
+  if(delayLed <= 0)
+  {
+    // set the colour in the LED
+    analogWrite(R_PIN, (v.x / 255.0) * OUTPUT_CONVERSION_FACTOR);
+    analogWrite(G_PIN, (v.y / 255.0) * OUTPUT_CONVERSION_FACTOR);
+    analogWrite(B_PIN, (v.z / 255.0) * OUTPUT_CONVERSION_FACTOR);
+
+      // wait fot the transition delay
+    v.x += dx;
+    v.y += dy;
+    v.z += dz;
+    
+  delayLed = TRANSITION_DELAY;
+  ledIterT++;
+  }
+  Serial.printf("v.x %d v.y %d v.z %d\n", v.x, v.y, v.z);
+  return false;
+}
+
+
+Encoder knob(ENCODER_PIN_1, ENCODER_PIN_2);
 
 enum PACKET_TYPE {
     Ping = 'p',
@@ -90,6 +167,8 @@ enum LED_MODE {
     Utility
 };
 
+LED_MODE SELECTED_LED_MODE = Impress;
+
 void setup() {
   Joystick.useManualSend(false);
   for(int i = 0; i < NUM_BUTTONS; i++) {
@@ -99,9 +178,9 @@ void setup() {
   pinMode(AI2, OUTPUT);
   pinMode(PWMA, OUTPUT);
   pinMode(ENCODER_RESET_BUTTON, INPUT);
-  pinMode(LED_R, OUTPUT);
-  pinMode(LED_G, OUTPUT);
-  pinMode(LED_B, OUTPUT);
+  pinMode(R_PIN, OUTPUT);
+  pinMode(G_PIN, OUTPUT);
+  pinMode(B_PIN, OUTPUT);
   Serial.begin(115200);
   analogReadResolution(READ_RESOLUTION);
   analogWriteResolution(WRITE_RESOLUTION);
@@ -140,9 +219,9 @@ void loop() {
             Serial.printf("Running self-test mode, %d iterations\n", TEST_ITER);
             testing = !testing;
         }
-        case SelectLedMode: {
+        /*case SelectLedMode: {
             char
-        }
+        }*/
         break;
         
   }
@@ -283,21 +362,39 @@ void loop() {
   Joystick.send_now();
   lastTime = micros();
 
-  switch(SELECTED_LED_MODE) {
-    case Impress: {
-        int millis = millis();
+  //switch(SELECTED_LED_MODE) {
+    //case Impress: {
+        // the new vertex and the previous one
 
-        int Rval = millis % 1010;
-        int Gval = millis % 745;
-        int Bval = millis % 1150;
-
-        analogWrite(LED_R, Rval * OUTPUT_CONVERSION_FACTOR / 1010);
-        analogWrite(LED_G, Gval * OUTPUT_CONVERSION_FACTOR / 745);
-        analogWrite(LED_B, Bval * OUTPUT_CONVERSION_FACTOR / 1150);
-    };
-    break;
-
+  // initialise the place we start from as the first vertex in the array
+  if(ledIter >= 2*MAX_PATH_SIZE) {
+    Serial.println("REINIT");
+    v1, v2 = 0;
+    v.x = (vertex[v2].x ? MAX_RGB_VALUE : MIN_RGB_VALUE);
+    v.y = (vertex[v2].y ? MAX_RGB_VALUE : MIN_RGB_VALUE);
+    v.z = (vertex[v2].z ? MAX_RGB_VALUE : MIN_RGB_VALUE);
+    firstRun = true;
+    ledIter = 0;
   }
+
+  if(ledIterT >= MAX_RGB_VALUE-MIN_RGB_VALUE || firstRun) {
+    v1 = v2;
+    if (ledIter&1)  // odd number is the second element and ...
+      v2 = path[ledIter>>1] & 0xf;  // ... the bottom nybble (index /2) or ...
+    else      // ... even number is the first element and ...
+      v2 = path[ledIter>>1] >> 4;  // ... the top nybble
+    firstRun = false;
+  }
+  
+  if(traverse(vertex[v2].x-vertex[v1].x,
+             vertex[v2].y-vertex[v1].y,
+             vertex[v2].z-vertex[v1].z,
+             delta))
+    ledIter++;
+    //};
+    //break;
+
+  //}
 
 
   delay(5);
