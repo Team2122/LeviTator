@@ -72,8 +72,9 @@ public class SliderApp {
 
         System.out.println("Connected to NetworkTables!");
 //        while (true) {
-            NetworkTableEntry pos = smartDashboard.getEntry("liftTarget");
-            NetworkTableEntry move = smartDashboard.getEntry("move");
+            NetworkTableEntry pos = smartDashboard.getEntry("Lift/liftTarget");
+            NetworkTableEntry move = smartDashboard.getEntry("Lift/move");
+            NetworkTableEntry maxHeight = smartDashboard.getEntry("Lift/maxHeight");
             pos.addListener(entryNotification -> {
                 double num = pos.getNumber(-1).doubleValue();
                 boolean shouldMove = move.getBoolean(false);
