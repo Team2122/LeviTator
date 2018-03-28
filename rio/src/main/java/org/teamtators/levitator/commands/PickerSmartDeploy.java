@@ -103,6 +103,7 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     }
 
     public enum DeployPower {
+        SOFTEST,
         SOFT,
         MEDIUM,
         HARD
