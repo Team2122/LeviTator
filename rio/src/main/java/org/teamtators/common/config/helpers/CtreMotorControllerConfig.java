@@ -1,7 +1,9 @@
 package org.teamtators.common.config.helpers;
 
-import com.ctre.phoenix.motorcontrol.*;
-import org.teamtators.common.Robot;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 import org.teamtators.common.config.ConfigException;
 
 public class CtreMotorControllerConfig {

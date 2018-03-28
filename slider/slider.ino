@@ -33,7 +33,7 @@ DATE: 3/17/2018
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
 #define ERROR_MARGIN 0.003
-#define CPR 48[]\.0
+#define CPR 48.0
 
 const int BUTTON_PORTS[] = {};
 const int NUM_BUTTONS = 0;

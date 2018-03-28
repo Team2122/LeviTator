@@ -8,6 +8,7 @@ public class TalonSRXConfig extends CtreMotorControllerConfig implements ConfigH
     public WPI_TalonSRX create() {
         super.validate();
         WPI_TalonSRX motor = new WPI_TalonSRX(id);
+        motor.enableCurrentLimit(false);
         super.configure(motor);
         super.checkVersion(motor, REQUIRED_FIRMWARE);
         return motor;
