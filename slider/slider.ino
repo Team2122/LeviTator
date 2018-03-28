@@ -10,7 +10,7 @@ AUTHOR: Avery Bainbridge
 DATE: 3/17/2018
 
 ************************************************************/
-#define VERSION 1.20
+#define VERSION 1.10
 
 #define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
@@ -26,11 +26,6 @@ DATE: 3/17/2018
 #define TOUCH_SENSOR 3
 #define LIFT_SLIDER 5
 #define POWER_SLIDER 18
-
-#define LED_R 5
-#define LED_G 6
-#define LED_B 7
-
 //#define DEBUG
 #ifdef DEBUG
 #define ENABLE_LOGGING
@@ -38,7 +33,7 @@ DATE: 3/17/2018
 #define READ_RESOLUTION 13
 #define WRITE_RESOLUTION 12
 #define ERROR_MARGIN 0.003
-#define CPR 48.0
+#define CPR 48[]\.0
 
 const int BUTTON_PORTS[] = {};
 const int NUM_BUTTONS = 0;
@@ -70,24 +65,16 @@ int tests = 0;
 boolean enabled = true;
 boolean testing = false;
 
-unsigned long lastTime;
+long lastTime;
 
-unsigned long testStarted;
+long testStarted;
 
 Encoder knob(ENCODER_PIN_1, ENCODER_PIN_2);
-
-LED_MODE selected = Impress;
 
 enum PACKET_TYPE {
     Ping = 'p',
     UpdateSlider = 's',
-    RunSelfTest = 't',
-    SelectLed = 'l'
-};
-
-enum LED_MODE {
-    Impress,
-    Utility
+    RunSelfTest = 't'
 };
 
 void setup() {
@@ -99,9 +86,6 @@ void setup() {
   pinMode(AI2, OUTPUT);
   pinMode(PWMA, OUTPUT);
   pinMode(ENCODER_RESET_BUTTON, INPUT);
-  pinMode(LED_R, OUTPUT);
-  pinMode(LED_G, OUTPUT);
-  pinMode(LED_B, OUTPUT);
   Serial.begin(115200);
   analogReadResolution(READ_RESOLUTION);
   analogWriteResolution(WRITE_RESOLUTION);
@@ -139,9 +123,6 @@ void loop() {
             TEST_ITER = in == 0 ? 10 : in;
             Serial.printf("Running self-test mode, %d iterations\n", TEST_ITER);
             testing = !testing;
-        }
-        case SelectLedMode: {
-            char
         }
         break;
         
@@ -249,16 +230,19 @@ void loop() {
       enabled = true;
       testStarted = micros();
       }
+      
     }
-    #ifdef ENABLE_LOGGING
+    
+#ifdef ENABLE_LOGGING
     Serial.printf("%.3f,%.3f,%.3f\n", output, sliderVal, setpoint);
-    #endif
+#endif
     driveMotor(output);
   } else {
     totalError = 0;
     driveMotor(0);
   }
-  lastError = errorVal;
+    lastError = errorVal;
+
   lastValue = sliderVal;
   lastPosition = sliderVal;
 
@@ -276,30 +260,12 @@ void loop() {
   }
   */
   int knobV = knob.read();
-  Joystick.Y((knobV / CPR + 0.5) * 1023);
+  Joystick.Y((knobV / CPR + .5) * 1023);
   int powerSlider = analogRead(POWER_SLIDER);
   //Serial.println(powerSlider);
   Joystick.Z(((INPUT_CONVERSION_FACTOR - powerSlider) / INPUT_CONVERSION_FACTOR) * 1023);
   Joystick.send_now();
   lastTime = micros();
-
-  switch(SELECTED_LED_MODE) {
-    case Impress: {
-        int millis = millis();
-
-        int Rval = millis % 1010;
-        int Gval = millis % 745;
-        int Bval = millis % 1150;
-
-        analogWrite(LED_R, Rval * OUTPUT_CONVERSION_FACTOR / 1010);
-        analogWrite(LED_G, Gval * OUTPUT_CONVERSION_FACTOR / 745);
-        analogWrite(LED_B, Bval * OUTPUT_CONVERSION_FACTOR / 1150);
-    };
-    break;
-
-  }
-
-
   delay(5);
 }
 
