@@ -109,7 +109,7 @@ pivot:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 98
+    offset: -9.1
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
@@ -138,11 +138,11 @@ pivot:
 #    logData: true
   pivotHoldPower: 0.15
   anglePresets:
-    LEFT: -88
+    LEFT: -90
     HALF_LEFT: -45
     CENTER: 0
     HALF_RIGHT: 45
-    RIGHT: 85
+    RIGHT: 90
 
   bumpPivotValue: 15
 
@@ -177,21 +177,21 @@ climber:
     - type: TALON_SRX
       config:
         id: 6
-        inverted: false
+        inverted: true
         feedbackDevice: CTRE_MagEncoder_Relative
     - type: VICTOR_SPX
       config:
         id: 7
-        inverted: false
-    - type: TALON_SRX
+        inverted: true
+    - type: VICTOR_SPX
       config:
         id: 8
-        inverted: true
-    - type: TALON_SRX
+        inverted: false
+    - type: VICTOR_SPX
       config:
         id: 9
-        inverted: true
+        inverted: false
   topLimit: { channel: 17, type: NPN }
   bottomLimit: { channel: 15, type: NPN }
   releaser: { channel: 2 }
-  distancePerPulse: 0.08518518518518519
+  distancePerPulse: -0.08518518518518519

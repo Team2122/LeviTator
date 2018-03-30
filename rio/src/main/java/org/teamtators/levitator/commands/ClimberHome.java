@@ -22,11 +22,13 @@ public class ClimberHome extends Command implements Configurable<ClimberHome.Con
     }
 
     protected void finish(boolean interrupted) {
-        logger.info("Climber has been homed");
         climber.setPower(0.0);
         if (!interrupted) {
+            logger.info("Climber has been homed");
             climber.resetPosition();
             climber.setHomed(true);
+        } else {
+            logger.warn("Climber home interrupted");
         }
     }
 

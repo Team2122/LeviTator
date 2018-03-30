@@ -23,8 +23,9 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
             this.cancel();
             return;
         }
-        direction = Math.signum(config.height - climber.getPosition());
-        logger.info("Going to {} (direction is {})", config.height, direction == 1 ? "positive" : direction == -1 ? "negative" : "0");
+        double position = climber.getPosition();
+        direction = Math.signum(config.height - position);
+        logger.info("Going to {} (from {}, direction is {})", config.height, position, direction == 1 ? "positive" : direction == -1 ? "negative" : "0");
     }
 
     @Override
