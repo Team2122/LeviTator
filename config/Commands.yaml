@@ -494,7 +494,7 @@ $AutoStartRightScaleRightScaleRight:
     path:
       - { x: 74, y: 225 }
       - { x: 85, y: 240 }
-      - { x: 100, y: 292 }
+      - { x: 112, y: 292 }
   - WaitForRight
   - PickerAutoDeploy
   - PivotCenter
@@ -504,7 +504,7 @@ $AutoStartRightScaleRightScaleRight:
     parallel: true
     speed: 80
     path:
-      - { x: 100, y: 292 }
+      - { x: 112, y: 292 }
       - { x: 90, y: 240, radius: 36, arcSpeed: 40, speed: 30 }
       - { x: 52, y: 208 }
 #  - { parallel: true, name: $LiftSequenceScaleLowRight }
