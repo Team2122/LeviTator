@@ -162,7 +162,7 @@ ClimberOverBar:
 
 ClimberClimb:
   class: ClimberMoveToHeight
-  height: 7.0
+  height: 3.0
 #  maxAcceleration: 84.0
 #TestDriveRotate:
 #  class: DriveRotate
