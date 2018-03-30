@@ -300,8 +300,8 @@ $CenterAutoLSwitch:
   - { class: DriveStraight, angle: 60, distance: 34.0 }
 
 $CenterAutoRSwitch:
-  - { class: DriveArc, arcLength: 55, angle: 48, speed: 100, endSpeed: 100.0 }
-  - { class: DriveArc, arcLength: 55, angle: 0, speed: 100 }
+  - { class: DriveArc, arcLength: 58, angle: 45, speed: 100, endSpeed: 100.0 }
+  - { class: DriveArc, arcLength: 58, angle: 0, speed: 100 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 160 }
@@ -312,7 +312,7 @@ $CenterAutoRSwitch:
   - WaitForPick
   - { class: DriveStraight, angle: -60, distance: -32, maxAcceleration: 160 }
   - { class: DriveRotate, angle: 0, maxAcceleration: 600 }
-  - { class: DriveStraight, angle: 0, distance: 54.0, maxAcceleration: 160 }
+  - { class: DriveStraight, angle: 0, distance: 58.0, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -34, maxAcceleration: 160 }
