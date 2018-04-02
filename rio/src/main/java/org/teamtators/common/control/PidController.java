@@ -1,6 +1,5 @@
 package org.teamtators.common.control;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import org.teamtators.common.config.Configurable;
@@ -133,11 +132,6 @@ public class PidController extends AbstractController implements Configurable<Pi
         super.configure(config);
     }
 
-    public static class Config extends AbstractController.Config {
-        public double P = 0.0, I = 0.0, D = 0.0, F = 0.0;
-        public double maxIError = Double.POSITIVE_INFINITY, minISetpoint = 0.0;
-    }
-
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PIDController");
@@ -148,5 +142,10 @@ public class PidController extends AbstractController implements Configurable<Pi
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    }
+
+    public static class Config extends AbstractController.Config {
+        public double P = 0.0, I = 0.0, D = 0.0, F = 0.0;
+        public double maxIError = Double.POSITIVE_INFINITY, minISetpoint = 0.0;
     }
 }

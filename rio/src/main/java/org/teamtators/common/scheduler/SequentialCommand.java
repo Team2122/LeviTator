@@ -177,14 +177,14 @@ public class SequentialCommand extends Command implements CommandRunContext {
             logger.error("rootContext is null??");
         }
         sequence
-            .forEach(r -> {
-                if (r.command.isRunning() && r.parallel) {
+                .forEach(r -> {
+                    if (r.command.isRunning() && r.parallel) {
 //                    r.command.setContext(rootContext);
-                    if (interrupted) {
-                        r.command.cancel();
+                        if (interrupted) {
+                            r.command.cancel();
+                        }
                     }
-                }
-            });
+                });
         if (sequence.size() == 0 || currentPosition >= sequence.size()) return;
         Command currentCommand = currentRun().command;
         if (interrupted && currentCommand.isRunning()) {

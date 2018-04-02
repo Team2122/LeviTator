@@ -134,10 +134,6 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         calculator.updateProfile(baseProfile);
     }
 
-    public synchronized void setEndVelocity(double endVelocity) {
-        baseProfile.setEndVelocity(endVelocity);
-    }
-
     public void resetEndVelocity() {
         setEndVelocity(config.endVelocity);
     }
@@ -146,8 +142,8 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         return baseProfile.getEndVelocity();
     }
 
-    public synchronized void setTravelVelocity(double travelVelocity) {
-        baseProfile.setTravelVelocity(travelVelocity);
+    public synchronized void setEndVelocity(double endVelocity) {
+        baseProfile.setEndVelocity(endVelocity);
     }
 
     public void resetTravelVelocity() {
@@ -158,8 +154,8 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         return baseProfile.getTravelVelocity();
     }
 
-    public synchronized void setMaxAcceleration(double maxAcceleration) {
-        baseProfile.setMaxAcceleration(maxAcceleration);
+    public synchronized void setTravelVelocity(double travelVelocity) {
+        baseProfile.setTravelVelocity(travelVelocity);
     }
 
     public void resetMaxAcceleration() {
@@ -168,6 +164,10 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
     public synchronized double getMaxAcceleration() {
         return baseProfile.getMaxAcceleration();
+    }
+
+    public synchronized void setMaxAcceleration(double maxAcceleration) {
+        baseProfile.setMaxAcceleration(maxAcceleration);
     }
 
     public Predicate<TrapezoidalProfileFollower> getOnTargetPredicate() {

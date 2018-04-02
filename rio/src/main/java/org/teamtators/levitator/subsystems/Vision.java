@@ -4,7 +4,10 @@ import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.opencv.core.*;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.teamtators.common.config.Configurable;
@@ -16,9 +19,7 @@ import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.levitator.TatorRobot;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 public class Vision extends Subsystem implements Configurable<Vision.Config>, Deconfigurable {
     public static final Scalar REJECTED_CONTOUR_COLOR = new Scalar(255, 0, 0);
@@ -267,6 +268,13 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         }
     }
 
+    @Override
+    public ManualTestGroup createManualTests() {
+        ManualTestGroup tests = super.createManualTests();
+        tests.addTest(new VisionTest());
+        return tests;
+    }
+
     public enum DisplayMode {
         Source, HSV, Threshold, AllContours, FilteredContours
     }
@@ -316,13 +324,6 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         public MatOfPoint getContour() {
             return contour;
         }
-    }
-
-    @Override
-    public ManualTestGroup createManualTests() {
-        ManualTestGroup tests = super.createManualTests();
-        tests.addTest(new VisionTest());
-        return tests;
     }
 
     private class VisionTest extends ManualTest {

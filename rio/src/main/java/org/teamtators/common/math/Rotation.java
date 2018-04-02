@@ -137,7 +137,7 @@ public class Rotation {
 
     /**
      * @param length the length of the resultant vector
-     * @return   a vector pointing in the direction of the rotation with the specified length
+     * @return a vector pointing in the direction of the rotation with the specified length
      */
     public Translation2d toTranslation(double length) {
         return toTranslation().scale(length);
@@ -145,6 +145,7 @@ public class Rotation {
 
     /**
      * Checks if this rotation is between the smallest angle formed between start and end
+     *
      * @param start
      * @param end
      * @return

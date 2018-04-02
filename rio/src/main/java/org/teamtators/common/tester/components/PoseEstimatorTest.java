@@ -5,9 +5,6 @@ import org.teamtators.common.drive.PoseEstimator;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.tester.ManualTest;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 public class PoseEstimatorTest extends ManualTest {
     private final PoseEstimator poseEstimator;
 

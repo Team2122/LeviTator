@@ -15,7 +15,8 @@ public class DetectedObject {
         this.height = height;
     }
 
-    public DetectedObject() {}
+    public DetectedObject() {
+    }
 
     @Override
     public String toString() {

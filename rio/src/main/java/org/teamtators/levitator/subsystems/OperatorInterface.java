@@ -1,7 +1,10 @@
 package org.teamtators.levitator.subsystems;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.controllers.*;
+import org.teamtators.common.controllers.ButtonBoardFingers;
+import org.teamtators.common.controllers.Controller;
+import org.teamtators.common.controllers.LogitechF310;
+import org.teamtators.common.controllers.RawController;
 import org.teamtators.common.math.LinearInterpolationFunction;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;

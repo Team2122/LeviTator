@@ -27,7 +27,7 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
             return false;
         }
         if (!Double.isNaN(config.remainingDistance)) {
-            if (report.remainingDistance <= config.remainingDistance || report.isFinished){
+            if (report.remainingDistance <= config.remainingDistance || report.isFinished) {
                 logger.info("WaitForPath finished remaining distance {} < {}", report.remainingDistance, config.remainingDistance);
                 return true;
             }
@@ -35,8 +35,7 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
         if (report.isFinished) {
             logger.info("WaitForPath finished because path finished");
             return true;
-        }
-        else return false;
+        } else return false;
     }
 
     @Override

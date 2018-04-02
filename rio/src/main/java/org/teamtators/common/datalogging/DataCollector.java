@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataCollector implements Updatable {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
     private static final Logger logger = LoggerFactory.getLogger(DataCollector.class);
-    private String outputDir;
     private static DataCollector collector = null;
+    private String outputDir;
     private Set<ProviderUsage> providers = ConcurrentHashMap.newKeySet();
 
     private DataCollector() {
@@ -145,10 +145,10 @@ public class DataCollector implements Updatable {
     }
 
     private class ProviderUsage {
+        public final ArrayList<Iterable<Object>> savedRows = new ArrayList<>();
         LogDataProvider provider;
         FileWriter writer;
         CSVPrinter csvPrinter;
-        public final ArrayList<Iterable<Object>> savedRows = new ArrayList<>();
 
         ProviderUsage(LogDataProvider provider, FileWriter writer, CSVPrinter csvPrinter) {
             this.provider = provider;

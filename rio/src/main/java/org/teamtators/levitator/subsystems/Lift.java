@@ -3,7 +3,10 @@ package org.teamtators.levitator.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.EncoderConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
@@ -13,7 +16,10 @@ import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.common.tester.components.*;
+import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.EncoderTest;
+import org.teamtators.common.tester.components.MotionCalibrationTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -359,36 +365,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         limitSensorBottom.free();
     }
 
-    public enum HeightPreset {
-        HOME,
-        PICK,
-        NEED_LOCK,
-        NEED_CENTER,
-        SWITCH_LOW,
-        SWITCH,
-        SCALE_LOW,
-        SCALE_HIGH;
-    }
-
-    public static class Config {
-        public SpeedControllerGroupConfig liftMotor;
-        public EncoderConfig liftEncoder;
-        public DigitalSensorConfig limitSensorTop;
-        public DigitalSensorConfig limitSensorBottom;
-
-        public TrapezoidalProfileFollower.Config heightController;
-
-        public Map<HeightPreset, Double> heightPresets;
-
-        public double bumpHeightValue;
-
-        public double heightTolerance;
-        public double homePower;
-        public double homeTolerance;
-        public double homingPower;
-        public double homingTimeout;
-    }
-
     private void updateHeight() {
         if (!homed) {
             if (!homeTimer.isRunning()) {
@@ -419,6 +395,36 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.setTargetHeight(desiredHeight);
     }
 
+    public enum HeightPreset {
+        HOME,
+        PICK,
+        NEED_LOCK,
+        NEED_CENTER,
+        SWITCH_LOW,
+        SWITCH,
+        SCALE_LOW,
+        SCALE_HIGH;
+    }
+
+    public static class Config {
+        public SpeedControllerGroupConfig liftMotor;
+        public EncoderConfig liftEncoder;
+        public DigitalSensorConfig limitSensorTop;
+        public DigitalSensorConfig limitSensorBottom;
+
+        public TrapezoidalProfileFollower.Config heightController;
+
+        public Map<HeightPreset, Double> heightPresets;
+
+        public double bumpHeightValue;
+
+        public double heightTolerance;
+        public double homePower;
+        public double homeTolerance;
+        public double homingPower;
+        public double homingTimeout;
+    }
+
     private class LiftTest extends ManualTest {
         private double axisValue;
 
@@ -431,7 +437,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
             disable();
         }
-
 
 
         @Override

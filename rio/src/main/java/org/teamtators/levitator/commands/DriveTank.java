@@ -7,7 +7,6 @@ import org.teamtators.common.util.JoystickModifiers;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.OperatorInterface;
-import org.teamtators.levitator.subsystems.Subsystems;
 
 public class DriveTank extends Command implements Configurable<DriveTank.Config> {
     private final Drive drive;

@@ -150,7 +150,9 @@ public class Subsystems extends SubsystemsBase
         return vision;
     }
 
-    public Climber getClimber() {return climber;}
+    public Climber getClimber() {
+        return climber;
+    }
 
     public static class Config {
         public OperatorInterface.Config operatorInterface;

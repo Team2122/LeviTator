@@ -4,7 +4,6 @@ import org.teamtators.common.math.Pose2d;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DriveSegments {
     private List<DriveSegment> segments = new ArrayList<>();

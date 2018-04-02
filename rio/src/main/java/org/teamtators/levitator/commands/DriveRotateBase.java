@@ -1,7 +1,6 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.control.ControllerPredicates;
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
@@ -11,10 +10,9 @@ import java.util.function.Predicate;
 
 public abstract class DriveRotateBase extends Command {
     protected final Drive drive;
-
-    private Config config;
     protected double angle;
     protected Predicate<TrapezoidalProfileFollower> predicate = ControllerPredicates.finished();
+    private Config config;
 
     protected DriveRotateBase(String name, TatorRobot robot) {
         super(name);

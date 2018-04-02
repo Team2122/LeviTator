@@ -4,7 +4,10 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.AnalogPotentiometerConfig;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.SolenoidConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
@@ -286,6 +289,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotLockSensor.free();
     }
 
+    @SuppressWarnings("unused")
+    public enum AnglePreset {
+        LEFT,
+        HALF_LEFT,
+        CENTER,
+        HALF_RIGHT,
+        RIGHT;
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
@@ -308,15 +320,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public double sweepTimeoutSeconds;
         public double lockedPeriod;
         public double lockAngle;
-    }
-
-    @SuppressWarnings("unused")
-    public enum AnglePreset {
-        LEFT,
-        HALF_LEFT,
-        CENTER,
-        HALF_RIGHT,
-        RIGHT;
     }
 
     private class PivotTest extends ManualTest {

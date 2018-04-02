@@ -43,9 +43,10 @@ public class TriggerSchedulers {
         return new RunnableScheduler(runnable) {
             private Timer timer = new Timer();
             private boolean hasRun = false;
+
             @Override
             protected boolean shouldRun(boolean active) {
-                if(!active) {
+                if (!active) {
                     timer.restart();
                     hasRun = false;
                     return false;
@@ -53,8 +54,7 @@ public class TriggerSchedulers {
                 if (timer.hasPeriodElapsed(duration) && !hasRun) {
                     hasRun = true;
                     return true;
-                }
-                else return false;
+                } else return false;
             }
         };
     }

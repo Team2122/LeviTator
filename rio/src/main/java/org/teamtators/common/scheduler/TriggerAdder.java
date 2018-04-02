@@ -1,7 +1,5 @@
 package org.teamtators.common.scheduler;
 
-import org.teamtators.common.control.Timer;
-
 public class TriggerAdder {
     TriggerSource triggerSource;
     private Scheduler scheduler;

@@ -2,11 +2,10 @@ package org.teamtators.common.hw;
 
 import com.google.common.base.Preconditions;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Sendable;
 
 /**
  * An abstraction for either PNP or NPN digital sensors
- *
+ * <p>
  * Essentially allows for inverting the sensor reading
  */
 public class DigitalSensor extends DigitalInput {

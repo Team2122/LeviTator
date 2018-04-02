@@ -84,11 +84,11 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
 
-    public void extend(){
+    public void extend() {
         setPickerExtended(true);
     }
 
-    public void retract(){
+    public void retract() {
         setPickerExtended(false);
     }
 
@@ -123,10 +123,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setDefaultExtended(false);
     }
 
-    public void setArmLocked(boolean locked) {
-        armLock.set(locked);
-    }
-
     public void lockArms() {
         setArmLocked(true);
     }
@@ -137,6 +133,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     public boolean isArmLocked() {
         return armLock.get();
+    }
+
+    public void setArmLocked(boolean locked) {
+        armLock.set(locked);
     }
 
     @Override

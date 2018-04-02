@@ -1,6 +1,9 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
@@ -234,12 +237,12 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return gyro.getAngle();
     }
 
-    public double getYawRate() {
-        return gyro.getRate();
-    }
-
     public void setYawAngle(double yawAngle) {
         gyro.setAngle(yawAngle);
+    }
+
+    public double getYawRate() {
+        return gyro.getRate();
     }
 
     public void resetYawAngle() {

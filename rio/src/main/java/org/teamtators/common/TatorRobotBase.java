@@ -57,23 +57,19 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     protected final Updater dashboardUpdater = new Updater(smartDashboardUpdater, 1 / 10.0);
     protected final DataCollector dataCollector = DataCollector.getDataCollector();
     protected final Updater dataCollectorUpdater = new Updater(dataCollector, 1.0 / 60.0);
-    protected List<Controller<?, ?>> gameControllers = Collections.emptyList();
     protected final Timer stateTimer = new Timer();
+    protected List<Controller<?, ?>> gameControllers = Collections.emptyList();
     protected double lastDelta = 0.0;
 
     protected boolean reinitialize = false;
-
+    protected int reinitializeListener;
+    protected Profiler profiler;
     private PowerDistributionPanel pdp;
     private DriverStation driverStation;
     private Command autoCommand;
     private List<Subsystem> subsystemList;
-
     private FMSData fmsData = new FMSData();
-
     private NetworkTableEntry reinitializeEntry;
-    protected int reinitializeListener;
-
-    protected Profiler profiler;
 
     public TatorRobotBase(String configDir) {
         configMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);

@@ -6,7 +6,10 @@ import org.teamtators.common.control.AbstractUpdatable;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.LogDataProvider;
-import org.teamtators.common.math.*;
+import org.teamtators.common.math.Epsilon;
+import org.teamtators.common.math.LinearInterpolationFunction;
+import org.teamtators.common.math.Pose2d;
+import org.teamtators.common.math.Twist2d;
 
 import java.util.Arrays;
 import java.util.List;
@@ -83,12 +86,12 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         return speedFollower;
     }
 
-    public void setMaxAcceleration(double maxAcceleration) {
-        speedFollower.setMaxAcceleration(maxAcceleration);
-    }
-
     public double getMaxAcceleration() {
         return speedFollower.getMaxAcceleration();
+    }
+
+    public void setMaxAcceleration(double maxAcceleration) {
+        speedFollower.setMaxAcceleration(maxAcceleration);
     }
 
     private void updateProfile() {

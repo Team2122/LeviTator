@@ -8,6 +8,7 @@ import org.teamtators.levitator.subsystems.Pivot;
 public class LiftRecall extends Command {
     private Lift lift;
     private Pivot pivot;
+
     public LiftRecall(TatorRobot robot) {
         super("LiftRecall");
         this.lift = robot.getSubsystems().getLift();

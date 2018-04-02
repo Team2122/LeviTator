@@ -3,9 +3,9 @@ package org.teamtators.common.tester.components;
 import org.teamtators.common.control.ControllerInput;
 import org.teamtators.common.control.ControllerOutput;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
+import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.LogDataProvider;
-import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
 import java.util.Arrays;
@@ -16,7 +16,7 @@ public class MotionCalibrationTest extends ManualTest {
     private final ControllerInput positionProvider;
     private final ControllerInput velocityProvider;
     private final ControllerOutput outputConsumer;
-
+    private final DataCollector dataCollector;
     private double stickInput;
     private boolean applyStick;
     private boolean run;
@@ -27,8 +27,6 @@ public class MotionCalibrationTest extends ManualTest {
     private double velocityPower;
     private double acceleration;
     private double acclerationPower;
-
-    private final DataCollector dataCollector;
     private LogDataProvider logDataProvider = new LogDataProvider() {
         @Override
         public String getName() {

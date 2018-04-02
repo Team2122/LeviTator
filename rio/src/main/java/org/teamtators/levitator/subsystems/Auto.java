@@ -72,6 +72,11 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
         autoChoices.free();
     }
 
+    public static class Config {
+        public String[] autoChoices;
+        public String defaultChoice;
+    }
+
     private class BooleanChooser extends SendableChooser<Boolean> {
         public BooleanChooser(String name, String yes, String no) {
             super();
@@ -79,10 +84,5 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
             addObject(yes, true);
             addObject(no, false);
         }
-    }
-
-    public static class Config {
-        public String[] autoChoices;
-        public String defaultChoice;
     }
 }

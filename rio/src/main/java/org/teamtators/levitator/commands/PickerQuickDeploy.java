@@ -2,7 +2,6 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
-import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Picker;

@@ -210,11 +210,11 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         }
     }
 
-    public void setProfiler(Profiler profiler) {
-        this.profiler = profiler;
-    }
-
     public Profiler getProfiler() {
         return profiler;
+    }
+
+    public void setProfiler(Profiler profiler) {
+        this.profiler = profiler;
     }
 }

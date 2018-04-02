@@ -7,13 +7,19 @@ import org.teamtators.common.scheduler.TriggerSource;
  */
 public interface Controller<TButton, TAxis> {
     String getName();
+
     Class<TButton> getButtonClass();
+
     Class<TAxis> getAxisClass();
 
     double getAxisValue(TAxis axis);
+
     boolean isButtonDown(TButton button);
+
     boolean isButtonPressed(TButton button);
+
     boolean isButtonReleased(TButton button);
+
     /**
      * Gets a trigger source for the specified button on the joystick
      *
@@ -23,11 +29,15 @@ public interface Controller<TButton, TAxis> {
     TriggerSource getTriggerSource(TButton button);
 
     int getAxisCount();
+
     int getButtonCount();
 
     double getRawAxisValue(int axis);
+
     boolean isRawButtonDown(int button);
+
     boolean isRawButtonPressed(int button);
+
     boolean isRawButtonReleased(int button);
 
     /**
@@ -41,10 +51,13 @@ public interface Controller<TButton, TAxis> {
     default int getPov() {
         return getPov(0);
     }
+
     int getPov(int pov);
 
     void setOutput(int outputNumber, boolean value);
+
     void setOutputs(int outputs);
+
     void setRumble(RumbleType type, double value);
 
     void onDriverStationData();

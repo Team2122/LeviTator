@@ -2,19 +2,14 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.ConfigCommandStore;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.Timer;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
-import org.teamtators.common.scheduler.SequentialCommand;
 import org.teamtators.common.util.FieldSide;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Auto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AutoSelector extends Command implements Configurable<AutoSelector.Config> {
     private final Auto auto;

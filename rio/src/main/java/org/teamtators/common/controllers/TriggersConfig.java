@@ -3,9 +3,7 @@ package org.teamtators.common.controllers;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.teamtators.common.controllers.LogitechF310;
 
 import java.util.HashMap;
 import java.util.Map;

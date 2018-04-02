@@ -15,13 +15,13 @@ public class NoSpeedController implements edu.wpi.first.wpilibj.SpeedController 
     }
 
     @Override
-    public void setInverted(boolean isInverted) {
-        this.inverted = isInverted;
+    public boolean getInverted() {
+        return inverted;
     }
 
     @Override
-    public boolean getInverted() {
-        return inverted;
+    public void setInverted(boolean isInverted) {
+        this.inverted = isInverted;
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.teamtators.common.scheduler.Command;
 
 public class LogCommand extends Command implements Configurable<LogCommand.Config> {
     private Config config;
+
     public LogCommand() {
         super("LogCommand");
     }
@@ -44,16 +45,16 @@ public class LogCommand extends Command implements Configurable<LogCommand.Confi
     protected void finish(boolean interrupted) {
     }
 
-    public static class Config {
-        public LogLevel level = LogLevel.INFO;
-        public String message;
-    }
-
     public enum LogLevel {
         INFO,
         DEBUG,
         TRACE,
         WARN,
         ERROR
+    }
+
+    public static class Config {
+        public LogLevel level = LogLevel.INFO;
+        public String message;
     }
 }
