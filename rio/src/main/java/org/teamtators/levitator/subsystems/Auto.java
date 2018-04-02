@@ -13,12 +13,11 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
 
     private SendableChooser<String> autoChoices = new SendableChooser<>();
     private FMSData data;
-    private Config config;
     private TatorRobot robot;
 
     private SendableChooser<String> startPosition = new SendableChooser<>();
 
-    public Auto(TatorRobot robot) {
+    Auto(TatorRobot robot) {
         super("Auto");
         autoChoices.setName("Auto", "Choices");
         startPosition.setName("Auto", "StartPos");
@@ -50,7 +49,6 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
     @Override
     public void configure(Config config) {
         super.configure();
-        this.config = config;
         for (String choice : config.autoChoices) {
             autoChoices.addObject(choice, choice);
         }
@@ -72,11 +70,13 @@ public class Auto extends Subsystem implements Configurable<Auto.Config> {
         autoChoices.free();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public String[] autoChoices;
         public String defaultChoice;
     }
 
+    @SuppressWarnings("unused")
     private class BooleanChooser extends SendableChooser<Boolean> {
         public BooleanChooser(String name, String yes, String no) {
             super();

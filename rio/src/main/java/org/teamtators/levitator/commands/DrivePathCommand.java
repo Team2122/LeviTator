@@ -14,10 +14,9 @@ import java.util.List;
  */
 public class DrivePathCommand extends Command implements Configurable<DrivePathCommand.Config> {
     private final Drive drive;
-    private DrivePath drivePath;
     private DriveSegments driveSegments;
 
-    public DrivePathCommand(TatorRobot robot) {
+    DrivePathCommand(TatorRobot robot) {
         super("DrivePath");
         this.drive = robot.getSubsystems().getDrive();
         requires(drive);
@@ -42,7 +41,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
 
     @Override
     public void configure(Config config) {
-        this.drivePath = new DrivePath();
+        DrivePath drivePath = new DrivePath();
         for (int i = 0; i < config.path.size(); i++) {
             DrivePath.Point point = config.path.get(i);
             boolean isLast = i == config.path.size() - 1;
@@ -72,6 +71,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
         logger.trace("segments: " + driveSegments);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double speed;
         public double arcSpeed;

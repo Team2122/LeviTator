@@ -11,7 +11,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
     private Timer timer = new Timer();
     private Config config;
 
-    public PickerQuickDeploy(TatorRobot robot) {
+    PickerQuickDeploy(TatorRobot robot) {
         super("PickerQuickDeploy");
         this.picker = robot.getSubsystems().getPicker();
         requires(picker);
@@ -58,6 +58,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
         picker.unlockArms();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double kickPower;
         public double timeBeforeKick;

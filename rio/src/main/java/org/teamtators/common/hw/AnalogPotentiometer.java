@@ -4,10 +4,11 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+@SuppressWarnings("unused")
 public class AnalogPotentiometer extends SensorBase implements Potentiometer, Sendable {
-    public static final double DEFAULT_FULL_RANGE = 360.0;
-    public static final double DEFAULT_OFFSET = 0.0;
-    public static final boolean DEFAULT_CONTINUOUS = false;
+    private static final double DEFAULT_FULL_RANGE = 360.0;
+    private static final double DEFAULT_OFFSET = 0.0;
+    private static final boolean DEFAULT_CONTINUOUS = false;
     private AnalogInput analogInput;
     private double fullRange = DEFAULT_FULL_RANGE;
     private double offset = DEFAULT_OFFSET;
@@ -31,7 +32,7 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
 
     @Override
     public double get() {
-        double p = analogInput.getAverageVoltage() / ControllerPower.getVoltage5V();
+        double p = analogInput.getAverageVoltage() / RobotController.getVoltage5V();
         double value = p * fullRange + offset;
         if (continuous) {
             if (value < minValue) {
@@ -84,10 +85,12 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
         analogInput.setAverageBits(averageBits);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     public int getOversampleBits() {
         return analogInput.getOversampleBits();
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     public void setOversampleBits(int oversampleBits) {
         analogInput.setOversampleBits(oversampleBits);
     }

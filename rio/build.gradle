@@ -1,4 +1,5 @@
 import jaci.gradle.deploy.DeployContext
+import jaci.gradle.deploy.artifact.CommandArtifact
 import jaci.gradle.deploy.artifact.FileCollectionArtifact
 import jaci.openrio.gradle.frc.FRCJavaArtifact
 import jaci.openrio.gradle.frc.RoboRIO
@@ -39,7 +40,7 @@ deploy {
             files = project.configurations.compile
             directory = 'libs'
         }
-        artifact('permissions', jaci.gradle.deploy.artifact.CommandArtifact) {
+        artifact('permissions', CommandArtifact) {
             targets << 'roborio'
             command = "chmod 755 .; chown lvuser ."
         }

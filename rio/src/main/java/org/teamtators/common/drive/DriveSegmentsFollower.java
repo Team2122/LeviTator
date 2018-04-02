@@ -5,7 +5,6 @@ import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.AbstractUpdatable;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.datalogging.DataCollector;
-import org.teamtators.common.datalogging.LogDataProvider;
 import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.LinearInterpolationFunction;
 import org.teamtators.common.math.Pose2d;
@@ -18,6 +17,7 @@ import java.util.function.DoubleUnaryOperator;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DriveSegmentsFollower extends AbstractUpdatable
         implements Configurable<DriveSegmentsFollower.Config> {
     private final TankDrive drive;
@@ -32,7 +32,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private PursuitReport report;
     private LookaheadReport lookaheadReport;
     private double speedPower;
-    private LogDataProvider logDataProvider = new LogDataProvder();
+    private org.teamtators.common.datalogging.LogDataProvider logDataProvider = new LogDataProvider();
     private Pose2d currentPose;
     private Twist2d twist;
     private DriveOutputs driveOutputs;
@@ -53,6 +53,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         reset();
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void setSpeedPower(double speedPower) {
         this.speedPower = speedPower;
     }
@@ -163,6 +164,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         return segments.getSegments().get(currentSegmentIdx);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean hasSegment() {
         return currentSegmentIdx < getSegments().getSegments().size();
     }
@@ -270,13 +272,14 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         return report;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
         public boolean logData = false;
     }
 
-    private class LogDataProvder implements LogDataProvider {
+    private class LogDataProvider implements org.teamtators.common.datalogging.LogDataProvider {
         @Override
         public String getName() {
             return DriveSegmentsFollower.this.getName();

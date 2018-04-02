@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Rotation {
     private double sin;
     private double cos;
@@ -102,7 +103,7 @@ public class Rotation {
                 this.cos * other.cos + this.sin * other.sin);
     }
 
-    public Rotation mult(double scaleNum) {
+    public Rotation scale(double scaleNum) {
         return Rotation.fromRadians(scaleNum * toRadians());
     }
 
@@ -145,18 +146,11 @@ public class Rotation {
 
     /**
      * Checks if this rotation is between the smallest angle formed between start and end
-     *
-     * @param start
-     * @param end
-     * @return
      */
     public boolean isBetween(Rotation start, Rotation end) {
         double a = end.sub(start).toRadians();
         double b = this.sub(start).toRadians();
-        if (a * b > 0 && Math.abs(b) < Math.abs(a)) {
-            return true;
-        }
-        return false;
+        return a * b > 0 && Math.abs(b) < Math.abs(a);
     }
 
     public void normalize() {

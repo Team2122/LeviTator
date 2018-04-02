@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings("WeakerAccess")
 public class StateCommand<S> extends Command {
     private Initializer<S> initializer;
     private Stepper<S> stepper;

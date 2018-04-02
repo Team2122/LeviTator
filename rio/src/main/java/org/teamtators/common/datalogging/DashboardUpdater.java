@@ -5,6 +5,7 @@ import org.teamtators.common.control.Updatable;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("WeakerAccess")
 public class DashboardUpdater extends ArrayList<DashboardUpdatable> implements Updatable {
     private Dashboard smartDashboard;
     private Dashboard noopDashboard;
@@ -12,11 +13,10 @@ public class DashboardUpdater extends ArrayList<DashboardUpdatable> implements U
     private Dashboard current;
 
     private Dashboard.Type type;
-    private TatorRobotBase robot;
 
+    @SuppressWarnings("unused")
     public DashboardUpdater(TatorRobotBase robot, Dashboard.Type type) {
         this.type = type;
-        this.robot = robot;
     }
 
     public void setDashboard(Dashboard.Type type) {

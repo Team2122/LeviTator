@@ -17,7 +17,7 @@ import static org.teamtators.common.math.Epsilon.isEpsilonZero;
  */
 public class DriveSegmentsFollowerTest {
     @Test
-    public void testGetPursuitReport() throws Exception {
+    public void testGetPursuitReport() {
         DriveSegments segments = DrivePathTest.getTestPath().toSegments();
         DriveSegmentsFollower follower = new DriveSegmentsFollower(null);
         follower.setSegments(segments);
@@ -41,20 +41,8 @@ public class DriveSegmentsFollowerTest {
         }
     }
 
-    static class TwistTestCase {
-        public Pose2d pose;
-        public Translation2d point;
-        public Twist2d twist;
-
-        public TwistTestCase(Pose2d pose, Translation2d point, Twist2d twist) {
-            this.pose = pose;
-            this.point = point;
-            this.twist = twist;
-        }
-    }
-
     @Test
-    public void testGetTwist() throws Exception {
+    public void testGetTwist() {
         List<TwistTestCase> testCases = Arrays.asList(
                 new TwistTestCase(
                         new Pose2d(Translation2d.zero(), Rotation.fromDegrees(0)),
@@ -87,6 +75,18 @@ public class DriveSegmentsFollowerTest {
             Twist2d actualTwist = Twist2d.fromTangentArc(testCase.pose, testCase.point);
             Assert.assertTrue(actualTwist.epsilonEquals(testCase.twist),
                     "Expected twist: " + testCase.twist + ", actual twist: " + actualTwist);
+        }
+    }
+
+    static class TwistTestCase {
+        Pose2d pose;
+        Translation2d point;
+        Twist2d twist;
+
+        TwistTestCase(Pose2d pose, Translation2d point, Twist2d twist) {
+            this.pose = pose;
+            this.point = point;
+            this.twist = twist;
         }
     }
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
+@SuppressWarnings("unused")
 public class DoubleSolenoidTest extends ManualTest {
     private DoubleSolenoid doubleSolenoid;
 
@@ -19,14 +20,18 @@ public class DoubleSolenoidTest extends ManualTest {
 
     @Override
     public void onButtonDown(LogitechF310.Button button) {
-        if (button == LogitechF310.Button.A) {
-            doubleSolenoid.set(DoubleSolenoid.Value.kForward);
-            printTestInfo("Solenoid set to go forward");
-        } else if (button == LogitechF310.Button.B) {
-            doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
-            printTestInfo("Solenoid going in reverse direction");
-        } else if (button == LogitechF310.Button.X) {
-            doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+        switch (button) {
+            case A:
+                doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+                printTestInfo("Solenoid set to go forward");
+                break;
+            case B:
+                doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+                printTestInfo("Solenoid going in reverse direction");
+                break;
+            case X:
+                doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+                break;
         }
     }
 }

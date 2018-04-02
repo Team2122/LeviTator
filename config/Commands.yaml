@@ -1,5 +1,5 @@
 DriveTank:
-  modifiers: { deadzone: 0.1, exponent: 2.0 }
+  modifiers: { deadZone: 0.1, exponent: 2.0 }
 
 PickerPick:
   pickPowers: { left: 0.8, right: 0.8 }
@@ -180,7 +180,6 @@ ClimberClimb:
 #                                                                                           #
 #############################################################################################
 NoAuto: { class: Log, level: WARN, message: "No auto was selected."}
-DebugAfterHeld: { class: Log, level: INFO, message: "Woohoo! afterHeld works!"}
 LineCrossAuto: { class: DriveStraight, distance: -125 }
 
 SetPoseLeft:

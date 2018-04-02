@@ -40,14 +40,14 @@ import java.util.jar.Manifest;
  * run to completion before the OperatorControl code could start. In the future the Autonomous code
  * might be spawned as a task, then killed at the end of the Autonomous period.
  */
+@SuppressWarnings({"WeakerAccess", "unused", "SpellCheckingInspection"})
 public class Robot {
     public static Logger logger = LoggerFactory.getLogger(Robot.class);
 
-    protected final DriverStation m_ds;
-    protected final String configDir;
+    private final DriverStation m_ds;
+    private final String configDir;
     private org.teamtators.common.scheduler.RobotState robotState = null;
     private TatorRobotBase robot;
-    private NetworkTableInstance networkTables;
 
     /**
      * Constructor for a generic robot program. User code should be placed in the constructor that
@@ -63,7 +63,7 @@ public class Robot {
         // TODO: See if the next line is necessary
         // Resource.RestartProgram();
         this.configDir = configDir;
-        networkTables = NetworkTableInstance.getDefault();
+        NetworkTableInstance networkTables = NetworkTableInstance.getDefault();
         networkTables.setNetworkIdentity("Robot");
         networkTables.startServer("/home/lvuser/networktables.ini");// must be before b
         m_ds = DriverStation.getInstance();
@@ -166,7 +166,8 @@ public class Robot {
         System.exit(1);
     }
 
-    public static void writeVersionsFile() {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void writeVersionsFile() {
         try {
             final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
 
@@ -249,7 +250,7 @@ public class Robot {
         return m_ds.isNewControlData();
     }
 
-    public void startCompetition() {
+    private void startCompetition() {
         try {
             findLogDirectory();
             configureLogging();
@@ -387,7 +388,7 @@ public class Robot {
         robot.initialize();
     }
 
-    public void robotInit() throws Throwable {
+    private void robotInit() throws Throwable {
         try {
             initialize();
         } catch (Throwable t) {

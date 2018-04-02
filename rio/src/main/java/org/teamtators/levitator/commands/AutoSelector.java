@@ -13,18 +13,15 @@ import java.util.List;
 
 public class AutoSelector extends Command implements Configurable<AutoSelector.Config> {
     private final Auto auto;
-    private final TatorRobot robot;
     private SelectorType type;
     private Config config;
     private Command selected;
-    private boolean hasStarted;
     private ConfigCommandStore commandStore;
     private boolean initialized;
     private boolean cancel;
 
-    public AutoSelector(TatorRobot robot) {
+    AutoSelector(TatorRobot robot) {
         super("AutoSelector");
-        this.robot = robot;
         this.auto = robot.getSubsystems().getAuto();
         commandStore = robot.getCommandStore();
         validIn(RobotState.AUTONOMOUS);
@@ -32,8 +29,6 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
 
     @Override
     protected void initialize() {
-        hasStarted = false;
-
         String toStart = "$NoAuto";
         if (type == SelectorType.FIELD_CONFIGURATION) {
             FieldSide side = auto.getFieldConfiguration(config.object);
@@ -141,15 +136,19 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
             return;
         }
         List<String> commandNames = new ArrayList<>();
-        if (config.type == SelectorType.FIELD_CONFIGURATION) {
-            commandNames.add(config.left);
-            commandNames.add(config.right);
-            commandNames.add(config.center);
-        } else if (config.type == SelectorType.STARTING_POSITION) {
-            commandNames.add(config.L);
-            commandNames.add(config.R);
-        } else {
-            logger.error("Invalid selector type: " + config.type);
+        switch (config.type) {
+            case FIELD_CONFIGURATION:
+                commandNames.add(config.left);
+                commandNames.add(config.right);
+                commandNames.add(config.center);
+                break;
+            case STARTING_POSITION:
+                commandNames.add(config.L);
+                commandNames.add(config.R);
+                break;
+            default:
+                logger.error("Invalid selector type: " + config.type);
+                break;
         }
         for (String commandName : commandNames) {
             Command command;
@@ -167,6 +166,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
         FIELD_CONFIGURATION
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SelectorType type;
 

@@ -21,7 +21,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
     private List<Controller<?, ?>> controllers;
     private Config config;
 
-    public OperatorInterface() {
+    OperatorInterface() {
         super("Operator Interface");
     }
 
@@ -34,7 +34,7 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return -driverJoystick.getAxisValue(LogitechF310.Axis.RIGHT_STICK_Y);
     }
 
-    public double getSliderValueRaw() {
+    private double getSliderValueRaw() {
         return slider.getRawAxisValue(0);
     }
 
@@ -42,13 +42,13 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return config.sliderFunction.calculate(getSliderValueRaw());
     }
 
-    public double getPivotKnobRaw() {
+    private double getPivotKnobRaw() {
         return slider.getRawAxisValue(1);
     }
 
     public double getPivotKnob() {
         double knobAngle = getPivotKnobRaw() * config.knobRange;
-        if (Math.abs(knobAngle) < config.knobDeadzone) {
+        if (Math.abs(knobAngle) < config.knobDeadZone) {
             return 0;
         }
         return knobAngle;
@@ -79,10 +79,6 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return driverJoystick;
     }
 
-    public ButtonBoardFingers getGunnerJoystick() {
-        return gunnerJoystick;
-    }
-
     public List<Controller<?, ?>> getAllControllers() {
         return controllers;
     }
@@ -94,18 +90,19 @@ public class OperatorInterface extends Subsystem implements Configurable<Operato
         return group;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public LogitechF310.Config driverJoystick;
         public ButtonBoardFingers.Config gunnerJoystick;
         public RawController.Config gunnerSecondary;
         public RawController.Config slider;
         public double knobRange;
-        public double knobDeadzone;
+        public double knobDeadZone;
         public LinearInterpolationFunction sliderFunction;
     }
 
     private class OITest extends ManualTest {
-        public OITest() {
+        OITest() {
             super("OITest");
         }
 

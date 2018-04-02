@@ -5,6 +5,7 @@ import org.teamtators.common.config.ConfigException;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.DataLoggable;
 import org.teamtators.common.datalogging.LogDataProvider;
+import org.teamtators.common.math.MathUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class AbstractController extends AbstractUpdatable implements DataLoggable {
 
     private DataCollector dataCollector = DataCollector.getDataCollector();
@@ -36,12 +38,6 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
     public AbstractController(String name) {
         super(name);
         reset();
-    }
-
-    private static double applyLimits(double value, double min, double max) {
-        if (value > max) return max;
-        else if (value < min) return min;
-        else return value;
     }
 
     public synchronized void reset() {
@@ -72,7 +68,7 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
         }
         double minOutput = this.minOutput;
         double maxOutput = this.maxOutput;
-        computedOutput = applyLimits(computedOutput, minOutput, maxOutput);
+        computedOutput = MathUtil.applyLimits(computedOutput, minOutput, maxOutput);
 
         output = computedOutput;
         if (outputConsumer != null)
@@ -97,11 +93,11 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
         this.outputConsumer = outputConsumer;
     }
 
-    public Predicate getTargetPredicate() {
+    public Predicate<AbstractController> getTargetPredicate() {
         return targetPredicate;
     }
 
-    public void setTargetPredicate(Predicate targetPredicate) {
+    public void setTargetPredicate(Predicate<AbstractController> targetPredicate) {
         checkNotNull(targetPredicate);
         this.targetPredicate = targetPredicate;
     }
@@ -111,7 +107,7 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
         if (!config.isObject()) {
             throw new ConfigException("Controller target config must be an object");
         }
-        Predicate targetPredicate;
+        Predicate<AbstractController> targetPredicate;
         if (config.has("within")) {
             targetPredicate = ControllerPredicates.withinError(config.get("within").asDouble());
         } else {
@@ -119,7 +115,7 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
         }
         if (config.has("time")) {
             double time = config.get("time").asDouble();
-            targetPredicate = new ControllerPredicates.SampleTime(time, targetPredicate);
+            targetPredicate = new ControllerPredicates.SampleTime<>(time, targetPredicate);
         }
         setTargetPredicate(targetPredicate);
         if (config.has("stop") && config.get("stop").asBoolean()) {
@@ -180,7 +176,7 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
     }
 
     public synchronized void setSetpoint(double setpoint) {
-        this.setpoint = applyLimits(setpoint, minSetpoint, maxSetpoint);
+        this.setpoint = MathUtil.applyLimits(setpoint, minSetpoint, maxSetpoint);
     }
 
     public synchronized double getInput() {
@@ -225,6 +221,7 @@ public abstract class AbstractController extends AbstractUpdatable implements Da
             setMaxSetpoint(config.maxSetpoint);
             setMinSetpoint(config.minSetpoint);
         }
+        //noinspection Duplicates
         if (!Double.isNaN(config.maxAbsoluteOutput)) {
             setMaxOutput(config.maxAbsoluteOutput);
             setMinOutput(-config.maxAbsoluteOutput);

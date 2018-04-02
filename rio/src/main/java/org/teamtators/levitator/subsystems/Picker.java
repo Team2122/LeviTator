@@ -20,6 +20,7 @@ import org.teamtators.common.tester.components.SpeedControllerTest;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
     private MotorPowerUpdater leftMotorUpdater;

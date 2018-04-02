@@ -23,7 +23,7 @@ import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 import org.teamtators.levitator.TatorRobot;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
@@ -37,7 +37,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private Config config;
     private boolean homed;
 
-    public Climber(TatorRobot robot) {
+    Climber(TatorRobot robot) {
         super("Climber");
         this.robot = robot;
     }
@@ -88,7 +88,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public List<MotorPowerUpdater> getMotorUpdatables() {
-        return Arrays.asList(/*climberMotorUpdater*/);
+        return Collections.emptyList() /*Arrays.asList(climberMotorUpdater)*/;
     }
 
     @Override

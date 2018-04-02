@@ -21,8 +21,9 @@ import org.teamtators.common.hw.SpeedControllerGroup;
  * all values:
  * controllerName: {channel: 0, inverted: true, type: Victor, powerChannels: [0, 1, 2]}
  */
+@SuppressWarnings("unused")
 public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
-    public static final ObjectMapper CONFIG_MAPPER = TatorRobotBase.configMapper;
+    private static final ObjectMapper CONFIG_MAPPER = TatorRobotBase.configMapper;
     private int channel;
     private boolean inverted = false;
     private Type type = Type.NONE;
@@ -34,7 +35,7 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
     /**
      * Frees the object of any SpeedController, if it is able to be freed
      *
-     * @param speedController
+     * @param speedController the SpeedController to free
      */
     public static void free(SpeedController speedController) {
         if (speedController instanceof PWM) {

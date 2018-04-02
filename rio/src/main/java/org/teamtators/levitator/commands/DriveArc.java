@@ -10,7 +10,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
     private final Drive drive;
     private Config config;
 
-    public DriveArc(TatorRobot robot) {
+    DriveArc(TatorRobot robot) {
         super("DriveArc");
         drive = robot.getSubsystems().getDrive();
         requires(drive);
@@ -82,6 +82,7 @@ public class DriveArc extends Command implements Configurable<DriveArc.Config> {
         this.config = config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double angle;
         public double speed;

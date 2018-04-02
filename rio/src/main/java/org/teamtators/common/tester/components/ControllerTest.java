@@ -4,6 +4,7 @@ import org.teamtators.common.control.AbstractController;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.tester.ManualTest;
 
+@SuppressWarnings("WeakerAccess")
 public class ControllerTest extends ManualTest {
     private double minSetpoint;
     private AbstractController controller;
@@ -20,6 +21,7 @@ public class ControllerTest extends ManualTest {
         this(controller, maxSetpoint, -maxSetpoint);
     }
 
+    @SuppressWarnings("unused")
     public ControllerTest(AbstractController controller) {
         this(controller, controller.getMaxSetpoint(), controller.getMinSetpoint());
     }

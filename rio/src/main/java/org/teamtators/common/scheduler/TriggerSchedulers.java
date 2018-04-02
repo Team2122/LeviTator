@@ -62,12 +62,9 @@ public class TriggerSchedulers {
     public static abstract class RunnableScheduler implements TriggerScheduler {
         private Runnable runnable;
 
+        @SuppressWarnings("WeakerAccess")
         public RunnableScheduler(Runnable runnable) {
             this.runnable = runnable;
-        }
-
-        protected Runnable getRunnable() {
-            return runnable;
         }
 
         protected abstract boolean shouldRun(boolean active);
@@ -82,6 +79,7 @@ public class TriggerSchedulers {
     public static abstract class LastStateScheduler extends RunnableScheduler {
         private boolean lastActive = false;
 
+        @SuppressWarnings("WeakerAccess")
         public LastStateScheduler(Runnable runnable) {
             super(runnable);
         }

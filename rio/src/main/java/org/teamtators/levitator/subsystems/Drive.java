@@ -7,7 +7,10 @@ import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
-import org.teamtators.common.control.*;
+import org.teamtators.common.control.AbstractUpdatable;
+import org.teamtators.common.control.PidController;
+import org.teamtators.common.control.TrapezoidalProfileFollower;
+import org.teamtators.common.control.Updatable;
 import org.teamtators.common.drive.*;
 import org.teamtators.common.hw.ADXRS453;
 import org.teamtators.common.math.Pose2d;
@@ -20,15 +23,12 @@ import org.teamtators.common.tester.components.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Has 2 sets of wheels (on the left and right) which can be independently controlled with motors. Also has 2
  * encoders and a gyroscope to measure the movements of the robot
  */
 public class Drive extends Subsystem implements Configurable<Drive.Config>, TankDrive {
-
-    public static final Predicate<TrapezoidalProfileFollower> DEFAULT_PREDICATE = ControllerPredicates.finished();
     private SpeedController leftMotor;
     private SpeedController rightMotor;
     private Encoder rightEncoder;
@@ -47,16 +47,13 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     private PoseEstimator poseEstimator = new PoseEstimator(this);
     private DriveSegmentsFollower driveSegmentsFollower = new DriveSegmentsFollower(this);
 
-    private Config config;
     private double speed;
 
     public Drive() {
         super("Drive");
 
         rotationController.setInputProvider(this::getYawAngle);
-        rotationController.setOutputConsumer((double output) -> {
-            setPowers(speed + output, speed - output);
-        });
+        rotationController.setOutputConsumer((double output) -> setPowers(speed + output, speed - output));
 
 
         straightMotionFollower.setPositionProvider(this::getCenterDistance);
@@ -169,6 +166,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return rotationMotionFollower.isOnTarget();
     }
 
+    @SuppressWarnings("unused")
     public boolean isArcOnTarget() {
         return straightMotionFollower.isOnTarget() && rotationMotionFollower.isOnTarget();
     }
@@ -183,10 +181,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     public PidController getYawAngleController() {
         return yawAngleController;
-    }
-
-    public OutputController getOutputController() {
-        return outputController;
     }
 
     public TrapezoidalProfileFollower getRotationMotionFollower() {
@@ -204,11 +198,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         setRightMotorPower(right);
     }
 
-    public void setRightMotorPower(double power) {
+    private void setRightMotorPower(double power) {
         rightMotor.set(power);
     }
 
-    public void setLeftMotorPower(double power) {
+    private void setLeftMotorPower(double power) {
         leftMotor.set(power);
     }
 
@@ -320,7 +314,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     @Override
     public void configure(Config config) {
         super.configure();
-        this.config = config;
         this.tankKinematics = config.tankKinematics;
         poseEstimator.setKinematics(tankKinematics);
         this.leftMotor = config.leftMotor.create();
@@ -349,7 +342,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     @Override
     public void deconfigure() {
         super.deconfigure();
-        this.config = null;
         SpeedControllerConfig.free(leftMotor);
         SpeedControllerConfig.free(rightMotor);
         if (leftEncoder != null) leftEncoder.free();
@@ -361,6 +353,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         StraightOnly, RotationOnly, StraightAndRotation, None
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig leftMotor;
         public SpeedControllerConfig rightMotor;
@@ -379,23 +372,24 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         private double rotationOutput;
         private OutputMode mode = OutputMode.StraightOnly;
 
-        public OutputController() {
+        OutputController() {
             super("Drive.OutputController");
         }
 
-        public OutputMode getMode() {
+        @SuppressWarnings("unused")
+        OutputMode getMode() {
             return mode;
         }
 
-        public void setMode(OutputMode mode) {
+        void setMode(OutputMode mode) {
             this.mode = mode;
         }
 
-        public void setStraightOutput(double followerOutput) {
+        void setStraightOutput(double followerOutput) {
             this.straightOutput = followerOutput;
         }
 
-        public void setRotationOutput(double rotationOutput) {
+        void setRotationOutput(double rotationOutput) {
             this.rotationOutput = rotationOutput;
         }
 

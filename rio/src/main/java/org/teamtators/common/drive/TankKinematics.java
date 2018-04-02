@@ -7,6 +7,7 @@ import org.teamtators.common.math.*;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class TankKinematics {
     private static final Logger logger = LoggerFactory.getLogger(TankKinematics.class);
     private double effectiveTrackWidth = 0.0;
@@ -24,6 +25,7 @@ public class TankKinematics {
         if (Epsilon.isEpsilonZero(deltaHeadingRads)) {
             return new Pose2d(new Translation2d(deltaWheel, 0.0), deltaHeading);
         }
+        //noinspection UnnecessaryLocalVariable
         double arcLength = deltaWheel;
         double radius = arcLength / deltaHeadingRads;
         double centerX = 0.0;

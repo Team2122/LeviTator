@@ -7,7 +7,7 @@ import org.teamtators.common.tester.ManualTest;
 public class VictorSPTest extends ManualTest {
 
     private VictorSP motor;
-    private int fullspeed;
+    private int fullSpeed;
     private double axisValue;
 
     public VictorSPTest(String name, VictorSP motor) {
@@ -19,13 +19,13 @@ public class VictorSPTest extends ManualTest {
     public void start() {
         printTestInstructions("Push joystick in direction to move, where forward is positive");
         printTestInstructions("Press back/add to drive backward/forward at full speed");
-        fullspeed = 0;
+        fullSpeed = 0;
         axisValue = 0;
     }
 
     private double getSpeed() {
-        if (fullspeed != 0) {
-            return fullspeed;
+        if (fullSpeed != 0) {
+            return fullSpeed;
         } else {
             return axisValue;
         }
@@ -43,14 +43,14 @@ public class VictorSPTest extends ManualTest {
 
     @Override
     public void onButtonDown(LogitechF310.Button button) {
-        if (button == LogitechF310.Button.BACK) fullspeed--;
-        else if (button == LogitechF310.Button.START) fullspeed++;
+        if (button == LogitechF310.Button.BACK) fullSpeed--;
+        else if (button == LogitechF310.Button.START) fullSpeed++;
     }
 
     @Override
     public void onButtonUp(LogitechF310.Button button) {
-        if (button == LogitechF310.Button.BACK) fullspeed++;
-        else if (button == LogitechF310.Button.START) fullspeed--;
+        if (button == LogitechF310.Button.BACK) fullSpeed++;
+        else if (button == LogitechF310.Button.START) fullSpeed--;
     }
 
     @Override

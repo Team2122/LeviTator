@@ -154,6 +154,7 @@ public class Subsystems extends SubsystemsBase
         return climber;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class DataCollector implements Updatable {
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
     private static final Logger logger = LoggerFactory.getLogger(DataCollector.class);
     private static DataCollector collector = null;
     private String outputDir;
@@ -30,7 +30,11 @@ public class DataCollector implements Updatable {
 
     private DataCollector() {
         try {
-            outputDir = System.getProperty("tator.logdir") + "/datalogs";
+            String logdir = System.getProperty("tator.logdir");
+            if (logdir == null) {
+                throw new Exception("property tator.logdir not set");
+            }
+            outputDir = logdir + "/datalogs";
             File outputDirFile = new File(outputDir);
             if (outputDirFile.mkdirs()) {
                 logger.debug("Created data log directory {}", outputDirFile);
@@ -45,6 +49,7 @@ public class DataCollector implements Updatable {
         return collector;
     }
 
+    @SuppressWarnings("unused")
     public String getOutputDir() {
         return outputDir;
     }
@@ -58,7 +63,7 @@ public class DataCollector implements Updatable {
         Preconditions.checkNotNull(provider);
         if (providers.stream().anyMatch(u -> u.provider == provider))
             return;
-        ProviderUsage usage = new ProviderUsage(provider, null, null);
+        ProviderUsage usage = new ProviderUsage(provider);
         String timestamp = DATE_FORMAT.format(new Date());
         String fileName = String.format("%s/%s %s.csv", outputDir, timestamp, provider.getName());
         providers.add(usage);
@@ -99,11 +104,10 @@ public class DataCollector implements Updatable {
         Optional<ProviderUsage> providerUsage = providers.stream()
                 .filter(current -> current.provider.getName().equals(provider.getName()))
                 .findFirst();
-        if (providerUsage.isPresent()) {
-            ProviderUsage usage = providerUsage.get();
+        providerUsage.ifPresent(usage -> {
             providers.remove(usage);
             new Thread(() -> {
-                logger.debug("Stopping datalogging and flushing file for provider {}", provider.getName());
+                logger.debug("Stopping data logging and flushing file for provider {}", provider.getName());
                 try {
                     if (usage.csvPrinter != null) {
                         usage.csvPrinter.flush();
@@ -113,7 +117,7 @@ public class DataCollector implements Updatable {
                     logger.error("Error flushing csv file", e);
                 }
             }, "stopProvider-" + provider.getName()).start();
-        }
+        });
     }
 
     private void addRow(ProviderUsage usage) {
@@ -145,15 +149,13 @@ public class DataCollector implements Updatable {
     }
 
     private class ProviderUsage {
-        public final ArrayList<Iterable<Object>> savedRows = new ArrayList<>();
+        final ArrayList<Iterable<Object>> savedRows = new ArrayList<>();
         LogDataProvider provider;
-        FileWriter writer;
-        CSVPrinter csvPrinter;
+        FileWriter writer = null;
+        CSVPrinter csvPrinter = null;
 
-        ProviderUsage(LogDataProvider provider, FileWriter writer, CSVPrinter csvPrinter) {
+        ProviderUsage(LogDataProvider provider) {
             this.provider = provider;
-            this.writer = writer;
-            this.csvPrinter = csvPrinter;
         }
     }
 }

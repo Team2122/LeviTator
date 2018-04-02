@@ -18,6 +18,7 @@ public class DrivePath {
     private static final Logger logger = LoggerFactory.getLogger(DrivePath.class);
     private List<Point> points;
 
+    @SuppressWarnings("unused")
     public DrivePath(Collection<Point> points) {
         this.points = new ArrayList<>(points);
     }
@@ -31,6 +32,7 @@ public class DrivePath {
         this.points.add(point);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<Point> getPoints() {
         return points;
     }
@@ -60,8 +62,8 @@ public class DrivePath {
             straight.setStartPose(startPose);
             straight.setEndSpeed(point2.getArcSpeed());
             straight.setReverse(point1.reverse);
-            Rotation deltaHeading = null, angle = null;
-            Translation2d trans2 = null;
+            Rotation deltaHeading, angle = null;
+            Translation2d trans2;
             double length2 = 0;
             boolean isStraight = false;
             if (i >= numPoints - 1) {
@@ -84,7 +86,7 @@ public class DrivePath {
                 }
             }
             if (isRadius && !isStraight) {
-                Rotation halfAngle = angle.mult(0.5);
+                Rotation halfAngle = angle.scale(0.5);
                 double availableTakeOffLength = Math.min(length - lastTakeOffLength, length2);
                 takeOffLength = Math.abs(radius / halfAngle.tan());
                 if (availableTakeOffLength < takeOffLength) {
@@ -147,6 +149,7 @@ public class DrivePath {
                 '}';
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Point {
         private Translation2d translation;
         private double radius = Double.NaN;

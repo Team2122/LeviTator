@@ -38,7 +38,7 @@ public class DrivePathTest {
     }
 
     @Test
-    public void testToSegments() throws Exception {
+    public void testToSegments() {
         DrivePath path = getTestPath();
 
         DriveSegments segments = path.toSegments();

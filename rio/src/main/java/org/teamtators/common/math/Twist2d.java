@@ -1,5 +1,6 @@
 package org.teamtators.common.math;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Twist2d {
     private double deltaX;
     private Rotation deltaYaw;
@@ -16,11 +17,11 @@ public class Twist2d {
     public static Twist2d fromTangentArc(Pose2d startPose, Translation2d endPoint) {
         Translation2d diff = endPoint.sub(startPose.getTranslation());
         Translation2d halfDiff = diff.scale(0.5);
-        Pose2d perpBisector = new Pose2d(startPose.getTranslation().add(halfDiff), diff.getDirection().ccwNormal());
+        Pose2d perpendicularBisector = new Pose2d(startPose.getTranslation().add(halfDiff), diff.getDirection().ccwNormal());
         Rotation startHeading = startPose.getYaw();
         Rotation startNormal = startHeading.ccwNormal();
         Pose2d startNormalLine = new Pose2d(startPose.getTranslation(), startNormal);
-        Translation2d center = perpBisector.getIntersection(startNormalLine);
+        Translation2d center = perpendicularBisector.getIntersection(startNormalLine);
         Twist2d twist = new Twist2d();
         if (center.isNaN()) { // if the radii don't intersect, it is a straight line
             twist.setDeltaYaw(Rotation.identity());

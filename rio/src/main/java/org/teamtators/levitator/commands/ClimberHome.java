@@ -9,7 +9,7 @@ public class ClimberHome extends Command implements Configurable<ClimberHome.Con
     private Config config;
     private Climber climber;
 
-    public ClimberHome(TatorRobot robot) {
+    ClimberHome(TatorRobot robot) {
         super("ClimberHome");
         this.climber = robot.getSubsystems().getClimber();
         requires(climber);

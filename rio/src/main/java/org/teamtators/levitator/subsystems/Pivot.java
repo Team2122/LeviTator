@@ -20,9 +20,11 @@ import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private Lift lift;
 
@@ -224,7 +226,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(pivotMotorUpdater);
+        return Collections.singletonList(pivotMotorUpdater);
     }
 
 
@@ -279,6 +281,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void deconfigure() {
         super.deconfigure();
@@ -295,7 +298,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         HALF_LEFT,
         CENTER,
         HALF_RIGHT,
-        RIGHT;
+        RIGHT
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -312,6 +315,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         public double bumpPivotValue;
 
+        @SuppressWarnings("unused")
         public double angleTolerance;
         public double centerTolerance;
 
@@ -325,7 +329,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private class PivotTest extends ManualTest {
         private double axisValue;
 
-        public PivotTest() {
+        PivotTest() {
             super("PivotTest");
         }
 

@@ -35,7 +35,7 @@ public class Updater implements Runnable {
         this.updatable = updatable;
         this.period = period;
 //        executorService.scheduleAtFixedRate(this, 0, (long) (S_TO_NS * this.period), TimeUnit.NANOSECONDS);
-        this.notifier = new Notifier(this::run);
+        this.notifier = new Notifier(this);
     }
 
     public void start() {

@@ -1,6 +1,5 @@
 package org.teamtators.common.drive;
 
-import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Translation2d;
 
@@ -36,6 +35,7 @@ public class StraightSegment extends DriveSegmentBase {
     @Override
     protected Pose2d getNearestPoint(Translation2d point) {
         Translation2d nearestPoint = startPose.getNearestPoint(point);
+        /* TODO: is this ok?
         Translation2d diff = nearestPoint.sub(startPose.getTranslation());
         if (!Epsilon.isEpsilonZero(diff.getMagnitude())) {
             if (diff.getDirection().epsilonEquals(startPose.getYaw())) {
@@ -46,6 +46,7 @@ public class StraightSegment extends DriveSegmentBase {
 //                return getStartPose();
             }
         }
+        */
         return new Pose2d(nearestPoint, startPose.getYaw());
     }
 

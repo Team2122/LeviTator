@@ -53,6 +53,7 @@ public class LogCommand extends Command implements Configurable<LogCommand.Confi
         ERROR
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public LogLevel level = LogLevel.INFO;
         public String message;

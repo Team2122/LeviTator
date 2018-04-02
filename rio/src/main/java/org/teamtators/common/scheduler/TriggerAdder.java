@@ -1,7 +1,7 @@
 package org.teamtators.common.scheduler;
 
 public class TriggerAdder {
-    TriggerSource triggerSource;
+    private TriggerSource triggerSource;
     private Scheduler scheduler;
 
     TriggerAdder(Scheduler scheduler, TriggerSource triggerSource) {
@@ -35,9 +35,11 @@ public class TriggerAdder {
         scheduler.addTrigger(triggerSource, new WhilePressedScheduler(command));
     }
 
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public class TriggerBinder {
         Runnable runnable;
 
+        @SuppressWarnings("WeakerAccess")
         public TriggerBinder(Runnable runnable) {
             this.runnable = runnable;
         }
@@ -77,6 +79,7 @@ public class TriggerAdder {
         private boolean wasActive = false;
         private boolean iStarted = false;
 
+        @SuppressWarnings("WeakerAccess")
         public WhilePressedScheduler(Command command) {
             this.command = command;
         }
