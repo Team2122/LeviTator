@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SensorBase;
+import edu.wpi.first.wpilibj.hal.SPIJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * A sensor class for using an ADXRS453 gyroscope.
  * Measures angle change on the yaw axis.
  */
+@SuppressWarnings({"PointlessBitwiseExpression", "unused"})
 public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
-    public static final double UPDATE_PERIOD = 1.0 / 120.0;
-    public static final int STARTUP_DELAY_MS = 50;
-    protected static final Logger logger = LoggerFactory.getLogger(ADXRS453.class);
+    private static final double UPDATE_PERIOD = 1.0 / 120.0;
+    private static final double SAMPLE_PERIOD = 1.0 / 2000.0;
+    private static final int ACCUMULATOR_DEPTH = 2048;
+    private static final int STARTUP_DELAY_MS = 50;
+    private static final int DATA_SIZE = 4;
+    private static final int SPI_CLOCK_RATE = 3000000;
+    private static final double DEGREES_PER_SECOND_PER_LSB = 1 / 80.0;
+
+    private static final Logger logger = LoggerFactory.getLogger(ADXRS453.class);
     private static final int kSensorData = 1 << 29;
+    @SuppressWarnings("NumericOverflow")
     private static final int kRead = 1 << 31;
     private static final int kWrite = 1 << 30;
     private static final int kP = 1 << 0;
@@ -41,25 +50,32 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     private static final int kP0 = 1 << 28;
     private static final int kWriteBit = 1 << 29;
     private static final int kReadBit = 1 << 30;
-    private static final int kInvalidData = 0x0;
-    private static final int kValidData = 0x1;
-    private static final int kTestData = 0x2;
-    private static final int kReadWrite = 0x3;
-    private static final int kSPIClockRate = 3000000;
-    private static final double kDegreesPerSecondPerLSB = 80.0;
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
-    private Lock readLock = lock.readLock();
-    private Lock writeLock = lock.writeLock();
-    private AtomicBoolean hasStarted = new AtomicBoolean(false);
-    private Thread startup;
-    private SPI spi;
-    private int lastDataSent;
+    private static final int kInvalidData = 0b00 << 26;
+    private static final int kValidData = 0b01 << 26;
+    private static final int kTestData = 0b10 << 26;
+    private static final int kReadWrite = 0b11 << 26;
+    private static final int kStatusBits = 0b11 << 26;
+
+    private final SPI spi;
+    private final SPI.Port port;
+    private final AtomicBoolean hasStarted = new AtomicBoolean(false);
+    private final Thread startup;
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock readLock = lock.readLock();
+    private final Lock writeLock = lock.writeLock();
+    private final ByteBuffer accumulatorBuffer = ByteBuffer.allocateDirect(DATA_SIZE * ACCUMULATOR_DEPTH);
+
+    private int sampleCount;
+    private long rawRateSum;
     private double rate;
     private double angle;
+
     private boolean isCalibrating;
     private double calibrationOffset;
-    private EvictingQueue<Double> calibrationValues;
+    private EvictingQueue<Short> calibrationValues;
     private double calibrationPeriod;
+
     private PIDSourceType pidSource = PIDSourceType.kDisplacement;
 
     /**
@@ -68,19 +84,11 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      * @param port The SPI port to attach to
      */
     public ADXRS453(SPI.Port port) {
-        this(new SPI(port));
-    }
-
-    /**
-     * Creates a new ADXRS453
-     *
-     * @param spi The spi to use
-     */
-    public ADXRS453(SPI spi) {
         super();
         setName("ADXRS453");
-        this.spi = spi;
-        spi.setClockRate(kSPIClockRate);
+        this.spi = new SPI(port);
+        this.port = port;
+        spi.setClockRate(SPI_CLOCK_RATE);
         spi.setMSBFirst();
         spi.setSampleDataOnRising();
         spi.setClockActiveHigh();
@@ -174,8 +182,10 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
                 return;
             }
             calibrationOffset = calibrationValues.stream()
-                    .reduce(0.0, (a, b) -> a + b) / calibrationValues.size();
-            if (Double.isNaN(calibrationOffset) || Double.isInfinite(calibrationOffset)) {
+                    .mapToDouble(rawRate -> rawRate * DEGREES_PER_SECOND_PER_LSB)
+                    .average()
+                    .orElse(0.0);
+            if (!Double.isFinite(calibrationOffset)) {
                 calibrationOffset = 0.0;
             }
             angle = 0;
@@ -246,7 +256,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      * @param reg The register to read
      * @return The value in the register
      */
-    public int readRegister(Register reg) {
+    private int readRegister(Register reg) {
         int send, recv;
         send = kRead | (reg.address << 17);
         send = fixParity(send);
@@ -264,7 +274,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      * @param reg   The register to write
      * @param value The value to write to it
      */
-    public void writeRegister(Register reg, int value) {
+    @SuppressWarnings("unused")
+    private void writeRegister(Register reg, int value) {
         int send;
         send = kRead | (reg.address << 17) | (value << 1);
         send = fixParity(send);
@@ -277,7 +288,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      *
      * @return The temperature in celcius
      */
-    public double getTemperature() {
+    private double getTemperature() {
         int rawTemp = readRegister(Register.TEM);
         int tempLSB = rawTemp >>> 6;
         if ((tempLSB >>> 9) == 1) {
@@ -291,7 +302,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      *
      * @return The part ID
      */
-    public int getPartID() {
+    private int getPartID() {
         return readRegister(Register.PID);
     }
 
@@ -328,6 +339,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
 
     @Override
     public void free() {
+        hasStarted.set(false);
         spi.free();
         startup.interrupt();
     }
@@ -375,7 +387,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     private boolean checkResponse(int data) {
         if (!checkParity(data))
             return false;
-        int status = (data >>> 26) & 0b11;
+        int status = data & kStatusBits;
         switch (status) {
             case kInvalidData:
                 logger.warn("Invalid data received");
@@ -416,24 +428,26 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         }
     }
 
+    private ByteBuffer dataToBytes(int data) {
+        ByteBuffer bytes = ByteBuffer.allocate(DATA_SIZE);
+        bytes.putInt(data);
+        return bytes;
+    }
+
     private void write(int data) {
-        lastDataSent = data;
-        ByteBuffer send = ByteBuffer.allocateDirect(4);
-        send.putInt(data);
+        ByteBuffer send = dataToBytes(data);
         spi.write(send, send.capacity()); // send it
     }
 
     private int read() {
-        ByteBuffer recv = ByteBuffer.allocateDirect(4);
+        ByteBuffer recv = ByteBuffer.allocate(DATA_SIZE);
         spi.read(false, recv, recv.capacity()); // read into the buffer
         return recv.getInt();
     }
 
     private int transfer(int data) {
-        lastDataSent = data;
-        ByteBuffer send = ByteBuffer.allocateDirect(4);
-        ByteBuffer recv = ByteBuffer.allocateDirect(4);
-        send.putInt(data);
+        ByteBuffer send = dataToBytes(data);
+        ByteBuffer recv = ByteBuffer.allocate(DATA_SIZE);
         spi.transaction(send, recv, send.capacity());
         return recv.getInt();
     }
@@ -465,6 +479,13 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         if (!checkPartID()) {
             return;
         }
+
+        int cmd = fixParity(kSensorData);
+        spi.initAuto(DATA_SIZE * ACCUMULATOR_DEPTH);
+        ByteBuffer cmdBytes = dataToBytes(cmd);
+        spi.setAutoTransmitData(cmdBytes.array(), 0);
+        spi.startAutoRate(SAMPLE_PERIOD);
+
         hasStarted.set(true);
     }
 
@@ -473,31 +494,55 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         if (!hasStarted.get()) {
             return;
         }
-        double elapsed = delta;
         writeLock.lock();
         try {
-            int send, recv;
-            send = fixParity(kSensorData);
-            if (lastDataSent != send) // optimization, because of data latching
-                write(send);
-            recv = transfer(send);
-            if (!checkResponse(recv))
-                return;
-            short rawRate = (short) (recv >>> 10); // bits 10-25
-            rate = rawRate / kDegreesPerSecondPerLSB;
-            if (elapsed > .5) // don't intergrate if more than half a second
-                elapsed = 0;
-            if (isCalibrating) {
-                calibrationValues.add(rate);
-            } else {
-                rate -= calibrationOffset; // apply calibration offset
-                angle += rate * elapsed; // intergrate it into the angle
+            boolean hasData = true;
+            sampleCount = 0;
+            rawRateSum = 0;
+            while (hasData) {
+                int availableBytes = SPIJNI.spiReadAutoReceivedData(port.value, accumulatorBuffer, 0, 0);
+
+                availableBytes -= availableBytes % DATA_SIZE;
+                if (availableBytes > DATA_SIZE * ACCUMULATOR_DEPTH) {
+                    availableBytes = DATA_SIZE * ACCUMULATOR_DEPTH;
+                    hasData = true;
+                } else if (availableBytes == 0) {
+                    break;
+                } else {
+                    hasData = false;
+                }
+
+                SPIJNI.spiReadAutoReceivedData(port.value, accumulatorBuffer, availableBytes, 0);
+
+                for (int i = 0; i < availableBytes; i += DATA_SIZE) {
+                    int data = accumulatorBuffer.getInt(i);
+                    processSensorData(data);
+                }
             }
-//            logger.trace("ADXRS453 recv=" + recv + ", isCalibrating=" + isCalibrating + ", delta=" + delta +
-//                    ", rate=" + rate + ", angle=" + angle);
+
+            if (sampleCount > 0) {
+                // apply calibration offset
+                double rateSum = rawRateSum * DEGREES_PER_SECOND_PER_LSB - calibrationOffset * sampleCount;
+                rate = rateSum / sampleCount;
+                angle += rateSum * SAMPLE_PERIOD;
+            } else {
+                rate = 0.0;
+            }
         } finally {
             writeLock.unlock();
         }
+    }
+
+    private void processSensorData(int data) {
+        if (!checkResponse(data))
+            return;
+        short rawRate = (short) (data >>> 10);
+        if (isCalibrating) {
+            calibrationValues.add(rawRate);
+        } else {
+            rawRateSum += rawRate;
+        }
+        sampleCount++;
     }
 
     @Override
@@ -507,7 +552,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         builder.addDoubleProperty("Rate", this::getRate, null);
     }
 
-    public enum Register {
+    @SuppressWarnings("unused")
+    private enum Register {
         RATE(0x00),
         TEM(0x02),
         LO_CST(0x04),
