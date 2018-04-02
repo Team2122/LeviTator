@@ -69,6 +69,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         this.setPivot(pivot);
     }
 
+    public void resetHeightEncoder() {
+        liftEncoder.reset();
+    }
+
     /**
      * @return height in inches
      */
