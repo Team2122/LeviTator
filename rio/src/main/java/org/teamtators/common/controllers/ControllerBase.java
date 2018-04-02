@@ -9,13 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.Deconfigurable;
 import org.teamtators.common.control.Timer;
-import org.teamtators.common.control.Updatable;
 import org.teamtators.common.scheduler.TriggerSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,19 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerBase.Config>
         implements Controller<TButton, TAxis>, Configurable<TConfig>, Deconfigurable {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private String name;
-    private GenericHID hid = null;
-    private DriverStation driverStation = DriverStation.getInstance();
-
     private final AtomicInteger buttonsState = new AtomicInteger(0);
     private final AtomicInteger povState = new AtomicInteger(0);
     private final List<AtomicDouble> axisStates;
-
     private final AtomicDouble leftRumble = new AtomicDouble(0);
     private final AtomicDouble rightRumble = new AtomicDouble(0);
     private final AtomicInteger outputs = new AtomicInteger(0);
-
+    private String name;
+    private GenericHID hid = null;
+    private DriverStation driverStation = DriverStation.getInstance();
     private int lastAxisCount = -1;
     private int lastButtonCount = -1;
 
@@ -52,6 +46,14 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         axisStates = Collections.synchronizedList(new ArrayList<>(getAxisCount()));
     }
 
+    public ControllerBase(String name, int port) {
+        this(name, new Joystick(port));
+    }
+
+    public ControllerBase(String name) {
+        this(name, null);
+    }
+
     public void reset() {
         buttonsState.set(0);
         povState.set(0);
@@ -63,14 +65,6 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         outputs.set(0);
         lastAxisCount = 0;
         lastButtonCount = 0;
-    }
-
-    public ControllerBase(String name, int port) {
-        this(name, new Joystick(port));
-    }
-
-    public ControllerBase(String name) {
-        this(name, null);
     }
 
     @Override
@@ -148,6 +142,11 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         setRumble(rumbleType, value);
     }
 
+    @Override
+    public final int getAxisCount() {
+        return axisCount;
+    }
+
     protected final void setAxisCount(int axisCount) {
         this.axisCount = axisCount;
         axisStates.clear();
@@ -156,18 +155,13 @@ public abstract class ControllerBase<TButton, TAxis, TConfig extends ControllerB
         }
     }
 
-    protected final void setButtonCount(int buttonCount) {
-        this.buttonCount = buttonCount;
-    }
-
-    @Override
-    public final int getAxisCount() {
-        return axisCount;
-    }
-
     @Override
     public final int getButtonCount() {
         return buttonCount;
+    }
+
+    protected final void setButtonCount(int buttonCount) {
+        this.buttonCount = buttonCount;
     }
 
     @Override

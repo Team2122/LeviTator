@@ -43,9 +43,10 @@ public class TriggerSchedulers {
         return new RunnableScheduler(runnable) {
             private Timer timer = new Timer();
             private boolean hasRun = false;
+
             @Override
             protected boolean shouldRun(boolean active) {
-                if(!active) {
+                if (!active) {
                     timer.restart();
                     hasRun = false;
                     return false;
@@ -53,8 +54,7 @@ public class TriggerSchedulers {
                 if (timer.hasPeriodElapsed(duration) && !hasRun) {
                     hasRun = true;
                     return true;
-                }
-                else return false;
+                } else return false;
             }
         };
     }
@@ -62,12 +62,9 @@ public class TriggerSchedulers {
     public static abstract class RunnableScheduler implements TriggerScheduler {
         private Runnable runnable;
 
+        @SuppressWarnings("WeakerAccess")
         public RunnableScheduler(Runnable runnable) {
             this.runnable = runnable;
-        }
-
-        protected Runnable getRunnable() {
-            return runnable;
         }
 
         protected abstract boolean shouldRun(boolean active);
@@ -82,6 +79,7 @@ public class TriggerSchedulers {
     public static abstract class LastStateScheduler extends RunnableScheduler {
         private boolean lastActive = false;
 
+        @SuppressWarnings("WeakerAccess")
         public LastStateScheduler(Runnable runnable) {
             super(runnable);
         }

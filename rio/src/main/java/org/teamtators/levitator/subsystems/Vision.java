@@ -14,32 +14,34 @@ import org.teamtators.common.math.Polynomial3;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.levitator.TatorRobot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
 public class Vision extends Subsystem implements Configurable<Vision.Config>, Deconfigurable {
     public static final Scalar REJECTED_CONTOUR_COLOR = new Scalar(255, 0, 0);
     public static final Scalar FILTERED_CONTOUR_COLOR = new Scalar(0, 255, 0);
+    private static final boolean VISION_ENABLED = false;
     private Drive drive;
-    private TatorRobot robot;
     private Config config;
-    private SendableChooser<DisplayMode> displayModeChooser;
     private AtomicReference<DetectedObject> lastDetectedObject = new AtomicReference<>(new DetectedObject());
     private Thread processing;
-    private MjpegServer server;
     private CameraServer cs;
     private UsbCamera usbCamera;
     private CvSink cvSink;
     private CvSource outputStream;
 
+    @SuppressWarnings("WeakerAccess")
     public Vision(Drive drive) {
         super("Vision");
         cs = CameraServer.getInstance();
         this.drive = drive;
-        displayModeChooser = new SendableChooser<>();
+        SendableChooser<DisplayMode> displayModeChooser = new SendableChooser<>();
         displayModeChooser.addObject("Source", DisplayMode.Source);
         displayModeChooser.addObject("HSV", DisplayMode.HSV);
         displayModeChooser.addObject("Threshold", DisplayMode.Threshold);
@@ -55,6 +57,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         processing.start();
     }
 
+    @SuppressWarnings("UnusedAssignment")
     private void processingThread() {
         if (usbCamera == null) {
             UsbCameraInfo[] usbCameras = getCameras();
@@ -66,7 +69,6 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             usbCamera = cs.startAutomaticCapture("USBWebCam_Pick", usbCameras[0].dev);
             cvSink = cs.getVideo();
             outputStream = cs.putVideo("Vision_Pick", config.width, config.height);
-            server = cs.addServer("CameraServer2122");
         } else {
             logger.debug("Starting vision thread with existing source");
         }
@@ -75,7 +77,6 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
 //        usbCamera.setExposureManual(config.exposure);
         usbCamera.setExposureAuto();
 
-/*
         for (VideoProperty property : usbCamera.enumerateProperties()) {
             if (property.getName().equalsIgnoreCase("contrast")) {
                 property.set(config.contrast);
@@ -85,7 +86,9 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             }
         }
 
-        //return;
+        if (!VISION_ENABLED) {
+            return;
+        }
 
         VideoProperty displayModeProp = outputStream.createProperty("displayMode", VideoProperty.Kind.kEnum, 0, 4, 1, 0, 0);
         DisplayMode[] displayModeValues = DisplayMode.values();
@@ -159,7 +162,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
                 MatOfInt convexHull = new MatOfInt();
                 Imgproc.convexHull(contours.get(i), convexHull, false);
                 hulls.set(i, convexHull);
-    }*//*
+    }*/
             if (displayMode == DisplayMode.AllContours) {
                 Imgproc.drawContours(output, contours, -1, REJECTED_CONTOUR_COLOR);
             }
@@ -204,7 +207,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         threshold.release();
         hierarchy.release();
         output.release();
-        */
+
     }
 
     private UsbCameraInfo[] getCameras() {
@@ -267,10 +270,18 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         }
     }
 
+    @Override
+    public ManualTestGroup createManualTests() {
+        ManualTestGroup tests = super.createManualTests();
+        tests.addTest(new VisionTest());
+        return tests;
+    }
+
     public enum DisplayMode {
         Source, HSV, Threshold, AllContours, FilteredContours
     }
 
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public static class Config {
         public int width;
         public int height;
@@ -295,13 +306,13 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     }
 
     private class ContourInfo {
-        public MatOfPoint contour;
-        public Rect boundingRect;
-        public Size size;
-        public double area;
-        public Moments moments;
-        public double x;
-        public double y;
+        MatOfPoint contour;
+        Rect boundingRect;
+        Size size;
+        double area;
+        Moments moments;
+        double x;
+        double y;
 
         public ContourInfo(MatOfPoint contour) {
             this.contour = contour;
@@ -318,15 +329,8 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
         }
     }
 
-    @Override
-    public ManualTestGroup createManualTests() {
-        ManualTestGroup tests = super.createManualTests();
-        tests.addTest(new VisionTest());
-        return tests;
-    }
-
     private class VisionTest extends ManualTest {
-        public VisionTest() {
+        VisionTest() {
             super("Vision");
         }
 

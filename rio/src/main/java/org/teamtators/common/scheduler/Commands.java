@@ -3,6 +3,7 @@ package org.teamtators.common.scheduler;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Commands {
     private static AtomicInteger nextLogCommandNumber = new AtomicInteger(1);
 
@@ -25,9 +26,7 @@ public class Commands {
         StateCommand<Void> command = new StateCommand<>(() -> {
             initialize.run();
             return null;
-        }, s -> step.getAsBoolean(), (s, i) -> {
-            finish.run();
-        });
+        }, s -> step.getAsBoolean(), (s, i) -> finish.run());
         if (requirement != null)
             command.requires(requirement);
         return command;
@@ -49,15 +48,15 @@ public class Commands {
     }
 
     public static <S> Command stateful(Supplier<S> initialize, Predicate<S> step, BiConsumer<S, Boolean> finish) {
-        return new StateCommand<S>(initialize::get, step::test, finish::accept);
+        return new StateCommand<>(initialize::get, step::test, finish::accept);
     }
 
     public static <S> Command stateful(Supplier<S> initialize, Predicate<S> step, Consumer<S> finish) {
-        return new StateCommand<S>(initialize::get, step::test, (s, i) -> finish.accept(s));
+        return new StateCommand<>(initialize::get, step::test, (s, i) -> finish.accept(s));
     }
 
     public static <S> Command stateful(Supplier<S> initialize, Predicate<S> step) {
-        return new StateCommand<S>(initialize::get, step::test, (s, i) -> {
+        return new StateCommand<>(initialize::get, step::test, (s, i) -> {
         });
     }
 

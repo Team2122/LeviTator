@@ -1,8 +1,9 @@
 package org.teamtators.common.hw;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.ControllerPower;
+import edu.wpi.first.wpilibj.RobotController;
 
+@SuppressWarnings("unused")
 public class DistanceLaser {
     private double distance0V;
     private double distance5V;
@@ -14,6 +15,7 @@ public class DistanceLaser {
      * @param distance0V    the distance represented by a reading of 0V (in cm)
      * @param distance5V    the distance represented by a reading of 5V (in cm)
      */
+    @SuppressWarnings("WeakerAccess")
     public DistanceLaser(AnalogInput distanceLaser, double distance0V, double distance5V) {
         this.distanceLaser = distanceLaser;
         this.distance0V = distance0V;
@@ -30,7 +32,7 @@ public class DistanceLaser {
     }
 
     public double getDistance() {
-        double prop = distanceLaser.getVoltage() / ControllerPower.getVoltage5V();
+        double prop = distanceLaser.getVoltage() / RobotController.getVoltage5V();
         return (prop * (distance5V - distance0V)) + distance0V;
     }
 

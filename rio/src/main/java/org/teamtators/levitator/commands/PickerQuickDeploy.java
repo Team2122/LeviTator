@@ -2,7 +2,6 @@ package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.Timer;
-import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Picker;
@@ -12,7 +11,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
     private Timer timer = new Timer();
     private Config config;
 
-    public PickerQuickDeploy(TatorRobot robot) {
+    PickerQuickDeploy(TatorRobot robot) {
         super("PickerQuickDeploy");
         this.picker = robot.getSubsystems().getPicker();
         requires(picker);
@@ -59,6 +58,7 @@ public class PickerQuickDeploy extends Command implements Configurable<PickerQui
         picker.unlockArms();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double kickPower;
         public double timeBeforeKick;

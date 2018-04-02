@@ -4,7 +4,10 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.AnalogPotentiometerConfig;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.SolenoidConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
@@ -17,9 +20,11 @@ import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.components.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private Lift lift;
 
@@ -221,7 +226,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(pivotMotorUpdater);
+        return Collections.singletonList(pivotMotorUpdater);
     }
 
 
@@ -276,6 +281,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void deconfigure() {
         super.deconfigure();
@@ -284,6 +290,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotEncoder.free();
         pivotLockSolenoid.free();
         pivotLockSensor.free();
+    }
+
+    @SuppressWarnings("unused")
+    public enum AnglePreset {
+        LEFT,
+        HALF_LEFT,
+        CENTER,
+        HALF_RIGHT,
+        RIGHT
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -300,6 +315,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         public double bumpPivotValue;
 
+        @SuppressWarnings("unused")
         public double angleTolerance;
         public double centerTolerance;
 
@@ -310,19 +326,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public double lockAngle;
     }
 
-    @SuppressWarnings("unused")
-    public enum AnglePreset {
-        LEFT,
-        HALF_LEFT,
-        CENTER,
-        HALF_RIGHT,
-        RIGHT;
-    }
-
     private class PivotTest extends ManualTest {
         private double axisValue;
 
-        public PivotTest() {
+        PivotTest() {
             super("PivotTest");
         }
 

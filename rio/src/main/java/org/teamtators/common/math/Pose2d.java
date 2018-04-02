@@ -2,7 +2,6 @@ package org.teamtators.common.math;
 
 import com.google.common.base.Preconditions;
 
-import static org.teamtators.common.math.Epsilon.isEpsilonNegative;
 import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 
 /**
@@ -24,6 +23,18 @@ public class Pose2d {
 
     public static Pose2d zero() {
         return new Pose2d(Translation2d.zero(), Rotation.identity());
+    }
+
+    private static Translation2d intersectionHelper(Pose2d a, Pose2d b) {
+        Rotation a_r = a.getYaw();
+        Rotation b_r = b.getYaw();
+        Translation2d a_t = a.getTranslation();
+        Translation2d b_t = b.getTranslation();
+
+        double tan_b = b_r.tan();
+        double t = ((a_t.getX() - b_t.getX()) * tan_b + b_t.getY() - a_t.getY())
+                / (a_r.sin() - a_r.cos() * tan_b);
+        return a_t.add(a_r.toTranslation(t));
     }
 
     public Pose2d withTranslation(Translation2d translation) {
@@ -101,18 +112,6 @@ public class Pose2d {
         } else {
             return intersectionHelper(other, this);
         }
-    }
-
-    private static Translation2d intersectionHelper(Pose2d a, Pose2d b) {
-        Rotation a_r = a.getYaw();
-        Rotation b_r = b.getYaw();
-        Translation2d a_t = a.getTranslation();
-        Translation2d b_t = b.getTranslation();
-
-        double tan_b = b_r.tan();
-        double t = ((a_t.getX() - b_t.getX()) * tan_b + b_t.getY() - a_t.getY())
-                / (a_r.sin() - a_r.cos() * tan_b);
-        return a_t.add(a_r.toTranslation(t));
     }
 
     public Translation2d getNearestPoint(Translation2d point) {

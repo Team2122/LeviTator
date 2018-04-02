@@ -41,12 +41,15 @@ public class SetPose extends Command implements Configurable<SetPose.Config> {
     public static class Config {
         public Translation2d translation = Translation2d.zero();
         public Rotation rotation = Rotation.identity();
+
         public void setX(double x) {
             translation = translation.withX(x);
         }
+
         public void setY(double y) {
             translation = translation.withY(y);
         }
+
         public void setYaw(double yawDegrees) {
             rotation = Rotation.fromDegrees(yawDegrees);
         }

@@ -2,6 +2,7 @@ package org.teamtators.common.math;
 
 /**
  * For comparing doubles within a certain error value
+ *
  * @author Alex Mikhalev
  */
 public class Epsilon {

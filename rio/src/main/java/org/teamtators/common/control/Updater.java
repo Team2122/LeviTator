@@ -5,10 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Updates an Updatable at a constant period.
  *
@@ -18,8 +14,8 @@ public class Updater implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Updater.class);
     private static final double DEFAULT_PERIOD = 1.0 / 120.0;
     private static final double S_TO_NS = 1000000000.0;
-    private Notifier notifier;
     private final Updatable updatable;
+    private Notifier notifier;
     private double period;
     private boolean running = false;
     private double lastStepTime;
@@ -39,7 +35,7 @@ public class Updater implements Runnable {
         this.updatable = updatable;
         this.period = period;
 //        executorService.scheduleAtFixedRate(this, 0, (long) (S_TO_NS * this.period), TimeUnit.NANOSECONDS);
-        this.notifier = new Notifier(this::run);
+        this.notifier = new Notifier(this);
     }
 
     public void start() {

@@ -4,7 +4,7 @@ operatorInterface:
   gunnerSecondary: { port: 2 }
   slider: { port: 3 }
   knobRange: 90
-  knobDeadzone: 7
+  knobDeadZone: 7
   sliderFunction: { minX: -1, minY: 0, maxX: 1, maxY: 85 }
 drive:
   leftMotor: { type: VICTOR_SP, channel: 0, inverted: false, powerChannels: [] }

@@ -3,7 +3,10 @@ package org.teamtators.levitator.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.config.helpers.*;
+import org.teamtators.common.config.helpers.DigitalSensorConfig;
+import org.teamtators.common.config.helpers.EncoderConfig;
+import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.DigitalSensor;
@@ -13,13 +16,19 @@ import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.common.scheduler.Subsystem;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
-import org.teamtators.common.tester.components.*;
+import org.teamtators.common.tester.components.DigitalSensorTest;
+import org.teamtators.common.tester.components.EncoderTest;
+import org.teamtators.common.tester.components.MotionCalibrationTest;
+import org.teamtators.common.tester.components.SpeedControllerTest;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
+    private static final boolean WAIT_FOR_HOME_SENSOR = false;
     private Pivot pivot;
 
     private SpeedControllerGroup liftMotor;
@@ -60,6 +69,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return pivot;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setPivot(Pivot pivot) {
         this.pivot = pivot;
     }
@@ -79,6 +89,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     /**
      * @return velocity in inches per second
      */
+    @SuppressWarnings("WeakerAccess")
     public double getLiftVelocity() {
         return liftEncoder.getRate();
     }
@@ -297,7 +308,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(liftMotorUpdater);
+        return Collections.singletonList(liftMotorUpdater);
     }
 
     @Override
@@ -349,6 +360,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         homeTimer.stop();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void deconfigure() {
         super.deconfigure();
@@ -359,6 +371,37 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         limitSensorBottom.free();
     }
 
+    private void updateHeight() {
+        if (!homed) {
+            if (!homeTimer.isRunning()) {
+                homeTimer.start();
+            }
+            boolean homeTimeout = false;
+            if (homeTimer.hasPeriodElapsed(config.homingTimeout)) {
+                homeTimeout = true;
+                logger.warn("Homing timed out");
+            }
+            disableLiftController();
+            if (!pivot.isPivotLocked() && !homeTimeout) {
+                setLiftPower(0.0);
+                return;
+            }
+            setLiftPower(config.homingPower);
+            if (!isAtBottomLimit() && WAIT_FOR_HOME_SENSOR && !homeTimeout) {
+                return;
+            }
+            logger.info("Lift homed");
+            liftEncoder.reset();
+            enableLiftController();
+            homed = true;
+        } else {
+            enableLiftController();
+        }
+        //Set the lift target height to the desired height
+        this.setTargetHeight(desiredHeight);
+    }
+
+    @SuppressWarnings("unused")
     public enum HeightPreset {
         HOME,
         PICK,
@@ -367,9 +410,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         SWITCH_LOW,
         SWITCH,
         SCALE_LOW,
-        SCALE_HIGH;
+        SCALE_HIGH
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerGroupConfig liftMotor;
         public EncoderConfig liftEncoder;
@@ -389,40 +433,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         public double homingTimeout;
     }
 
-    private void updateHeight() {
-        if (!homed) {
-            if (!homeTimer.isRunning()) {
-                homeTimer.start();
-            }
-            boolean homeTimeout = false;
-            if (homeTimer.hasPeriodElapsed(config.homingTimeout)) {
-                homeTimeout = true;
-                logger.warn("Homing timed out");
-            }
-            disableLiftController();
-            if (!pivot.isPivotLocked() && !homeTimeout) {
-                setLiftPower(0.0);
-                return;
-            }
-            setLiftPower(config.homingPower);
-            if (!isAtBottomLimit() && false && !homeTimeout) {
-                return;
-            }
-            logger.info("Lift homed");
-            liftEncoder.reset();
-            enableLiftController();
-            homed = true;
-        } else {
-            enableLiftController();
-        }
-        //Set the lift target height to the desired height
-        this.setTargetHeight(desiredHeight);
-    }
-
     private class LiftTest extends ManualTest {
         private double axisValue;
 
-        public LiftTest() {
+        LiftTest() {
             super("LiftTest");
         }
 
@@ -431,7 +445,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
             disable();
         }
-
 
 
         @Override

@@ -5,6 +5,7 @@ import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.DataLoggable;
 import org.teamtators.common.datalogging.LogDataProvider;
 import org.teamtators.common.math.Epsilon;
+import org.teamtators.common.math.MathUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class TrapezoidalProfileFollower extends AbstractUpdatable implements DataLoggable,
         Configurable<TrapezoidalProfileFollower.Config> {
     private final DataCollector dataCollector = DataCollector.getDataCollector();
@@ -53,12 +55,6 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         setPositionProvider(positionProvider);
         setVelocityProvider(velocityProvider);
         setOutputConsumer(outputConsumer);
-    }
-
-    private static double applyLimits(double value, double min, double max) {
-        if (value > max) return max;
-        else if (value < min) return min;
-        else return value;
     }
 
     public synchronized void reset() {
@@ -134,10 +130,6 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         calculator.updateProfile(baseProfile);
     }
 
-    public synchronized void setEndVelocity(double endVelocity) {
-        baseProfile.setEndVelocity(endVelocity);
-    }
-
     public void resetEndVelocity() {
         setEndVelocity(config.endVelocity);
     }
@@ -146,8 +138,8 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         return baseProfile.getEndVelocity();
     }
 
-    public synchronized void setTravelVelocity(double travelVelocity) {
-        baseProfile.setTravelVelocity(travelVelocity);
+    public synchronized void setEndVelocity(double endVelocity) {
+        baseProfile.setEndVelocity(endVelocity);
     }
 
     public void resetTravelVelocity() {
@@ -158,8 +150,8 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         return baseProfile.getTravelVelocity();
     }
 
-    public synchronized void setMaxAcceleration(double maxAcceleration) {
-        baseProfile.setMaxAcceleration(maxAcceleration);
+    public synchronized void setTravelVelocity(double travelVelocity) {
+        baseProfile.setTravelVelocity(travelVelocity);
     }
 
     public void resetMaxAcceleration() {
@@ -168,6 +160,10 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
     public synchronized double getMaxAcceleration() {
         return baseProfile.getMaxAcceleration();
+    }
+
+    public synchronized void setMaxAcceleration(double maxAcceleration) {
+        baseProfile.setMaxAcceleration(maxAcceleration);
     }
 
     public Predicate<TrapezoidalProfileFollower> getOnTargetPredicate() {
@@ -219,13 +215,14 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         }
 
         double computedOutput = computeOutput(delta);
-        computedOutput = applyLimits(computedOutput, this.minOutput, this.maxOutput);
+        computedOutput = MathUtil.applyLimits(computedOutput, this.minOutput, this.maxOutput);
 
         output = computedOutput;
         if (outputConsumer != null)
             outputConsumer.controllerWrite(output);
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected double computeOutput(double delta) {
         positionError = calculator.getPosition() - getCurrentPosition();
         velocityError = calculator.getVelocity() - getCurrentVelocity();
@@ -246,6 +243,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
 
         double endPositionError = calculator.getProfile().getDistance() - getCurrentPosition();
         if (Math.abs(endPositionError) <= config.maxIError) {
+            //noinspection NonAtomicOperationOnVolatileField
             totalPError += endPositionError * delta;
             output += config.kiP * totalPError;
         } else {
@@ -369,6 +367,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         return config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double kpP = 0.0; // position error proportion
         public double kiP = 0.0; // position error integral
@@ -382,7 +381,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         public double maxAbsoluteOutput = Double.NaN; // maximum absolute output power
         public double tolerance = Double.POSITIVE_INFINITY;
         public double maxOutput = Double.POSITIVE_INFINITY; // maximum output power
-        public double minOutput = Double.NEGATIVE_INFINITY; // minumum output power
+        public double minOutput = Double.NEGATIVE_INFINITY; // minimum output power
         public double minPosition = Double.NEGATIVE_INFINITY; // the minimum position the follower will move to
         public double maxPosition = Double.POSITIVE_INFINITY; // the maximum position the follower will move to
 
@@ -390,7 +389,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         public double travelVelocity = 0.0; // default travelVelocity for the profile
         public double maxAcceleration = 0.0; // default maxAcceleration for the profile
 
-        public boolean logData = false; // whether datalog is enabled or not
+        public boolean logData = false; // whether to log data or not
     }
 
     private class ControllerLogDataProvider implements LogDataProvider {

@@ -1,9 +1,7 @@
 package org.teamtators.common.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.CommandStore;
 
@@ -14,11 +12,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ConfigCommandStore extends CommandStore {
-    private Map<String, Supplier<Command>> commandSuppliers = new HashMap<String, Supplier<Command>>();
+    private Map<String, Supplier<Command>> commandSuppliers = new HashMap<>();
     private Map<String, JsonNode> defaultConfigs = new HashMap<>();
 
-    public static ObjectNode applyDefaults(ObjectNode object, ObjectNode defaults) {
+    private static ObjectNode applyDefaults(ObjectNode object, ObjectNode defaults) {
         ObjectNode result = defaults.deepCopy();
         Iterator<Map.Entry<String, JsonNode>> it = object.fields();
         while (it.hasNext()) {
@@ -83,16 +82,20 @@ public class ConfigCommandStore extends CommandStore {
             Map.Entry<String, JsonNode> field = it.next();
             String commandName = field.getKey();
             char prefix = commandName.charAt(0);
-            if (prefix == '$') { // Sequential command config
-                logger.trace("Creating CommandGroup '" + commandName + "'");
-                putCommand(commandName, new ConfigSequentialCommand(this));
-            } else if (prefix == '^') {
-                String defaultFor = commandName.substring(1);
-                logger.trace("Adding default config for command '" + defaultFor + "'");
-                defaultConfigs.put(defaultFor, field.getValue());
-            } else {
-                logger.trace("Creating command '" + commandName + "'");
-                createCommandFromConfig(commandName, field.getValue());
+            switch (prefix) {
+                case '$':  // Sequential command config
+                    logger.trace("Creating CommandGroup '" + commandName + "'");
+                    putCommand(commandName, new ConfigSequentialCommand(this));
+                    break;
+                case '^':
+                    String defaultFor = commandName.substring(1);
+                    logger.trace("Adding default config for command '" + defaultFor + "'");
+                    defaultConfigs.put(defaultFor, field.getValue());
+                    break;
+                default:
+                    logger.trace("Creating command '" + commandName + "'");
+                    createCommandFromConfig(commandName, field.getValue());
+                    break;
             }
         }
         HashMap<String, Command> commandsMapCopy = new HashMap<>(getCommands());
@@ -126,7 +129,7 @@ public class ConfigCommandStore extends CommandStore {
         Configurables.configureObject(command, config);
     }
 
-    public Command createCommandFromConfig(String commandName, JsonNode config) throws ConfigException {
+    public void createCommandFromConfig(String commandName, JsonNode config) throws ConfigException {
         String className;
         JsonNode classNode = config.get("class");
         if (classNode != null) {
@@ -134,7 +137,7 @@ public class ConfigCommandStore extends CommandStore {
         } else {
             className = commandName;
         }
-        return constructCommandClass(commandName, className);
+        constructCommandClass(commandName, className);
     }
 
     public Command constructCommandClass(String commandName, String className) throws ConfigException {

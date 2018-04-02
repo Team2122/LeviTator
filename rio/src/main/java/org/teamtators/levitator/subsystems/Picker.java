@@ -20,6 +20,7 @@ import org.teamtators.common.tester.components.SpeedControllerTest;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Picker extends Subsystem implements Configurable<Picker.Config> {
     private SpeedController leftMotor;
     private MotorPowerUpdater leftMotorUpdater;
@@ -84,11 +85,11 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
     }
 
 
-    public void extend(){
+    public void extend() {
         setPickerExtended(true);
     }
 
-    public void retract(){
+    public void retract() {
         setPickerExtended(false);
     }
 
@@ -123,10 +124,6 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
         setDefaultExtended(false);
     }
 
-    public void setArmLocked(boolean locked) {
-        armLock.set(locked);
-    }
-
     public void lockArms() {
         setArmLocked(true);
     }
@@ -137,6 +134,10 @@ public class Picker extends Subsystem implements Configurable<Picker.Config> {
 
     public boolean isArmLocked() {
         return armLock.get();
+    }
+
+    public void setArmLocked(boolean locked) {
+        armLock.set(locked);
     }
 
     @Override

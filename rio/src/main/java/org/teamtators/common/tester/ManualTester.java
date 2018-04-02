@@ -14,17 +14,18 @@ import java.util.Map;
 /**
  * A class that allows manually running ManualTest's
  */
+@SuppressWarnings("unused")
 public class ManualTester extends Command {
-    public static final LogitechF310.Axis TEST_AXIS = LogitechF310.Axis.RIGHT_STICK_Y;
-    public static final double DEADZONE = 0.05;
-    public static final double EXPONENT = 2.0;
+    private static final LogitechF310.Axis TEST_AXIS = LogitechF310.Axis.RIGHT_STICK_Y;
+    private static final double DEAD_ZONE = 0.05;
+    private static final double EXPONENT = 2.0;
     private int testGroupIndex = 0;
     private int testIndex = 0;
     private Timer timer = new Timer();
 
     private LogitechF310 joystick;
 
-    private Map<LogitechF310.Button, Boolean> lastStates = new EnumMap<LogitechF310.Button, Boolean>(LogitechF310.Button.class);
+    private Map<LogitechF310.Button, Boolean> lastStates = new EnumMap<>(LogitechF310.Button.class);
     private List<ManualTestGroup> testGroups = new ArrayList<>();
 
     public ManualTester() {
@@ -55,7 +56,7 @@ public class ManualTester extends Command {
         ManualTest test = getCurrentTest();
         if (test != null) {
             double axisValue = -joystick.getAxisValue(TEST_AXIS);
-            axisValue = JoystickModifiers.applyDriveModifiers(axisValue, DEADZONE, EXPONENT);
+            axisValue = JoystickModifiers.applyDriveModifiers(axisValue, DEAD_ZONE, EXPONENT);
             test.updateAxis(axisValue);
         }
         for (LogitechF310.Button button : LogitechF310.Button.values()) {
@@ -121,14 +122,14 @@ public class ManualTester extends Command {
             test.stop();
     }
 
-    public void beginTest(int index) {
+    private void beginTest(int index) {
         if (getCurrentTestGroup() == null) return;
         stopTest();
         testIndex = index;
         startTest();
     }
 
-    public void nextTest() {
+    private void nextTest() {
         if (getCurrentTestGroup() == null) return;
         int newTestIndex = testIndex + 1;
         if (newTestIndex >= getCurrentTestGroup().getTests().size())
@@ -136,7 +137,7 @@ public class ManualTester extends Command {
         beginTest(newTestIndex);
     }
 
-    public void previousTest() {
+    private void previousTest() {
         if (getCurrentTestGroup() == null) return;
         int newTestIndex = testIndex - 1;
         if (getCurrentTestGroup().getTests().size() == 0)
@@ -146,11 +147,11 @@ public class ManualTester extends Command {
         beginTest(newTestIndex);
     }
 
-    public void beginTestGroup(int index) {
+    private void beginTestGroup(int index) {
         beginTestGroup(index, 0);
     }
 
-    public void beginTestGroup(int groupIndex, int testIndex) {
+    private void beginTestGroup(int groupIndex, int testIndex) {
         testGroupIndex = groupIndex;
         if (getCurrentTestGroup() == null) {
             logger.info("--> There are no test groups <--");
@@ -160,7 +161,7 @@ public class ManualTester extends Command {
         beginTest(testIndex);
     }
 
-    public void nextTestGroup() {
+    private void nextTestGroup() {
         if (testGroups.isEmpty()) return;
         int nextGroupIndex = testGroupIndex + 1;
         if (nextGroupIndex >= testGroups.size())
@@ -168,7 +169,7 @@ public class ManualTester extends Command {
         beginTestGroup(nextGroupIndex);
     }
 
-    public void previousTestGroup() {
+    private void previousTestGroup() {
         if (testGroups.isEmpty()) return;
         int nextGroupIndex = testGroupIndex - 1;
         if (nextGroupIndex < 0)
@@ -177,13 +178,18 @@ public class ManualTester extends Command {
     }
 
     private void startTest() {
+        ManualTestGroup group = getCurrentTestGroup();
+        if (group == null) {
+            logger.info("-> There are no test groups! <-");
+            return;
+        }
         ManualTest test = getCurrentTest();
         if (test == null) {
-            logger.info("-> Test group '{}' is empty! <-", getCurrentTestGroup().getName());
-        } else {
-            logger.info("-> Testing '{}' <-", test.getName());
-            test.start();
+            logger.info("-> Test group '{}' is empty! <-", group.getName());
+            return;
         }
+        logger.info("-> Testing '{}' <-", test.getName());
+        test.start();
     }
 
     /**

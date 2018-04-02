@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
 public class SpeedControllerGroup extends SendableBase implements SpeedController {
-    private boolean m_isInverted = false;
-    private final SpeedController[] m_speedControllers;
     private static int instances = 0;
+    private final SpeedController[] m_speedControllers;
+    private boolean m_isInverted = false;
 
     /**
      * Create a new SpeedControllerGroup with the provided SpeedControllers.
@@ -53,13 +53,13 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
     }
 
     @Override
-    public void setInverted(boolean isInverted) {
-        m_isInverted = isInverted;
+    public boolean getInverted() {
+        return m_isInverted;
     }
 
     @Override
-    public boolean getInverted() {
-        return m_isInverted;
+    public void setInverted(boolean isInverted) {
+        m_isInverted = isInverted;
     }
 
     @Override

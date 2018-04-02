@@ -9,9 +9,8 @@ import org.teamtators.levitator.subsystems.Drive;
 public class WaitForPath extends Command implements Configurable<WaitForPath.Config> {
     private final Drive drive;
     private Config config;
-    private PursuitReport report;
 
-    public WaitForPath(TatorRobot robot) {
+    WaitForPath(TatorRobot robot) {
         super("WaitForPath");
         this.drive = robot.getSubsystems().getDrive();
     }
@@ -22,12 +21,12 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
 
     @Override
     public boolean step() {
-        report = drive.getDriveSegmentsFollower().getReport();
+        PursuitReport report = drive.getDriveSegmentsFollower().getReport();
         if (report == null) {
             return false;
         }
         if (!Double.isNaN(config.remainingDistance)) {
-            if (report.remainingDistance <= config.remainingDistance || report.isFinished){
+            if (report.remainingDistance <= config.remainingDistance || report.isFinished) {
                 logger.info("WaitForPath finished remaining distance {} < {}", report.remainingDistance, config.remainingDistance);
                 return true;
             }
@@ -35,8 +34,7 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
         if (report.isFinished) {
             logger.info("WaitForPath finished because path finished");
             return true;
-        }
-        else return false;
+        } else return false;
     }
 
     @Override
@@ -51,6 +49,7 @@ public class WaitForPath extends Command implements Configurable<WaitForPath.Con
         this.config = config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double remainingDistance = Double.NaN;
     }

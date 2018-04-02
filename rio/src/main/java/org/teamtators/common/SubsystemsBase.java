@@ -9,9 +9,6 @@ import org.teamtators.common.scheduler.Subsystem;
 
 import java.util.List;
 
-/**
- * Created by TatorsDriverStation on 10/1/2017.
- */
 public abstract class SubsystemsBase implements Deconfigurable {
     public abstract List<Subsystem> getSubsystemList();
 

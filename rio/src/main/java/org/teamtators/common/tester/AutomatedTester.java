@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * A ManualTest which coordinates automated tests
  */
 public class AutomatedTester extends ManualTest {
-    public static final String AUTOTESTS_CONFIG_FILE = "AutoTests.yaml";
+    private static final String AUTO_TESTS_CONFIG_FILE = "AutoTests.yaml";
     private List<AutomatedTest> testList = new ArrayList<>();
     private SequentialCommand autoTests;
     private SequentialCommand hybridTests;
@@ -105,15 +105,17 @@ public class AutomatedTester extends ManualTest {
     @Override
     public void update(double delta) {
         if (running) {
+            //noinspection StatementWithEmptyBody
             if (!testingHybrids && !scheduler.containsCommand(autoTests.getName())) {
-                //beginHybrids();
+                //beginHybrids(); TODO: ???
             } else if (!scheduler.containsCommand(autoTests.getName()) && !scheduler.containsCommand(hybridTests.getName())) {
-                printTestInfo("stop got called. tesinghybrids: {} running: {}", testingHybrids, running);
+                printTestInfo("stop got called. testing hybrids: {} running: {}", testingHybrids, running);
                 stop();
             }
         }
     }
 
+    @SuppressWarnings("unused")
     private void beginHybrids() {
         testingHybrids = true;
         running = false;
@@ -148,7 +150,7 @@ public class AutomatedTester extends ManualTest {
      * @param configLoader Robot config loader
      */
     public void configure(ConfigLoader configLoader) {
-        ObjectNode configNode = (ObjectNode) configLoader.load(AUTOTESTS_CONFIG_FILE);
+        ObjectNode configNode = (ObjectNode) configLoader.load(AUTO_TESTS_CONFIG_FILE);
         for (AutomatedTest test : testList) {
             if (test instanceof Configurable) {
                 try {

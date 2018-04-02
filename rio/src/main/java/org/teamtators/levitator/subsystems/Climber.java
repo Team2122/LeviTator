@@ -23,31 +23,31 @@ import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
 import org.teamtators.levitator.TatorRobot;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private final TatorRobot robot;
     private SpeedControllerGroup climberMotor;
     private WPI_TalonSRX masterMotor;
-//    private MotorPowerUpdater climberMotorUpdater;
+    //    private MotorPowerUpdater climberMotorUpdater;
     private DigitalSensor topLimit;
     private DigitalSensor bottomLimit;
     private Solenoid releaser;
     private Config config;
     private boolean homed;
 
-    public Climber(TatorRobot robot) {
+    Climber(TatorRobot robot) {
         super("Climber");
         this.robot = robot;
     }
 
-    public void setHomed(boolean homed) {
-        this.homed = homed;
-    }
-
     public boolean isHomed() {
         return homed;
+    }
+
+    public void setHomed(boolean homed) {
+        this.homed = homed;
     }
 
     public void setPower(double power) {
@@ -88,7 +88,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public List<MotorPowerUpdater> getMotorUpdatables() {
-        return Arrays.asList(/*climberMotorUpdater*/);
+        return Collections.emptyList() /*Arrays.asList(climberMotorUpdater)*/;
     }
 
     @Override

@@ -31,7 +31,7 @@ public abstract class ManualTest implements Updatable {
     /**
      * Executed repeatedly while test is selected
      *
-     * @param delta
+     * @param delta the time elapsed since the last update
      */
     @Override
     public void update(double delta) {

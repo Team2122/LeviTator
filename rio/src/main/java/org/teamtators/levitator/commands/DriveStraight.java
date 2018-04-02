@@ -1,7 +1,6 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
@@ -10,7 +9,7 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
     private Drive drive;
     private Config config;
 
-    public DriveStraight(TatorRobot robot) {
+    DriveStraight(TatorRobot robot) {
         super("DriveStraight");
         drive = robot.getSubsystems().getDrive();
         requires(drive);
@@ -58,6 +57,7 @@ public class DriveStraight extends Command implements Configurable<DriveStraight
         this.config = config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double angle = Double.NaN;
         public double speed;

@@ -1,7 +1,7 @@
 package org.teamtators.common.tester.components;
 
-import org.teamtators.common.hw.DistanceLaser;
 import org.teamtators.common.controllers.LogitechF310;
+import org.teamtators.common.hw.DistanceLaser;
 import org.teamtators.common.tester.ManualTest;
 
 public class DistanceLaserTest extends ManualTest {

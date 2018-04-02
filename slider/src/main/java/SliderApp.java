@@ -4,29 +4,26 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class SliderApp {
-    static double lastTargetHeight = 0.0;
-    static SerialPort slider = null;
+    private static double lastTargetHeight = 0.0;
+    private static SerialPort slider = null;
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Finding slider...");
 
         SerialPort[] serialPorts = SerialPort.getCommPorts();
         byte[] pingPacket = {SliderPacketType.PING};
-        for (int i = 0; i < serialPorts.length; i++) {
-            System.out.println(serialPorts[i].getSystemPortName());
-            SerialPort p = serialPorts[i];
+        for (SerialPort serialPort : serialPorts) {
+            System.out.println(serialPort.getSystemPortName());
 
-            boolean connected = p.openPort();
+            boolean connected = serialPort.openPort();
 
             if (!connected) {
                 continue;
             }
 
-            int written = p.writeBytes(pingPacket, pingPacket.length);
+            int written = serialPort.writeBytes(pingPacket, pingPacket.length);
 
             if (written != pingPacket.length) {
                 continue;
@@ -34,14 +31,14 @@ public class SliderApp {
 
             Thread.sleep(25);
 
-            Scanner scanner = new Scanner(p.getInputStream());
+            Scanner scanner = new Scanner(serialPort.getInputStream());
 
             while (scanner.hasNextLine()) {
                 String in = scanner.nextLine();
                 System.out.println(in);
                 if (in.startsWith("~2122~")) {
                     System.out.printf("Slider version %s\n", in.split("~\\^")[1]);
-                    slider = p;
+                    slider = serialPort;
                     break;
                 }
             }
@@ -83,7 +80,7 @@ public class SliderApp {
                     byte[] bytes = generateSliderUpdatePacket(num / 83.0);
                     System.out.println(new String(bytes));
                     int result = slider.writeBytes(bytes, bytes.length);
-                    System.out.printf("Sent bytes %s\n", result == bytes.length ? "sucessfully" : "unsucessfully");
+                    System.out.printf("Sent bytes %s\n", result == bytes.length ? "successfully" : "unsuccessfully");
                     lastTargetHeight = num;
                 }
             }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);

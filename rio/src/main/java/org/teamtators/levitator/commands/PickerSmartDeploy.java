@@ -110,14 +110,15 @@ public class PickerSmartDeploy extends Command implements Configurable<PickerSma
     }
 
     public static class Config {
+        public Map<DeployPower, PowerConfig> powers;
+        public PowerConfig switchPower;
+        public double maxSwitchHeight;
+
         public static class PowerConfig {
             public double kickPower;
             public double timeBeforeKick;
             public double timeToKick;
             public double timeBeforeRetract;
         }
-        public Map<DeployPower, PowerConfig> powers;
-        public PowerConfig switchPower;
-        public double maxSwitchHeight;
     }
 }

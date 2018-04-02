@@ -43,7 +43,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     }
 
     private void updateKnob(double knobAngle) {
-        if(pivot.isRotationForced() &&
+        if (pivot.isRotationForced() &&
                 Math.abs(knobAngle - pivot.getDesiredPivotAngle()) < config.knobTolerance) {
             pivot.clearForceRotationFlag();
         }

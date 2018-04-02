@@ -19,11 +19,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * A sensor class for using an ADXRS453 gyroscope.
  * Measures angle change on the yaw axis.
  */
+@SuppressWarnings({"PointlessBitwiseExpression", "SpellCheckingInspection", "WeakerAccess", "unused"})
 public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
-    public static final double UPDATE_PERIOD = 1.0 / 120.0;
-    public static final int STARTUP_DELAY_MS = 50;
+    private static final double UPDATE_PERIOD = 1.0 / 120.0;
+    private static final int STARTUP_DELAY_MS = 50;
     protected static final Logger logger = LoggerFactory.getLogger(ADXRS453.class);
     private static final int kSensorData = 1 << 29;
+    @SuppressWarnings("NumericOverflow")
     private static final int kRead = 1 << 31;
     private static final int kWrite = 1 << 30;
     private static final int kP = 1 << 0;
@@ -507,6 +509,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         builder.addDoubleProperty("Rate", this::getRate, null);
     }
 
+    @SuppressWarnings("unused")
     public enum Register {
         RATE(0x00),
         TEM(0x02),

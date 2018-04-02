@@ -150,8 +150,11 @@ public class Subsystems extends SubsystemsBase
         return vision;
     }
 
-    public Climber getClimber() {return climber;}
+    public Climber getClimber() {
+        return climber;
+    }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public OperatorInterface.Config operatorInterface;
         public Drive.Config drive;

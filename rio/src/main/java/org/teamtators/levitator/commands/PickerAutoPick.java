@@ -3,10 +3,10 @@ package org.teamtators.levitator.commands;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.levitator.TatorRobot;
+import org.teamtators.levitator.subsystems.DetectedObject;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Picker;
 import org.teamtators.levitator.subsystems.Vision;
-import org.teamtators.levitator.subsystems.DetectedObject;
 
 public class PickerAutoPick extends Command implements Configurable<PickerAutoPick.Config> {
     private final Vision vision;
@@ -37,7 +37,7 @@ public class PickerAutoPick extends Command implements Configurable<PickerAutoPi
         Double distance = vision.getDistance(detected);
         double currentAngle = drive.getYawAngle();
         logger.trace(String.format("Distance from cube %5.3f, target angle %5.3f, drive angle %5.3f", distance, angle, currentAngle));
-        if(angle != null && distance != null) {
+        if (angle != null && distance != null) {
             drive.driveHeading(angle, config.velocity);
         }
         return drive.getCenterDistance() - startDistance >= config.maxDriveDistance || picker.isCubeDetectedAny();

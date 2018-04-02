@@ -4,9 +4,12 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
+import org.teamtators.common.Robot;
 import org.teamtators.common.config.ConfigException;
 
+@SuppressWarnings("WeakerAccess")
 public class CtreMotorControllerConfig {
+    private static final boolean CHECK_FIRMWARE_VERSION = false;
     public static int CONFIG_TIMEOUT = 500;
 
     public int id = -1;
@@ -45,9 +48,9 @@ public class CtreMotorControllerConfig {
 
     protected void checkVersion(com.ctre.phoenix.motorcontrol.can.BaseMotorController motor, int requiredVersion) {
         int firmwareVersion = motor.getFirmwareVersion();
-        if (firmwareVersion != requiredVersion) {
-//            Robot.logger.warn(String.format("%s (id %d) has wrong firmware version: %d.%d",
-//                    motor.getClass().getSimpleName(), id, firmwareVersion >> 2, firmwareVersion % 0xff));
+        if (firmwareVersion != requiredVersion && CHECK_FIRMWARE_VERSION) {
+            Robot.logger.warn(String.format("%s (id %d) has wrong firmware version: %d.%d",
+                    motor.getClass().getSimpleName(), id, firmwareVersion >> 2, firmwareVersion % 0xff));
         }
     }
 }

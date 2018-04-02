@@ -10,6 +10,7 @@ public class BooleanSampler implements Configurable<BooleanSampler.Config> {
     private double period;
     private Timer timer = new Timer();
 
+    @SuppressWarnings("WeakerAccess")
     public BooleanSampler(BooleanSupplier source, double period) {
         Preconditions.checkArgument(period >= 0, "period must be positive");
         Preconditions.checkNotNull(source);
@@ -26,15 +27,14 @@ public class BooleanSampler implements Configurable<BooleanSampler.Config> {
             if (!timer.isRunning()) {
                 timer.start();
             }
-            if (timer.hasPeriodElapsed(this.period)) {
-                return true;
-            }
+            return timer.hasPeriodElapsed(this.period);
         } else {
             timer.stop();
         }
         return false;
     }
 
+    @SuppressWarnings("unused")
     public double getPeriod() {
         return period;
     }
@@ -48,6 +48,7 @@ public class BooleanSampler implements Configurable<BooleanSampler.Config> {
         this.period = config.period;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double period;
     }

@@ -3,6 +3,7 @@ package org.teamtators.common.control;
 /**
  * @author Alex Mikhalev
  */
+@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess", "unused"})
 public class TrapezoidalProfileCalculator {
     // the profile this calculator is based off of
     private TrapezoidalProfile profile;

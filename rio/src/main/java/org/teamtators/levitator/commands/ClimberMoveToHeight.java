@@ -10,7 +10,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
     private Config config;
     private double direction;
 
-    public ClimberMoveToHeight(TatorRobot robot) {
+    ClimberMoveToHeight(TatorRobot robot) {
         super("ClimberMoveToHeight");
         this.climber = robot.getSubsystems().getClimber();
         requires(climber);
@@ -59,6 +59,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
         climber.setPower(0);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double height;
         public double power;

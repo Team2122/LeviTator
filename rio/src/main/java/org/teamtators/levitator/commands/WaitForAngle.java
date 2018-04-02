@@ -9,7 +9,7 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
     private Pivot pivot;
     private Config config;
 
-    public WaitForAngle(TatorRobot robot) {
+    WaitForAngle(TatorRobot robot) {
         super("WaitForCenter");
         this.pivot = robot.getSubsystems().getPivot();
     }
@@ -33,6 +33,7 @@ public class WaitForAngle extends Command implements Configurable<WaitForAngle.C
         this.config = config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double tolerance;
         public Pivot.AnglePreset preset;

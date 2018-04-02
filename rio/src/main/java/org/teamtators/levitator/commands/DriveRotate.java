@@ -6,7 +6,7 @@ import org.teamtators.levitator.TatorRobot;
 public class DriveRotate extends DriveRotateBase implements Configurable<DriveRotate.Config> {
     private Config config;
 
-    public DriveRotate(TatorRobot robot) {
+    DriveRotate(TatorRobot robot) {
         super("DriveRotate", robot);
         requires(drive);
     }
@@ -38,6 +38,7 @@ public class DriveRotate extends DriveRotateBase implements Configurable<DriveRo
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config extends DriveRotateBase.Config {
         public double angle;
     }

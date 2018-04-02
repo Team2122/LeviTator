@@ -76,6 +76,7 @@ public class Timer {
      *
      * @return True if the timer has been started and not reset
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isRunning() {
         return startTime != Double.NEGATIVE_INFINITY;
     }

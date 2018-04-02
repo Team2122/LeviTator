@@ -31,7 +31,6 @@ public class DigitalSensorConfig implements ConfigHelper<DigitalSensor> {
     }
 
     public DigitalSensor create() {
-        DigitalSensor digitalSensor = new DigitalSensor(channel, type);
-        return digitalSensor;
+        return new DigitalSensor(channel, type);
     }
 }

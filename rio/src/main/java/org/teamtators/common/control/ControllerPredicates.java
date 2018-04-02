@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ControllerPredicates {
     public static <T> Predicate<T> staticValue(boolean value) {
         return (controller) -> value;
@@ -23,7 +24,7 @@ public class ControllerPredicates {
     }
 
     public static Predicate<AbstractController> sampleWithinError(double time, double threshold) {
-        return new SampleTime<AbstractController>(time, withinError(threshold));
+        return new SampleTime<>(time, withinError(threshold));
     }
 
     public static Predicate<AbstractController> withinPercentage(double percentage) {
@@ -31,7 +32,7 @@ public class ControllerPredicates {
     }
 
     public static Predicate<AbstractController> sampleWithinPercentage(double time, double percentage) {
-        return new SampleTime<AbstractController>(time, withinPercentage(percentage));
+        return new SampleTime<>(time, withinPercentage(percentage));
     }
 
     public static Predicate<TrapezoidalProfileFollower> finished() {
@@ -57,7 +58,7 @@ public class ControllerPredicates {
     }
 
     public static <T extends AbstractUpdatable> Predicate<T> sampleTime(double time, Predicate<T> basePredicate) {
-        return new SampleTime<T>(time, basePredicate);
+        return new SampleTime<>(time, basePredicate);
     }
 
     public static class SampleTime<TController extends AbstractUpdatable> implements Predicate<TController> {
@@ -74,9 +75,7 @@ public class ControllerPredicates {
         public boolean test(TController controller) {
             if (basePredicate.test(controller)) {
                 currentTime += controller.getLastDelta();
-                if (currentTime > time) {
-                    return true;
-                }
+                return currentTime > time;
             } else {
                 currentTime = 0.0;
             }

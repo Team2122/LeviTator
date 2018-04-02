@@ -1,5 +1,7 @@
 package org.teamtators.common.math;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Alex Mikhalev
  */
@@ -37,8 +39,9 @@ public class InterpolableDouble implements Interpolable<InterpolableDouble>, Inv
         return query_dx / total_dx;
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public int compareTo(InterpolableDouble o) {
-        return Double.compare(value, o.value);
+        return Double.compare(value, Preconditions.checkNotNull(o).value);
     }
 }

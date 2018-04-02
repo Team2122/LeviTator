@@ -9,7 +9,7 @@ public class WaitForHeight extends Command implements Configurable<WaitForHeight
     private Lift lift;
     private Config config;
 
-    public WaitForHeight(TatorRobot robot) {
+    WaitForHeight(TatorRobot robot) {
         super("WaitForCenter");
         this.lift = robot.getSubsystems().getLift();
     }
@@ -29,6 +29,7 @@ public class WaitForHeight extends Command implements Configurable<WaitForHeight
         this.config = config;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Config {
         public double tolerance;
     }

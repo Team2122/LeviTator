@@ -1,10 +1,8 @@
 package org.teamtators.common.drive;
 
 import org.teamtators.common.control.AbstractUpdatable;
-import org.teamtators.common.drive.TankKinematics;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
-import org.teamtators.levitator.subsystems.Drive;
 
 /**
  * @author Alex Mikhalev
@@ -72,11 +70,11 @@ public class PoseEstimator extends AbstractUpdatable {
         pose = newPose;
     }
 
-    public void setKinematics(TankKinematics tankKinematics) {
-        this.kinematics = tankKinematics;
-    }
-
     public TankKinematics getKinematics() {
         return kinematics;
+    }
+
+    public void setKinematics(TankKinematics tankKinematics) {
+        this.kinematics = tankKinematics;
     }
 }

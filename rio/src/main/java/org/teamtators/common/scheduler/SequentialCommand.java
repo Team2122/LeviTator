@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings("WeakerAccess")
 public class SequentialCommand extends Command implements CommandRunContext {
     private List<SequentialCommandRun> sequence;
     private int currentPosition;
@@ -18,6 +19,7 @@ public class SequentialCommand extends Command implements CommandRunContext {
         this(name, Arrays.asList(sequence));
     }
 
+    @SuppressWarnings("unused")
     public SequentialCommand(Collection<Command> sequence) {
         this("SequentialCommand", sequence);
     }
@@ -131,6 +133,7 @@ public class SequentialCommand extends Command implements CommandRunContext {
                         logger.trace("Command could not be initialized at this time: {}", run.command.getName());
                     }
                 }
+                //noinspection SimplifiableIfStatement
                 if (run.initialized) {
                     finished = run.command.step();
                 } else {
@@ -177,24 +180,29 @@ public class SequentialCommand extends Command implements CommandRunContext {
             logger.error("rootContext is null??");
         }
         sequence
-            .forEach(r -> {
-                if (r.command.isRunning() && r.parallel) {
+                .forEach(r -> {
+                    if (r.command.isRunning() && r.parallel) {
 //                    r.command.setContext(rootContext);
-                    if (interrupted) {
-                        r.command.cancel();
+                        if (interrupted) {
+                            r.command.cancel();
+                        }
                     }
-                }
-            });
-        if (sequence.size() == 0 || currentPosition >= sequence.size()) return;
-        Command currentCommand = currentRun().command;
+                });
+        SequentialCommandRun run = currentRun();
+        if (sequence.size() == 0 || currentPosition >= sequence.size() || run == null) return;
+        Command currentCommand = run.command;
         if (interrupted && currentCommand.isRunning()) {
             currentCommand.finishRun(true);
         }
 
     }
 
+    @SuppressWarnings("unused")
     public void cancelCurrentCommand() {
-        cancelRun(currentRun());
+        SequentialCommandRun run = currentRun();
+        if (run != null) {
+            cancelRun(run);
+        }
     }
 
     @Override

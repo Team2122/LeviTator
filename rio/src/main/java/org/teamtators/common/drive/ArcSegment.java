@@ -4,7 +4,7 @@ import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
 import org.teamtators.common.math.Translation2d;
 
-import static org.teamtators.common.math.Epsilon.*;
+import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 
 public class ArcSegment extends DriveSegmentBase {
     private Translation2d center;

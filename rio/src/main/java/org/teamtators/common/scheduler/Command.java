@@ -7,6 +7,7 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Command implements CommandRunContext {
     protected Logger logger;
     private String name;

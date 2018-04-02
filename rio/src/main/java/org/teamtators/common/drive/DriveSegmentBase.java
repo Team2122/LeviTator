@@ -1,6 +1,5 @@
 package org.teamtators.common.drive;
 
-import org.teamtators.common.control.TrapezoidalProfile;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Translation2d;
 

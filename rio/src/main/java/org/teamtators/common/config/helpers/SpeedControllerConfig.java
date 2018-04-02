@@ -21,8 +21,9 @@ import org.teamtators.common.hw.SpeedControllerGroup;
  * all values:
  * controllerName: {channel: 0, inverted: true, type: Victor, powerChannels: [0, 1, 2]}
  */
+@SuppressWarnings("unused")
 public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
-    public static final ObjectMapper CONFIG_MAPPER = TatorRobotBase.configMapper;
+    private static final ObjectMapper CONFIG_MAPPER = TatorRobotBase.configMapper;
     private int channel;
     private boolean inverted = false;
     private Type type = Type.NONE;
@@ -31,16 +32,36 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
     //Not config
     private Logger logger = LoggerFactory.getLogger(SpeedControllerConfig.class);
 
-    public void setPowerChannel(int[] powerChannels) {
-        this.powerChannels = powerChannels;
+    /**
+     * Frees the object of any SpeedController, if it is able to be freed
+     *
+     * @param speedController the SpeedController to free
+     */
+    public static void free(SpeedController speedController) {
+        if (speedController instanceof PWM) {
+            ((PWM) speedController).free();
+        } else if (speedController instanceof WPI_TalonSRX) {
+            ((WPI_TalonSRX) speedController).free();
+        } else if (speedController instanceof WPI_VictorSPX) {
+            ((WPI_VictorSPX) speedController).free();
+        } else if (speedController instanceof SpeedControllerGroup) {
+            for (SpeedController childController : ((SpeedControllerGroup) speedController).getSpeedControllers()) {
+                free(childController);
+            }
+            ((SpeedControllerGroup) speedController).free();
+        }
     }
 
-    public void setPowerChannels(int[] powerChannels) {
+    public void setPowerChannel(int[] powerChannels) {
         this.powerChannels = powerChannels;
     }
 
     public int[] getPowerChannels() {
         return this.powerChannels;
+    }
+
+    public void setPowerChannels(int[] powerChannels) {
+        this.powerChannels = powerChannels;
     }
 
     public int getPowerChannel() {
@@ -49,6 +70,11 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
             return 0;
         }
         return powerChannels[0];
+    }
+
+    public void setPowerChannel(int powerChannel) {
+        this.powerChannels = new int[1];
+        this.powerChannels[0] = powerChannel;
     }
 
     public double getTotalCurrent(PowerDistributionPanel pdp) {
@@ -68,11 +94,6 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
 
     public void setChannel(int channel) {
         this.channel = channel;
-    }
-
-    public void setPowerChannel(int powerChannel) {
-        this.powerChannels = new int[1];
-        this.powerChannels[0] = powerChannel;
     }
 
     public boolean isInverted() {
@@ -170,24 +191,5 @@ public class SpeedControllerConfig implements ConfigHelper<SpeedController> {
         VICTOR_SP,
         TALON_SRX,
         VICTOR_SPX
-    }
-
-    /**
-     * Frees the object of any SpeedController, if it is able to be freed
-     * @param speedController
-     */
-    public static void free(SpeedController speedController) {
-        if (speedController instanceof PWM) {
-            ((PWM) speedController).free();
-        } else if (speedController instanceof WPI_TalonSRX) {
-            ((WPI_TalonSRX) speedController).free();
-        } else if (speedController instanceof WPI_VictorSPX) {
-            ((WPI_VictorSPX) speedController).free();
-        } else if (speedController instanceof SpeedControllerGroup) {
-            for (SpeedController childController : ((SpeedControllerGroup) speedController).getSpeedControllers()) {
-                free(childController);
-            }
-            ((SpeedControllerGroup) speedController).free();
-        }
     }
 }

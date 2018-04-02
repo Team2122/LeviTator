@@ -22,7 +22,6 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
     private Set<FMSDataListener> dataListeners = new HashSet<>();
 
     private RobotState robotState = RobotState.DISABLED;
-    private FMSData fmsData;
     private Profiler profiler;
 
     public Scheduler() {
@@ -32,10 +31,12 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         defaultCommands.add(defaultCommand);
     }
 
+    @SuppressWarnings("unused")
     public void registerDefaultCommands(Collection<Command> defaultCommands) {
         this.defaultCommands.addAll(defaultCommands);
     }
 
+    @SuppressWarnings("unused")
     public void clearDefaultCommands() {
         defaultCommands.clear();
     }
@@ -50,6 +51,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         stateListeners.add(subsystem);
     }
 
+    @SuppressWarnings("unused")
     public void unregisterStateListener(RobotStateListener subsystem) {
         stateListeners.remove(subsystem);
     }
@@ -63,6 +65,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         dataListeners.add(listener);
     }
 
+    @SuppressWarnings("unused")
     public void unregisterFMSDataListener(FMSDataListener listener) {
         dataListeners.remove(listener);
     }
@@ -147,6 +150,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
      * @param name Name of the command to check
      * @return Whether the named command is running or queued
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean containsCommand(String name) {
         return runningCommands.containsKey(name);
     }
@@ -175,6 +179,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         runningCommands.put(command.getName(), commandRun);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void cancelCommand(String commandName) {
         checkNotNull(commandName);
         CommandRun run = runningCommands.get(commandName);
@@ -204,17 +209,17 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
 
     @Override
     public void onFMSData(FMSData data) {
-        this.fmsData = data;
         for (FMSDataListener listener : dataListeners) {
             listener.onFMSData(data);
         }
     }
 
-    public void setProfiler(Profiler profiler) {
-        this.profiler = profiler;
-    }
-
+    @SuppressWarnings("unused")
     public Profiler getProfiler() {
         return profiler;
+    }
+
+    public void setProfiler(Profiler profiler) {
+        this.profiler = profiler;
     }
 }

@@ -9,7 +9,7 @@ import org.teamtators.common.tester.ManualTest;
 public class SpeedControllerTest extends ManualTest {
 
     private SpeedController motor;
-    private int fullspeed;
+    private int fullSpeed;
     private double axisValue;
     private PowerDistributionPanel pdp;
     private SpeedControllerConfig motorConfig;
@@ -19,6 +19,7 @@ public class SpeedControllerTest extends ManualTest {
         this.motor = motor;
     }
 
+    @SuppressWarnings("unused")
     public SpeedControllerTest(String name, SpeedController motor, PowerDistributionPanel pdp,
                                SpeedControllerConfig motorConfig) {
         this(name, motor);
@@ -32,13 +33,13 @@ public class SpeedControllerTest extends ManualTest {
         if (this.pdp != null) {
             printTestInstructions("Press A to get current usage");
         }
-        fullspeed = 0;
+        fullSpeed = 0;
         axisValue = 0;
     }
 
     private double getSpeed() {
-        if (fullspeed != 0) {
-            return fullspeed;
+        if (fullSpeed != 0) {
+            return fullSpeed;
         } else {
             return axisValue;
         }
@@ -60,8 +61,8 @@ public class SpeedControllerTest extends ManualTest {
 
     @Override
     public void onButtonDown(LogitechF310.Button button) {
-        if (button == LogitechF310.Button.BACK) fullspeed--;
-        else if (button == LogitechF310.Button.START) fullspeed++;
+        if (button == LogitechF310.Button.BACK) fullSpeed--;
+        else if (button == LogitechF310.Button.START) fullSpeed++;
         else if (button == LogitechF310.Button.A && pdp != null) {
             logger.info("Total current usage: " + this.getCurrent());
         }
@@ -69,8 +70,8 @@ public class SpeedControllerTest extends ManualTest {
 
     @Override
     public void onButtonUp(LogitechF310.Button button) {
-        if (button == LogitechF310.Button.BACK) fullspeed++;
-        else if (button == LogitechF310.Button.START) fullspeed--;
+        if (button == LogitechF310.Button.BACK) fullSpeed++;
+        else if (button == LogitechF310.Button.START) fullSpeed--;
     }
 
     @Override
