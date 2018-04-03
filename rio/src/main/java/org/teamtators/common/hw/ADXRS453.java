@@ -1,6 +1,5 @@
 package org.teamtators.common.hw;
 
-import com.google.common.collect.EvictingQueue;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.SPI;
@@ -9,6 +8,7 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teamtators.common.util.ShortCircularBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -73,7 +73,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
 
     private boolean isCalibrating;
     private double calibrationOffset;
-    private EvictingQueue<Short> calibrationValues;
+    private final ShortCircularBuffer calibrationValues = new ShortCircularBuffer(0);
     private double calibrationPeriod;
 
     private PIDSourceType pidSource = PIDSourceType.kDisplacement;
@@ -141,7 +141,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         writeLock.lock();
         try {
             this.calibrationPeriod = calibrationPeriod;
-            calibrationValues = EvictingQueue.create((int) (calibrationPeriod / UPDATE_PERIOD));
+            int capacity = (int) (calibrationPeriod / SAMPLE_PERIOD);
+            calibrationValues.setCapacity(capacity);
         } finally {
             writeLock.unlock();
         }
@@ -311,7 +312,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
      *
      * @return The 32 bit serial number
      */
-    public int getSerialNumber() {
+    private int getSerialNumber() {
         int serial = 0;
         serial |= readRegister(Register.SN_H) << 16;
         serial |= readRegister(Register.SN_L);

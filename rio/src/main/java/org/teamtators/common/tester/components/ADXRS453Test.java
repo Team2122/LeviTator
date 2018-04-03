@@ -15,7 +15,7 @@ public class ADXRS453Test extends ManualTest {
     @Override
     public void start() {
         printTestInstructions("Press A to get the rate, the angle, and the calibration offset of the gyro");
-        printTestInstructions("B to start calibration, and Y to end calibration, X to get detailed information");
+        printTestInstructions("B to start calibration, and Y to end calibration");
     }
 
     @Override
@@ -34,11 +34,6 @@ public class ADXRS453Test extends ManualTest {
             case Y:
                 printTestInfo("Finishing gyro calibration");
                 gyro.finishCalibration();
-                break;
-            case X:
-                int serial = gyro.getSerialNumber();
-                double temperature = gyro.getTemperature();
-                printTestInfo("Serial: 0x{}, temperature: {} C", Integer.toHexString(serial), temperature);
                 break;
         }
     }
