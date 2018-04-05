@@ -51,8 +51,8 @@ drive:
       kfA: 0.004
       maxIError: 10.0
       maxAcceleration: 100.0
-#    logData: true
-  tankKinematics: { effectiveTrackWidth: 36.0 }
+#      logData: true
+  tankKinematics: { effectiveTrackWidth: 38.0 }
 picker:
   leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
   rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
@@ -109,7 +109,7 @@ pivot:
   pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: -54.1
+    offset: -42.5
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
@@ -155,7 +155,7 @@ pivot:
   sweepTimeoutSeconds: 5.0
   lockedPeriod: 0.1
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto", "SmartScale"]
   defaultChoice: "LineCrossAuto"
 vision:
   width: 320
@@ -179,18 +179,22 @@ climber:
         id: 6
         inverted: true
         feedbackDevice: CTRE_MagEncoder_Relative
+        neutralToFullTime: 0.25
     - type: VICTOR_SPX
       config:
         id: 7
-        inverted: true
+        inverted: false
+        neutralToFullTime: 0.25
     - type: VICTOR_SPX
       config:
         id: 8
         inverted: false
+        neutralToFullTime: 0.25
     - type: VICTOR_SPX
       config:
         id: 9
-        inverted: false
+        inverted: true
+        neutralToFullTime: 0.25
   topLimit: { channel: 17, type: NPN }
   bottomLimit: { channel: 15, type: NPN }
   releaser: { channel: 2 }

@@ -14,16 +14,16 @@ driver:
 #  POV_LEFT: start whenPressed BumpPivotLeft
 #  POV_RIGHT: start whenPressed BumpPivotRight
   A: start whenPressed $LiftHome
-  START: start whenPressed PrintPose
-  BACK: toggle whenPressed $TestDrive
+  # START: start whenPressed PrintPose
+  # BACK: toggle whenPressed $TestDrive
 #  START: start whenPressed $LiftScaleLow
 #  BACK: start whenPressed $PickerReleaseMedium
 #  B: start whenPressed $LiftSwitchLow
 #  STICK_LEFT: start whenPressed PickerSwitchDeploy
 #  B: start whenPressed $LiftSwitchLow
-  B: start whenPressed ClimberClimb
-  X: start whenPressed ClimberSubBar
-  Y: start whenPressed ClimberOverBar
+  # B: start whenPressed ClimberClimb
+  # X: start whenPressed ClimberSubBar
+  # Y: start whenPressed ClimberOverBar
   STICK_LEFT: toggle whenPressed PickerRegrip
   STICK_RIGHT: start whenPressed PickerExtendToggle
 

@@ -17,6 +17,7 @@ public class CtreMotorControllerConfig {
     public double voltageCompensationSaturation = Double.NaN;
     public boolean logTiming = false;
     public FeedbackDevice feedbackDevice = FeedbackDevice.None;
+    public double neutralToFullTime = 0;
 
     protected void validate() {
         if (id == -1) {
@@ -41,6 +42,7 @@ public class CtreMotorControllerConfig {
         motor.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, CONFIG_TIMEOUT);
         motor.configForwardSoftLimitEnable(false, CONFIG_TIMEOUT);
         motor.configReverseSoftLimitEnable(false, CONFIG_TIMEOUT);
+        motor.configOpenloopRamp(neutralToFullTime, CONFIG_TIMEOUT);
     }
 
     protected void checkVersion(com.ctre.phoenix.motorcontrol.can.BaseMotorController motor, int requiredVersion) {

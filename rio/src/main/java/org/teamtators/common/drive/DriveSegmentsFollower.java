@@ -35,6 +35,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private DriveOutputs driveOutputs;
     private boolean logData;
     private Profiler profiler;
+    private double lookahead;
 
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
@@ -119,7 +120,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             report.isFinished = true;
             return;
         }
-        double lookahead = lookAheadFunction.applyAsDouble(Math.abs(centerWheelRate));
+        lookahead = lookAheadFunction.applyAsDouble(Math.abs(centerWheelRate));
         DriveSegment currentSegment = getCurrentSegment();
         Pose2d pose = currentSegment.isReverse() ? currentPose.invertYaw() : currentPose;
         lookaheadReport = currentSegment.getLookaheadReport(pose, lookahead);
@@ -281,8 +282,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
         @Override
         public List<Object> getKeys() {
-            return Arrays.asList("traveledDistance", "remainingDistance", "currentPose", "nearestPoint", "lookaheadPoint",
-                    "twist", "speedPower", "driveOutputs");
+            return Arrays.asList("remainingDistance", "currentPoseX", "currentPoseY", "currentPoseYaw", "nearestPoint", "lookaheadDistance",
+                    "twistdx", "twistdyaw", "speedPower", "driveOutputLeft", "driveOutputRight");
         }
 
         @Override
@@ -291,8 +292,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             if (report == null) {
                 report = new PursuitReport();
             }
-            return Arrays.asList(report.traveledDistance, report.remainingDistance, currentPose, report.nearestPoint, report.lookaheadPoint,
-                    twist, speedPower, driveOutputs);
+            return Arrays.asList(report.remainingDistance, currentPose.getX(), currentPose.getY(), currentPose.getYaw(), report.nearestPoint, lookahead,
+                    twist.getDeltaX(), twist.getDeltaYaw(), speedPower, driveOutputs.getLeft(), driveOutputs.getRight());
         }
     }
 }

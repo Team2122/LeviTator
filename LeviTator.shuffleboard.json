@@ -304,6 +304,18 @@
                 }
               ]
             }
+          },
+          "6,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "PDP",
+              "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[0]",
+              "_title": "LiveWindow/Ungrouped/PowerDistributionPanel[0]",
+              "showIndicatorText": true
+            }
           }
         }
       }
