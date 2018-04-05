@@ -194,18 +194,11 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return driveSegmentsFollower;
     }
 
-    @Override
-    public void setPowers(double left, double right) {
-        logger.trace("setPowers({}, {})", left, right);
-        setLeftMotorPower(left);
-        setRightMotorPower(right);
-    }
-
-    public void setRightMotorPower(double power) {
+    public void setRightPower(double power) {
         rightMotor.set(power);
     }
 
-    public void setLeftMotorPower(double power) {
+    public void setLeftPower(double power) {
         leftMotor.set(power);
     }
 

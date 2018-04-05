@@ -4,7 +4,12 @@ import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Twist2d;
 
 public interface TankDrive {
-    void setPowers(double left, double right);
+    void setLeftPower(double power);
+    void setRightPower(double right);
+    default void setPowers(double left, double right) {
+        setLeftPower(left);
+        setRightPower(right);
+    }
     default void setPowers(DriveOutputs outputs) {
         setPowers(outputs.getLeft(), outputs.getRight());
     }

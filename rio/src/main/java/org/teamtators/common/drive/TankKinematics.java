@@ -48,7 +48,7 @@ public class TankKinematics {
         double yawDistance = effectiveTrackWidth * curvature.getDeltaYaw().toRadians() / 2;
         double deltaX = curvature.getDeltaX();
         DriveOutputs outputs = new DriveOutputs(deltaX - yawDistance, deltaX + yawDistance);
-        outputs = outputs.scale(power / Math.abs(deltaX)).normalize();
+        outputs = outputs.scale(power / Math.abs(deltaX));
         return outputs;
     }
 }

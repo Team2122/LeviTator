@@ -41,7 +41,8 @@ drive:
       maxIError: 2.0
   #    logData: true
   driveSegmentsFollower:
-    lookAhead: { minX: 9, maxX: 9, minY: 120, maxY: 21 }
+    lookAhead: { minX: 9, minY: 9, maxX: 120, maxY: 21 }
+    logData: true
     speedFollower:
       kpP: 0.4
       kiP: 0.2

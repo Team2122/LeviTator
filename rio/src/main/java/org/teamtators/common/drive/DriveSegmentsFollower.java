@@ -3,10 +3,14 @@ package org.teamtators.common.drive;
 import org.slf4j.profiler.Profiler;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.control.AbstractUpdatable;
+import org.teamtators.common.control.PidController;
 import org.teamtators.common.control.TrapezoidalProfileFollower;
 import org.teamtators.common.datalogging.DataCollector;
 import org.teamtators.common.datalogging.LogDataProvider;
-import org.teamtators.common.math.*;
+import org.teamtators.common.math.Epsilon;
+import org.teamtators.common.math.LinearInterpolationFunction;
+import org.teamtators.common.math.Pose2d;
+import org.teamtators.common.math.Twist2d;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +26,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
     private TrapezoidalProfileFollower speedFollower;
     private DriveSegments segments = new DriveSegments();
+    private PidController leftController;
+    private PidController rightController;
 
     private int currentSegmentIdx;
     private double previousTraveled;
@@ -40,6 +46,13 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
         this.drive = drive;
+
+        leftController = new PidController("DriveSegmentsFollower.leftController");
+        leftController.setInputProvider(drive::getLeftRate);
+        leftController.setOutputConsumer(drive::setLeftPower);
+        rightController = new PidController("DriveSegmentsFollower.rightController");
+        rightController.setInputProvider(drive::getRightRate);
+        leftController.setOutputConsumer(drive::setRightPower);
 
         speedFollower = new TrapezoidalProfileFollower("DriveSegmentsFollower.speedFollower");
         speedFollower.setPositionProvider(this::getTraveledDistance);
@@ -84,12 +97,12 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         return speedFollower;
     }
 
-    public void setMaxAcceleration(double maxAcceleration) {
-        speedFollower.setMaxAcceleration(maxAcceleration);
-    }
-
     public double getMaxAcceleration() {
         return speedFollower.getMaxAcceleration();
+    }
+
+    public void setMaxAcceleration(double maxAcceleration) {
+        speedFollower.setMaxAcceleration(maxAcceleration);
     }
 
     private void updateProfile() {
@@ -182,6 +195,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             running = true;
             reset();
             speedFollower.reset();
+//            leftController.start();
+//            rightController.start();
             if (logData) {
                 DataCollector.getDataCollector().startProvider(logDataProvider);
             }
@@ -192,6 +207,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public synchronized void stop() {
         super.stop();
         speedFollower.stop();
+//        leftController.stop();
+//        rightController.stop();
         DataCollector.getDataCollector().stopProvider(logDataProvider);
     }
 
@@ -200,7 +217,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     }
 
     public boolean isOnTarget() {
-        return report != null && report.remainingDistance < 0.1;
+        return report != null && report.remainingDistance < 0.5;
     }
 
     @Override
@@ -231,8 +248,17 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         }
         profiler.start("speedFollower");
         speedFollower.update(delta);
+//        speedFollower.getCalculator().setPosition(report.traveledDistance);
         profiler.start("setOutputs");
+        /*driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedFollower.getCalculator().getVelocity());
+        leftController.setSetpoint(driveOutputs.getLeft());
+        rightController.setSetpoint(driveOutputs.getRight());
+
+        leftController.update(delta);
+        rightController.update(delta);*/
+
         driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
+        driveOutputs = driveOutputs.normalize();
         drive.setPowers(driveOutputs);
         if (isOnTarget()) {
             report.isFinished = true;
@@ -261,6 +287,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public void configure(Config config) {
         setLookAheadFunction(config.lookAhead);
         speedFollower.configure(config.speedFollower);
+//        leftController.configure(config.driveSideController);
+//        rightController.configure(config.driveSideController);
         this.logData = config.logData;
     }
 
@@ -271,6 +299,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
+//        public PidController.Config driveSideController;
         public boolean logData = false;
     }
 
@@ -282,8 +311,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
         @Override
         public List<Object> getKeys() {
-            return Arrays.asList("remainingDistance", "currentPoseX", "currentPoseY", "currentPoseYaw", "nearestPoint", "lookaheadDistance",
-                    "twistdx", "twistdyaw", "speedPower", "driveOutputLeft", "driveOutputRight");
+            return Arrays.asList("remainingDistance", "currentPoseX", "currentPoseY", "currentPoseYaw", "nearestPointX", "nearestPointY", "nearestPointYaw",
+                    "lookaheadDistance", "twistdx", "twistdyaw", "speedPower", "driveOutputLeft", "driveOutputRight");
         }
 
         @Override
@@ -292,7 +321,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
             if (report == null) {
                 report = new PursuitReport();
             }
-            return Arrays.asList(report.remainingDistance, currentPose.getX(), currentPose.getY(), currentPose.getYaw(), report.nearestPoint, lookahead,
+            return Arrays.asList(report.remainingDistance, currentPose.getX(), currentPose.getY(), currentPose.getYaw(), report.nearestPoint.getX(),
+                    report.nearestPoint.getY(), report.nearestPoint.getYaw(), lookahead,
                     twist.getDeltaX(), twist.getDeltaYaw(), speedPower, driveOutputs.getLeft(), driveOutputs.getRight());
         }
     }

@@ -68,6 +68,10 @@ public class TrapezoidalProfileCalculator {
         return velocity;
     }
 
+    public void setPosition(double position) {
+        // TODO implement
+    }
+
     public double getPosition() {
         return position;
     }
