@@ -330,9 +330,9 @@ $CenterAutoLSwitch:
     path:
 #      - { x: 2, y: 19 }
       - { x: 2, y: 31 }
-      - { x: 2, y: 57 }
-      - { x: -34, y: 90 }
-      - { x: -34, y: 124 }
+      - { x: 2, y: 45, radius: 36 }
+      - { x: -34, y: 100 }
+      - { x: -38, y: 124 }
   - { class: DriveStraight, angle: 0, distance: 3, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
