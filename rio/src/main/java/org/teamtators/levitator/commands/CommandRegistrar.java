@@ -69,6 +69,7 @@ public class CommandRegistrar {
         Climber climber = robot.getSubsystems().getClimber();
         commandStore.registerCommand("ClimberMoveToHeight", () -> new ClimberMoveToHeight(robot));
         commandStore.registerCommand("ClimberHome", () -> new ClimberHome(robot));
+        commandStore.registerCommand("ClimberForce", () -> new ClimberForce(robot));
         commandStore.putCommand("ClimberRelease", Commands.instant(climber::release));
         commandStore.putCommand("ClimberUnrelease", Commands.instant(climber::unrelease));
     }

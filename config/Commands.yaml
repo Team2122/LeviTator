@@ -172,6 +172,14 @@ ClimberClimb:
 #  rotationSpeed: 30
 #  maxAcceleration: 30
 
+ClimberForceUp:
+  class: ClimberForce
+  power: 1.0
+
+ClimberForceDown:
+  class: ClimberForce
+  power: -1.0
+
 ^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
@@ -333,9 +341,9 @@ $CenterAutoLSwitch:
 #      - { x: 2, y: 19 }
       - { x: 2, y: 31 }
       - { x: 2, y: 45, radius: 36 }
-      - { x: -30, y: 100 }
+      - { x: -32, y: 100 }
       - { x: -40, y: 124 }
-  - { class: DriveStraight, angle: 0, distance: 3, maxAcceleration: 160 }
+  - { class: DriveStraight, angle: 0, distance: 6, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 160 }
@@ -363,7 +371,7 @@ $CenterAutoRSwitch:
       - { x: 2, y: 50 }
       - { x: 32, y: 100 }
       - { x: 38, y: 124 }
-  - { class: DriveStraight, angle: 0, distance: 3, maxAcceleration: 160 }
+  - { class: DriveStraight, angle: 0, distance: 6, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
   - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 160 }

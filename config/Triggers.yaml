@@ -48,8 +48,8 @@ gunnerSecondary:
   3: toggle whenPressed ClimberSubBar
   4: toggle whenPressed PickerPick
   5: start whenPressed PickerRetract
-  6: start whenPressed BumpPivotLeft
-  7: start whenPressed BumpPivotRight
+  6: whilePressed ClimberForceUp
+  7: whilePressed ClimberForceDown
   8: start whenPressed $LiftSwitch
   9: start whenPressed $LiftScaleHigh
   10: start whenPressed PivotCenter

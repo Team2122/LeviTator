@@ -50,15 +50,17 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         return homed;
     }
 
-    public void setPower(double power) {
+    public void setPower(double power, boolean force) {
         double pow = power;
-        if (isAtTopLimit() && power > 0) {
-            logger.warn("Attempted to give climber power {} at top limit", power);
-            pow = 0;
-        }
-        if (isAtBottomLimit() && power < 0) {
-            logger.warn("Attempted to give climber power {} at bottom limit", power);
-            pow = 0;
+        if (!force) {
+            if (isAtTopLimit() && power > 0) {
+                logger.warn("Attempted to give climber power {} at top limit", power);
+                pow = 0;
+            }
+            if (isAtBottomLimit() && power < 0) {
+                logger.warn("Attempted to give climber power {} at bottom limit", power);
+                pow = 0;
+            }
         }
         climberMotor.set(pow);
     }
@@ -164,7 +166,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         public void start() {
             super.start();
             printTestInstructions("Press A to read the encoder value. Press B to reset the encoder value.");
-            setPower(0.0);
+            setPower(0.0, false);
         }
 
         @Override
@@ -178,10 +180,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
                     resetPosition();
                     break;
                 case X:
-                    setPower(1.0);
+                    setPower(1.0, false);
                     break;
                 case Y:
-                    setPower(-1.0);
+                    setPower(-1.0, false);
                     break;
             }
         }
@@ -192,14 +194,14 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
             switch (button) {
                 case X:
                 case Y:
-                    setPower(0.0);
+                    setPower(0.0, false);
                     break;
             }
         }
 
         @Override
         public void stop() {
-            setPower(0.0);
+            setPower(0.0, false);
         }
     }
 }

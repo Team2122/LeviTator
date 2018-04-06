@@ -17,12 +17,12 @@ public class ClimberHome extends Command implements Configurable<ClimberHome.Con
 
     @Override
     public boolean step() {
-        climber.setPower(config.power);
+        climber.setPower(config.power, false);
         return climber.isAtBottomLimit();
     }
 
     protected void finish(boolean interrupted) {
-        climber.setPower(0.0);
+        climber.setPower(0.0, false);
         if (!interrupted) {
             logger.info("Climber has been homed");
             climber.resetPosition();

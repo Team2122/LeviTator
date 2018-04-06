@@ -45,7 +45,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
             return true;
         }
 
-        climber.setPower(config.power * direction);
+        climber.setPower(config.power * direction, false);
         return false;
     }
 
@@ -56,7 +56,7 @@ public class ClimberMoveToHeight extends Command implements Configurable<Climber
 
     public void finish(boolean interrupted) {
         super.finish(interrupted);
-        climber.setPower(0);
+        climber.setPower(0, false);
     }
 
     public static class Config {
