@@ -359,6 +359,10 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         limitSensorBottom.free();
     }
 
+    public double getMaxHeight() {
+        return config.heightController.maxPosition;
+    }
+
     public enum HeightPreset {
         HOME,
         PICK,
