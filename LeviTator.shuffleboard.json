@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.13564668769716087,
+  "dividerPosition": 0.138801261829653,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -89,7 +89,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Drive/leftMotor",
                   "_title": "leftMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -101,7 +101,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Drive/rightMotor",
                   "_title": "rightMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -134,14 +134,14 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Picker/leftMotor",
                   "_title": "leftMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Picker/rightMotor",
                   "_title": "rightMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -169,6 +169,11 @@
                   "_title": "upperCubeSensor/Value",
                   "colorWhenTrue": "#7CFC00FF",
                   "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Toggle Button",
+                  "_source0": "network_table:///LiveWindow/Picker/armLock/Value",
+                  "_title": "armLock/Value"
                 }
               ]
             }
@@ -187,14 +192,14 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Climber/climberMotor",
                   "_title": "climberMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Climber/slaveMotor",
                   "_title": "slaveMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -233,7 +238,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Pivot/pivotMotor",
                   "_title": "pivotMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -280,7 +285,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Lift/liftMotor",
                   "_title": "liftMotor",
-                  "controllable": false,
+                  "controllable": true,
                   "orientation": "HORIZONTAL"
                 },
                 {
