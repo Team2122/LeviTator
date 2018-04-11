@@ -4,9 +4,11 @@ import edu.wpi.first.wpilibj.*;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
+import org.teamtators.common.config.helpers.SpeedControllerGroupConfig;
 import org.teamtators.common.control.*;
 import org.teamtators.common.drive.*;
 import org.teamtators.common.hw.ADXRS453;
+import org.teamtators.common.hw.SpeedControllerGroup;
 import org.teamtators.common.math.Pose2d;
 import org.teamtators.common.math.Rotation;
 import org.teamtators.common.math.Translation2d;
@@ -26,8 +28,8 @@ import java.util.function.Predicate;
 public class Drive extends Subsystem implements Configurable<Drive.Config>, TankDrive {
 
     public static final Predicate<TrapezoidalProfileFollower> DEFAULT_PREDICATE = ControllerPredicates.finished();
-    private SpeedController leftMotor;
-    private SpeedController rightMotor;
+    private SpeedControllerGroup leftMotor;
+    private SpeedControllerGroup rightMotor;
     private Encoder rightEncoder;
     private Encoder leftEncoder;
     private ADXRS453 gyro;
@@ -274,6 +276,16 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         tests.addTests(new EncoderTest("RightEncoder", rightEncoder));
 
         tests.addTests(new ADXRS453Test("gyro", gyro));
+
+        for (int i = 0; i < leftMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = leftMotor.getSpeedControllers()[i];
+            tests.addTest(new SpeedControllerTest("leftMotor(" + i + ")", speedController));
+        }
+
+        for (int i = 0; i < rightMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = rightMotor.getSpeedControllers()[i];
+            tests.addTest(new SpeedControllerTest("rightMotor(" + i + ")", speedController));
+        }
         tests.addTests(new ControllerTest(rotationController, 180));
         tests.addTests(new PoseEstimatorTest(poseEstimator));
         tests.addTest(new MotionCalibrationTest(straightMotionFollower) {
@@ -328,7 +340,15 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         gyro.startCalibration();
 
         ((Sendable) leftMotor).setName("Drive", "leftMotor");
+        for (int i = 0; i < leftMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = leftMotor.getSpeedControllers()[i];
+            ((Sendable) speedController).setName("Drive", ("leftMotor(" + i + ")"));
+        }
         ((Sendable) rightMotor).setName("Drive", "rightMotor");
+        for (int i = 0; i < rightMotor.getSpeedControllers().length; i++) {
+            SpeedController speedController = rightMotor.getSpeedControllers()[i];
+            ((Sendable) speedController).setName("Drive", ("rightMotor(" + i + ")"));
+        }
         leftEncoder.setName("Drive", "leftEncoder");
         rightEncoder.setName("Drive", "rightEncoder");
         gyro.setName("Drive", "gyro");
@@ -352,8 +372,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     }
 
     public static class Config {
-        public SpeedControllerConfig leftMotor;
-        public SpeedControllerConfig rightMotor;
+        public SpeedControllerGroupConfig leftMotor;
+        public SpeedControllerGroupConfig rightMotor;
         public EncoderConfig leftEncoder;
         public EncoderConfig rightEncoder;
         public PidController.Config rotationController;
