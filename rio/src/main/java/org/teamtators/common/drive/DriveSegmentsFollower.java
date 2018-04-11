@@ -26,8 +26,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
 
     private TrapezoidalProfileFollower speedFollower;
     private DriveSegments segments = new DriveSegments();
-    private PidController leftController;
-    private PidController rightController;
 
     private int currentSegmentIdx;
     private double previousTraveled;
@@ -46,13 +44,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public DriveSegmentsFollower(TankDrive drive) {
         super("DriveSegmentsFollower");
         this.drive = drive;
-
-        leftController = new PidController("DriveSegmentsFollower.leftController");
-        leftController.setInputProvider(drive::getLeftRate);
-        leftController.setOutputConsumer(drive::setLeftPower);
-        rightController = new PidController("DriveSegmentsFollower.rightController");
-        rightController.setInputProvider(drive::getRightRate);
-        leftController.setOutputConsumer(drive::setRightPower);
 
         speedFollower = new TrapezoidalProfileFollower("DriveSegmentsFollower.speedFollower");
         speedFollower.setPositionProvider(this::getTraveledDistance);
@@ -248,18 +239,13 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         }
         profiler.start("speedFollower");
         speedFollower.update(delta);
-//        speedFollower.getCalculator().setPosition(report.traveledDistance);
         profiler.start("setOutputs");
-        /*driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedFollower.getCalculator().getVelocity());
-        leftController.setSetpoint(driveOutputs.getLeft());
-        rightController.setSetpoint(driveOutputs.getRight());
-
-        leftController.update(delta);
-        rightController.update(delta);*/
 
         driveOutputs = drive.getTankKinematics().calculateOutputs(twist, speedPower);
-        driveOutputs = driveOutputs.normalize();
-        drive.setPowers(driveOutputs);
+//        driveOutputs = driveOutputs.normalize();
+//        drive.setPowers(driveOutputs);
+        driveOutputs = driveOutputs.normalize(drive.getMaxSpeed());
+        drive.setSpeeds(driveOutputs);
         if (isOnTarget()) {
             report.isFinished = true;
         }
@@ -287,8 +273,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public void configure(Config config) {
         setLookAheadFunction(config.lookAhead);
         speedFollower.configure(config.speedFollower);
-//        leftController.configure(config.driveSideController);
-//        rightController.configure(config.driveSideController);
         this.logData = config.logData;
     }
 
@@ -299,7 +283,6 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     public static class Config {
         public LinearInterpolationFunction lookAhead;
         public TrapezoidalProfileFollower.Config speedFollower;
-//        public PidController.Config driveSideController;
         public boolean logData = false;
     }
 

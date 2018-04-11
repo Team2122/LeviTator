@@ -24,13 +24,21 @@ public class DriveOutputs {
     }
 
     public DriveOutputs normalize() {
-        double max = Math.max(Math.abs(left), Math.abs(right));
-        max = Math.max(max, 1.0);
-        return new DriveOutputs(left / max, right / max);
+        return normalize(1.0);
+    }
+
+    public DriveOutputs normalize(double maxValue) {
+        double greatest = Math.max(Math.abs(left), Math.abs(right));
+        greatest = Math.max(greatest, maxValue);
+        return new DriveOutputs(left / greatest, right / greatest);
     }
 
     public DriveOutputs maximize() {
-        double max = Math.max(Math.abs(left), Math.abs(right));
+        return maximize(1.0);
+    }
+
+    public DriveOutputs maximize(double maxValue) {
+        double max = Math.max(Math.abs(left), Math.abs(right)) / maxValue;
         return new DriveOutputs(left / max, right / max);
     }
 

@@ -13,7 +13,7 @@ import org.teamtators.common.util.FMSData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable, FMSDataListener,
+public abstract class Subsystem implements Updatable, RobotStateListener, ManualTestable, AutomatedTestable, FMSDataListener,
         Deconfigurable {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final String name;

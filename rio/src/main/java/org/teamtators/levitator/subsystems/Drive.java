@@ -1,6 +1,9 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
 import org.teamtators.common.config.helpers.SpeedControllerConfig;
@@ -37,6 +40,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     private TrapezoidalProfileFollower straightMotionFollower = new TrapezoidalProfileFollower("Drive.straightMotionFollower");
     private PidController yawAngleController = new PidController("Drive.yawAngleController");
+    private PidController leftController = new PidController("Drive.leftController");
+    private PidController rightController = new PidController("Drive.rightController");
     private OutputController outputController = new OutputController();
 
     private TrapezoidalProfileFollower rotationMotionFollower =
@@ -49,14 +54,16 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     private Config config;
     private double speed;
 
+    private DriveMode driveMode;
+
     public Drive() {
         super("Drive");
 
         rotationController.setInputProvider(this::getYawAngle);
         rotationController.setOutputConsumer((double output) -> {
-            setPowers(speed + output, speed - output);
+            outputController.setStraightOutput(speed, false);
+            outputController.setRotationOutput(output);
         });
-
 
         straightMotionFollower.setPositionProvider(this::getCenterDistance);
         straightMotionFollower.setVelocityProvider(this::getCenterRate);
@@ -69,25 +76,10 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         rotationMotionFollower.setVelocityProvider(this::getYawRate);
         rotationMotionFollower.setOutputConsumer(outputController::setRotationOutput);
 
-
-    }
-
-    /**
-     * Drives with a certain heading (angle) and speed
-     *
-     * @param heading in degrees
-     * @param speed   in inches/second
-     */
-    public void driveHeading(double heading, double speed) {
-        rotationController.start();
-        straightMotionFollower.stop();
-        yawAngleController.stop();
-        rotationMotionFollower.stop();
-        outputController.stop();
-        outputController.setMode(OutputMode.None);
-        this.speed = speed;
-
-        rotationController.setSetpoint(heading);
+        leftController.setInputProvider(this::getLeftRate);
+        leftController.setOutputConsumer(outputController::setLeftOutput);
+        rightController.setInputProvider(this::getRightRate);
+        rightController.setOutputConsumer(outputController::setRightOutput);
     }
 
     /**
@@ -97,23 +89,53 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
      * @param rightPower the power for the right side
      */
     public void drivePowers(double leftPower, double rightPower) {
-        rotationController.stop();
-        straightMotionFollower.stop();
-        yawAngleController.stop();
-        rotationMotionFollower.stop();
-        outputController.stop();
-        outputController.setMode(OutputMode.None);
-        driveSegmentsFollower.stop();
-
+        setDriveMode(DriveMode.Power);
         setPowers(leftPower, rightPower);
     }
 
-    public void driveStraightProfile(double heading, double distance) {
-        rotationController.stop();
-        rotationMotionFollower.stop();
-        outputController.setMode(OutputMode.StraightAndRotation);
-        driveSegmentsFollower.stop();
+    private void stopPowers() {
+        setPowers(0, 0);
+        driveMode = DriveMode.Stop;
+    }
 
+    public void driveSpeeds(double leftSpeed, double rightSpeed) {
+        setDriveMode(DriveMode.Speeds);
+        setSpeeds(leftSpeed, rightSpeed);
+        leftController.start();
+        rightController.start();
+    }
+
+    private void stopSpeeds() {
+        leftController.stop();
+        rightController.stop();
+        stopPowers();
+    }
+
+    /**
+     * Drives with a certain heading (angle) and speed
+     *
+     * @param heading in degrees
+     * @param speed   in inches/second
+     */
+    public void driveHeading(double heading, double speed) {
+        setDriveMode(DriveMode.Heading);
+        rotationController.setSetpoint(heading);
+        outputController.setStraightOutput(speed, false);
+        this.speed = speed;
+
+        rotationController.start();
+        outputController.start();
+    }
+
+    private void stopHeading() {
+        rotationController.stop();
+        outputController.setStraightOutput(0, true);
+        outputController.stop();
+        stopPowers();
+    }
+
+    public void driveStraightProfile(double heading, double distance) {
+        setDriveMode(DriveMode.StraightProfile);
         yawAngleController.setSetpoint(heading);
         straightMotionFollower.moveDistance(distance);
 
@@ -122,24 +144,28 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         outputController.start();
     }
 
-    public void driveRotationProfile(double heading) {
-        rotationController.stop();
+    private void stopStraightProfile() {
         straightMotionFollower.stop();
         yawAngleController.stop();
-        outputController.setMode(OutputMode.RotationOnly);
-        driveSegmentsFollower.stop();
+        outputController.stop();
+        stopPowers();
+    }
 
+    public void driveRotationProfile(double heading) {
+        setDriveMode(DriveMode.RotationProfile);
         rotationMotionFollower.moveToPosition(heading);
         rotationMotionFollower.start();
         outputController.start();
     }
 
-    public void driveArcProfile(double arcLength, double endAngle) {
-        rotationController.stop();
-        yawAngleController.stop();
-        outputController.setMode(OutputMode.StraightAndRotation);
-        driveSegmentsFollower.stop();
+    private void stopRotationProfile() {
+        rotationMotionFollower.stop();
+        outputController.stop();
+        stopPowers();
+    }
 
+    public void driveArcProfile(double arcLength, double endAngle) {
+        setDriveMode(DriveMode.ArcProfile);
         straightMotionFollower.moveDistance(arcLength);
         rotationMotionFollower.moveToPosition(endAngle);
 
@@ -148,16 +174,58 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         outputController.start();
     }
 
-    public void driveSegments(DriveSegments segments) {
-        rotationController.stop();
+    private void stopArcProfile() {
         straightMotionFollower.stop();
-        yawAngleController.stop();
         rotationMotionFollower.stop();
         outputController.stop();
-        outputController.setMode(OutputMode.None);
+        stopPowers();
+    }
 
+    public void driveSegments(DriveSegments segments) {
+        setDriveMode(DriveMode.Segments);
         driveSegmentsFollower.setSegments(segments);
         driveSegmentsFollower.start();
+    }
+
+    private void stopSegments() {
+        driveSegmentsFollower.stop();
+        stopPowers();
+    }
+
+    private void setDriveMode(DriveMode mode) {
+        if (this.driveMode != mode) {
+            stop();
+        }
+        this.driveMode = mode;
+    }
+
+    public void stop() {
+        switch (driveMode) {
+            case Stop:
+                break;
+            case Power:
+                stopPowers();
+                break;
+            case Speeds:
+                stopSpeeds();
+                break;
+            case Heading:
+                stopHeading();
+                break;
+            case StraightProfile:
+                stopStraightProfile();
+                break;
+            case RotationProfile:
+                stopRotationProfile();
+                break;
+            case ArcProfile:
+                stopArcProfile();
+                break;
+            case Segments:
+                stopSegments();
+                break;
+        }
+        drivePowers(0, 0);
     }
 
     public boolean isStraightProfileOnTarget() {
@@ -229,16 +297,26 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return gyro.getAngle();
     }
 
-    public double getYawRate() {
-        return gyro.getRate();
-    }
-
     public void setYawAngle(double yawAngle) {
         gyro.setAngle(yawAngle);
     }
 
+    public double getYawRate() {
+        return gyro.getRate();
+    }
+
     public void resetYawAngle() {
         gyro.resetAngle();
+    }
+
+    @Override
+    public void setRightSpeed(double rightSpeed) {
+        rightController.setSetpoint(rightSpeed);
+    }
+
+    @Override
+    public void setLeftSpeed(double leftSpeed) {
+        leftController.setSetpoint(leftSpeed);
     }
 
     @Override
@@ -254,16 +332,18 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         return poseEstimator.getPose();
     }
 
+    @Override
+    public double getMaxSpeed() {
+        return config.maxSpeed;
+    }
+
     public List<Updatable> getUpdatables() {
         return Arrays.asList(
                 gyro, poseEstimator, rotationController, yawAngleController,
-                straightMotionFollower, yawAngleController, outputController, rotationMotionFollower,
-                driveSegmentsFollower
-        );
-    }
-
-    public void stop() {
-        drivePowers(0, 0);
+                straightMotionFollower, driveSegmentsFollower, yawAngleController, leftController, rightController,
+                rotationMotionFollower,
+                outputController
+                );
     }
 
     @Override
@@ -277,6 +357,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
         tests.addTests(new ADXRS453Test("gyro", gyro));
 
+        // TODO: make a SpeedControllerGroup tests so we no longer need this
         for (int i = 0; i < leftMotor.getSpeedControllers().length; i++) {
             SpeedController speedController = leftMotor.getSpeedControllers()[i];
             tests.addTest(new SpeedControllerTest("leftMotor(" + i + ")", speedController));
@@ -287,20 +368,20 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
             tests.addTest(new SpeedControllerTest("rightMotor(" + i + ")", speedController));
         }
         tests.addTests(new ControllerTest(rotationController, 180));
+        tests.addTests(new ControllerTest(leftController, config.maxSpeed));
+        tests.addTests(new ControllerTest(rightController, config.maxSpeed));
         tests.addTests(new PoseEstimatorTest(poseEstimator));
         tests.addTest(new MotionCalibrationTest(straightMotionFollower) {
             @Override
             public void start() {
                 super.start();
                 outputController.start();
-                outputController.setMode(OutputMode.StraightOnly);
             }
 
             @Override
             public void stop() {
                 super.stop();
                 outputController.stop();
-                outputController.setMode(OutputMode.None);
             }
         });
 
@@ -331,6 +412,8 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         this.rightEncoder = config.rightEncoder.create();
         this.straightMotionFollower.configure(config.straightMotionFollower);
         this.yawAngleController.configure(config.yawAngleController);
+        this.leftController.configure(config.speedController);
+        this.rightController.configure(config.speedController);
         this.rotationMotionFollower.configure(config.rotationMotionFollower);
         this.driveSegmentsFollower.configure(config.driveSegmentsFollower);
 
@@ -367,8 +450,15 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         if (gyro != null) gyro.free();
     }
 
-    private enum OutputMode {
-        StraightOnly, RotationOnly, StraightAndRotation, None
+    public enum DriveMode {
+        Stop,
+        Power,
+        Speeds,
+        Heading,
+        StraightProfile,
+        RotationProfile,
+        ArcProfile,
+        Segments
     }
 
     public static class Config {
@@ -378,56 +468,72 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         public EncoderConfig rightEncoder;
         public PidController.Config rotationController;
         public TrapezoidalProfileFollower.Config straightMotionFollower;
+        public PidController.Config speedController;
         public PidController.Config yawAngleController;
         public TrapezoidalProfileFollower.Config rotationMotionFollower;
         public TankKinematics tankKinematics;
         public DriveSegmentsFollower.Config driveSegmentsFollower;
+        public double maxSpeed;
     }
 
     private class OutputController extends AbstractUpdatable {
-        private double straightOutput;
-        private double rotationOutput;
-        private OutputMode mode = OutputMode.StraightOnly;
+        double leftOutput;
+        double rightOutput;
+        double straightOutput;
+        boolean clearOutputs = true;
+        double rotationOutput;
 
-        public OutputController() {
+        OutputController() {
             super("Drive.OutputController");
         }
 
-        public OutputMode getMode() {
-            return mode;
+        void setLeftOutput(double leftOutput) {
+            this.leftOutput = leftOutput;
         }
 
-        public void setMode(OutputMode mode) {
-            this.mode = mode;
+        void setRightOutput(double rightOutput) {
+            this.rightOutput = rightOutput;
         }
 
-        public void setStraightOutput(double followerOutput) {
-            this.straightOutput = followerOutput;
+        void setStraightOutput(double straightOutput, boolean clearOutputs) {
+            this.straightOutput = straightOutput;
+            this.clearOutputs = clearOutputs;
         }
 
-        public void setRotationOutput(double rotationOutput) {
+        void setStraightOutput(double straightOutput) {
+            setStraightOutput(straightOutput, true);
+        }
+
+        void setRotationOutput(double rotationOutput) {
             this.rotationOutput = rotationOutput;
         }
 
         @Override
+        public synchronized void stop() {
+            if (isRunning()) {
+                setPowers(0, 0);
+            }
+            super.stop();
+        }
+
+        @Override
         protected void doUpdate(double delta) {
-            double left = 0, right = 0;
-            if (mode == OutputMode.StraightOnly || mode == OutputMode.StraightAndRotation) {
-                left += straightOutput;
-                right += straightOutput;
-                straightOutput = Double.NaN;
+            double left = leftOutput;
+            double right = rightOutput;
+            leftOutput = 0;
+            rightOutput = 0;
+            left += straightOutput;
+            right += straightOutput;
+            if (clearOutputs) {
+                straightOutput = 0;
             }
-            if (mode == OutputMode.RotationOnly || mode == OutputMode.StraightAndRotation) {
-                left += rotationOutput;
-                right -= rotationOutput;
-                rotationOutput = Double.NaN;
-            }
-            if (mode != OutputMode.None && !Double.isNaN(left) && !Double.isNaN(right)) {
+            left += rotationOutput;
+            right -= rotationOutput;
+            rotationOutput = 0;
+            if (!Double.isNaN(left) && !Double.isNaN(right)) {
                 setPowers(left, right);
-                //logger.trace("driving at powers {}, {}", left, right);
             } else {
                 setPowers(0, 0);
-                //logger.trace("not driving, something was NaN: {}, {}", left, right);
             }
         }
     }

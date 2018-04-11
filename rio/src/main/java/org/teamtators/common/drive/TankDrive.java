@@ -14,6 +14,16 @@ public interface TankDrive {
         setPowers(outputs.getLeft(), outputs.getRight());
     }
 
+    void setRightSpeed(double rightSpeed);
+    void setLeftSpeed(double leftSpeed);
+    default void setSpeeds(double leftSpeed, double rightSpeed) {
+        setLeftSpeed(leftSpeed);
+        setRightSpeed(rightSpeed);
+    }
+    default void setSpeeds(DriveOutputs outputs) {
+        setSpeeds(outputs.getLeft(), outputs.getRight());
+    }
+
     void stop();
 
     double getLeftDistance();
@@ -39,4 +49,6 @@ public interface TankDrive {
     Pose2d getPose();
 
     TankKinematics getTankKinematics();
+
+    double getMaxSpeed();
 }
