@@ -1,5 +1,7 @@
 package org.teamtators.levitator.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import edu.wpi.first.wpilibj.*;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.EncoderConfig;
@@ -204,6 +206,16 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         leftMotor.set(power);
     }
 
+    public void setNeutralMode(NeutralMode neutralMode) {
+        for (SpeedControllerGroup group : Arrays.asList(leftMotor, rightMotor)) {
+            for (SpeedController motor : group.getSpeedControllers()) {
+                if (motor instanceof BaseMotorController) {
+                    ((BaseMotorController) motor).setNeutralMode(neutralMode);
+                }
+            }
+        }
+    }
+
     public double getLeftRate() {
         return leftEncoder.getRate();
     }
@@ -353,6 +365,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         rightEncoder.setName("Drive", "rightEncoder");
         gyro.setName("Drive", "gyro");
 
+        setNeutralMode(NeutralMode.Coast);
         poseEstimator.start();
     }
 
