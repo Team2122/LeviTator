@@ -1,6 +1,9 @@
 package org.teamtators.levitator.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
+    private static final boolean ENABLE_HOMING = false;
     private Pivot pivot;
 
     private SpeedControllerGroup liftMotor;
@@ -67,6 +71,14 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     public void linkTo(Pivot pivot) {
         pivot.setLift(this);
         this.setPivot(pivot);
+    }
+
+    public void setNeutralMode(NeutralMode neutralMode) {
+        for (SpeedController liftMotor : liftMotor.getSpeedControllers()) {
+            if (liftMotor instanceof BaseMotorController) {
+                ((BaseMotorController) liftMotor).setNeutralMode(neutralMode);
+            }
+        }
     }
 
     /**
@@ -347,6 +359,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
         homed = false;
         homeTimer.stop();
+        setNeutralMode(NeutralMode.Coast);
     }
 
     @Override
@@ -409,10 +422,11 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 return;
             }
             setLiftPower(config.homingPower);
-            if (!isAtBottomLimit() && false && !homeTimeout) {
+            if (!isAtBottomLimit() && ENABLE_HOMING && !homeTimeout) {
                 return;
             }
             logger.info("Lift homed");
+            setNeutralMode(NeutralMode.Brake);
             liftEncoder.reset();
             enableLiftController();
             homed = true;
