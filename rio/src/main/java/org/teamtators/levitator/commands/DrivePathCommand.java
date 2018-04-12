@@ -16,6 +16,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     private final Drive drive;
     private DrivePath drivePath;
     private DriveSegments driveSegments;
+    private Config config;
 
     public DrivePathCommand(TatorRobot robot) {
         super("DrivePath");
@@ -26,6 +27,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     @Override
     protected void initialize() {
         logger.info("Starting driving path at " + drive.getPose());
+        drive.getDriveSegmentsFollower().setMaxAcceleration(config.maxAcceleration);
         drive.driveSegments(driveSegments);
     }
 
@@ -42,6 +44,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
 
     @Override
     public void configure(Config config) {
+        this.config = config;
         this.drivePath = new DrivePath();
         for (int i = 0; i < config.path.size(); i++) {
             DrivePath.Point point = config.path.get(i);
@@ -75,6 +78,7 @@ public class DrivePathCommand extends Command implements Configurable<DrivePathC
     public static class Config {
         public double speed;
         public double arcSpeed;
+        public double maxAcceleration;
         public double radius;
         public boolean reverse = false;
         public List<DrivePath.Point> path;

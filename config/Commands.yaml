@@ -188,7 +188,7 @@ ClimberForceDown:
 ^DriveStraight: { speed: 100.0, endSpeed: 0.0, maxAcceleration: 100 }
 ^DriveRotate: { rotationSpeed: 180, maxAcceleration: 400 }
 ^DriveArc: { speed: 60.0, endSpeed: 0.0, maxAcceleration: 100, maxAngularAcceleration: 400 }
-^DrivePath: { speed: 100, arcSpeed: 60, radius: 30 }
+^DrivePath: { speed: 100, arcSpeed: 60, radius: 30, maxAcceleration: 100 }
 #############################################################################################
 #                                                                                           #
 #                                  AUTO SEQUENCES                                           #
