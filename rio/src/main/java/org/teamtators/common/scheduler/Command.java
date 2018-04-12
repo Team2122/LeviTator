@@ -105,8 +105,12 @@ public abstract class Command implements CommandRunContext {
         return requirements != null && requirements.contains(subsystem);
     }
 
-    public void updateRequirements() {
-
+    /**
+     * Updates any requirements on this command to require all child commands
+     * @return If any requirements had to be added
+     */
+    public boolean updateRequirements() {
+        return false;
     }
 
     private boolean isRequiring(Subsystem subsystem, CommandRunContext context) {

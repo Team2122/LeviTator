@@ -102,12 +102,14 @@ public class ConfigCommandStore extends CommandStore {
             JsonNode config = json.get(command.getName());
             configureCommand(command, config);
         }
-        for (int i = 0; i < 10; i++) {
+        boolean wasUpdated;
+        do {
+            wasUpdated = false;
             for (Map.Entry<String, Command> commandEntry : commandsMapCopy.entrySet()) {
                 Command command = commandEntry.getValue();
-                command.updateRequirements();
+                wasUpdated = wasUpdated || command.updateRequirements();
             }
-        }
+        } while (wasUpdated);
     }
 
     public void configureCommand(Command command, JsonNode config) throws ConfigException {
