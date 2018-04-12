@@ -1,5 +1,6 @@
 package org.teamtators.levitator.subsystems;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -26,7 +27,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private SpeedController pivotMotor;
     private MotorPowerUpdater pivotMotorUpdater;
     private AbstractUpdatable pivotUpdatable;
-    private AnalogPotentiometer pivotEncoder;
+    private Encoder pivotEncoder;
     private Solenoid pivotLockSolenoid;
     private DigitalSensor pivotLockSensor;
 
@@ -34,6 +35,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private InputDerivative pivotVelocity;
     private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
+    private boolean homed = false;
     private double desiredPivotAngle;
     private double targetAngle;
     private double lastAttemptedAngle;
@@ -66,8 +68,16 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.lift = lift;
     }
 
+    public boolean isHomed() {
+        return homed;
+    }
+
     public double getCurrentPivotAngle() {
-        return pivotEncoder.get();
+        return pivotEncoder.getDistance();
+    }
+
+    private void resetPivotAngle() {
+        pivotEncoder.reset();
     }
 
     public double getDesiredPivotAngle() {
@@ -75,7 +85,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public void setDesiredPivotAngle(double desiredAngle, boolean force) {
-//        if (getSafePivotAngle(desiredAngle) == desiredAngle) {
         if (rotationForced && !force) {
             return;
         }
@@ -86,9 +95,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             this.desiredPivotAngle = desiredAngle;
             this.rotationForced = force;
         }
-//        } else {
-//            logger.warn("Rotation to desired angle {} is not allowed at the current height {}!!", desiredAngle, getCurrentHeight());
-//        }
     }
 
     public void setDesiredAnglePreset(AnglePreset desiredPivotAngle) {
@@ -244,7 +250,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
-        tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
+        tests.addTest(new EncoderTest("pivotEncoder", pivotEncoder));
         tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
@@ -274,6 +280,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotLockSensor.setName("Pivot", "pivotLockSensor");
 
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
+
+        homed = false;
     }
 
     @Override
@@ -289,7 +297,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
-        public AnalogPotentiometerConfig pivotEncoder;
+        public EncoderConfig pivotEncoder;
         public SolenoidConfig pivotLockSolenoid;
         public DigitalSensorConfig pivotLockSensor;
 
@@ -381,6 +389,19 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         @Override
         public void doUpdate(double delta) {
             Pivot pivot = Pivot.this;
+            if (!pivot.isHomed()) {
+                pivot.disablePivotController();
+                pivot.setPivotPower(0.0);
+                pivot.setPivotLockSolenoid(true);
+                if (pivot.isPivotLocked()) {
+                    pivot.resetPivotAngle();
+                    logger.info("Pivot homed");
+                    pivot.setDesiredAnglePreset(AnglePreset.CENTER);
+                    pivot.homed = true;
+                } else {
+                    return;
+                }
+            }
             double centerAngle = pivot.getAnglePreset(AnglePreset.CENTER);
             double currentAngle = pivot.getCurrentPivotAngle();
             double safePivotAngle = pivot.getSafePivotAngle(desiredPivotAngle);
