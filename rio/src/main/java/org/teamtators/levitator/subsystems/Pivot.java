@@ -32,7 +32,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private DigitalSensor pivotLockSensor;
 
     private TrapezoidalProfileFollower pivotController;
-    private InputDerivative pivotVelocity;
     private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
     private boolean homed = false;
@@ -49,10 +48,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     public Pivot() {
         super("Pivot");
 
-        pivotVelocity = new InputDerivative("pivotAngleDerivative", this::getCurrentPivotAngle);
         pivotController = new TrapezoidalProfileFollower("pivotController");
         pivotController.setPositionProvider(this::getCurrentPivotAngle);
-        pivotController.setVelocityProvider(pivotVelocity);
+        pivotController.setVelocityProvider(this::getCurrentPivotVelocity);
         pivotController.setOutputConsumer(this::setPivotPower);
         pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
@@ -77,6 +75,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     private void resetPivotAngle() {
         pivotEncoder.reset();
+    }
+
+    public double getCurrentPivotVelocity() {
+        return pivotEncoder.getRate();
     }
 
     public double getDesiredPivotAngle() {
@@ -170,7 +172,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(pivotVelocity, pivotUpdatable, pivotController);
+        return Arrays.asList(pivotUpdatable, pivotController);
     }
 
     public boolean isPivotLockedRaw() {
