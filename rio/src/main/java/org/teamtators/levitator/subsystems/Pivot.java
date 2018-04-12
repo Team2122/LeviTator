@@ -31,7 +31,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private Solenoid pivotLockSolenoid;
     private DigitalSensor pivotLockSensor;
 
-    private /*TrapezoidalProfileFollower*/ StupidController pivotController;
+    private TrapezoidalProfileFollower pivotController;
     private InputDerivative pivotVelocity;
     private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
@@ -50,12 +50,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         super("Pivot");
 
         pivotVelocity = new InputDerivative("pivotAngleDerivative", this::getCurrentPivotAngle);
-        pivotController = new /*TrapezoidalProfileFollower*/StupidController("pivotController");
-//        pivotController.setPositionProvider(this::getCurrentPivotAngle);
-//        pivotController.setVelocityProvider(pivotVelocity);
-        pivotController.setInputProvider(this::getCurrentPivotAngle);
+        pivotController = new TrapezoidalProfileFollower("pivotController");
+        pivotController.setPositionProvider(this::getCurrentPivotAngle);
+        pivotController.setVelocityProvider(pivotVelocity);
         pivotController.setOutputConsumer(this::setPivotPower);
-//        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
+        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
         pivotUpdatable = new PivotUpdatable();
     }
@@ -128,7 +127,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
                 angle, distance));
         targetAngle = angle;
-        pivotController./*moveToPosition*/setSetpoint(angle);
+        pivotController.moveToPosition(angle);
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
@@ -254,7 +253,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
-        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController, 90.0));
+        tests.addTest(new MotionCalibrationTest(pivotController));
 
         tests.addTest(new PivotTest());
         return tests;
@@ -301,7 +300,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public SolenoidConfig pivotLockSolenoid;
         public DigitalSensorConfig pivotLockSensor;
 
-        public /*TrapezoidalProfileFollower*/ StupidController.Config pivotController;
+        public TrapezoidalProfileFollower.Config pivotController;
         public double pivotHoldPower;
 
         public Map<AnglePreset, Double> anglePresets;
@@ -344,10 +343,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public void onButtonDown(LogitechF310.Button button) {
             switch (button) {
                 case B:
-                    double angle = (config.pivotController./*maxPosition*/maxSetpoint - config.pivotController./*minPosition*/minSetpoint)
-                            * ((axisValue + 1) / 2) + config.pivotController./*minPosition*/minSetpoint;
+                    double angle = (config.pivotController.maxPosition - config.pivotController.minPosition)
+                            * ((axisValue + 1) / 2) + config.pivotController.minPosition;
                     logger.info("Moving pivot to angle {}", angle);
-                    pivotController./*moveToPosition*/setSetpoint(angle);
+                    pivotController.moveToPosition(angle);
                     break;
                 case Y:
                     enable();
