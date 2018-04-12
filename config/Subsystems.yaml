@@ -55,16 +55,16 @@ drive:
     lookAhead: { minX: 9, minY: 12, maxX: 120, maxY: 21 }
     logData: true
     speedFollower:
-      kpP: 0.4
-      kiP: 0.2
-      kpV: 0.04
-      kfV: .0074
-      kMinOutput: .082
-      kfA: 0.004
+      kpP: 2.0
+      kiP: 0.0
+      kpV: 0.0
+      kfV: 1.0
+      kMinOutput: 0.0
+      kfA: 0.1
       maxIError: 10.0
       maxAcceleration: 100.0
 #      logData: true
-  tankKinematics: { effectiveTrackWidth: 30.0 }
+  tankKinematics: { effectiveTrackWidth: 27.0 }
 picker:
   leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
   rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
