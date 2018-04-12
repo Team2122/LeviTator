@@ -1,5 +1,7 @@
 package org.teamtators.levitator.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -28,9 +30,9 @@ import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private final TatorRobot robot;
-    private SpeedControllerGroup climberMotor;
+    private SpeedControllerGroup climberMotors;
     private WPI_TalonSRX masterMotor;
-//    private MotorPowerUpdater climberMotorUpdater;
+    //    private MotorPowerUpdater climberMotorUpdater;
     private DigitalSensor topLimit;
     private DigitalSensor bottomLimit;
     private Solenoid releaser;
@@ -42,12 +44,12 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         this.robot = robot;
     }
 
-    public void setHomed(boolean homed) {
-        this.homed = homed;
-    }
-
     public boolean isHomed() {
         return homed;
+    }
+
+    public void setHomed(boolean homed) {
+        this.homed = homed;
     }
 
     public void setPower(double power, boolean force) {
@@ -62,7 +64,15 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
                 pow = 0;
             }
         }
-        climberMotor.set(pow);
+        climberMotors.set(pow);
+    }
+
+    public void setNeutralMode(NeutralMode neutralMode) {
+        for (SpeedController climberMotor : climberMotors.getSpeedControllers()) {
+            if (climberMotor instanceof BaseMotorController) {
+                ((BaseMotorController) climberMotor).setNeutralMode(neutralMode);
+            }
+        }
     }
 
     public double getPosition() {
@@ -101,22 +111,32 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
                 robot.getScheduler().startCommand(homeCommand);
             }
         }
+        switch (state) {
+            case DISABLED:
+                setNeutralMode(NeutralMode.Coast);
+                break;
+            default:
+                setNeutralMode(NeutralMode.Brake);
+                break;
+        }
     }
 
     @Override
     public void configure(Config config) {
         this.config = config;
-        climberMotor = config.climberMotor.create();
-        masterMotor = (WPI_TalonSRX) climberMotor.getSpeedControllers()[0];
+        climberMotors = config.climberMotor.create();
+        masterMotor = (WPI_TalonSRX) climberMotors.getSpeedControllers()[0];
         topLimit = config.topLimit.create();
         bottomLimit = config.bottomLimit.create();
         releaser = config.releaser.create();
-//        climberMotorUpdater = new MotorPowerUpdater(climberMotor);
+//        climberMotorUpdater = new MotorPowerUpdater(climberMotors);
 
-        climberMotor.setName("Climber", "climberMotor");
-        for (int i = 0; i < climberMotor.getSpeedControllers().length; i++) {
-            SpeedController speedController = climberMotor.getSpeedControllers()[i];
-            ((Sendable) speedController).setName("Climber", ("climberMotor(" + i + ")"));
+        setNeutralMode(NeutralMode.Coast);
+
+        climberMotors.setName("Climber", "climberMotors");
+        for (int i = 0; i < climberMotors.getSpeedControllers().length; i++) {
+            SpeedController speedController = climberMotors.getSpeedControllers()[i];
+            ((Sendable) speedController).setName("Climber", ("climberMotors(" + i + ")"));
         }
         topLimit.setName("Climber", "topLimit");
         bottomLimit.setName("Climber", "bottomLimit");
@@ -127,7 +147,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
 
     @Override
     public void deconfigure() {
-        SpeedControllerConfig.free(climberMotor);
+        SpeedControllerConfig.free(climberMotors);
         topLimit.free();
         bottomLimit.free();
         releaser.free();
@@ -137,10 +157,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     public ManualTestGroup createManualTests() {
         ManualTestGroup group = super.createManualTests();
         group.addTest(new ClimberEncoderTest());
-        group.addTest(new SpeedControllerTest("climberMotor", climberMotor));
-        for (int i = 0; i < climberMotor.getSpeedControllers().length; i++) {
-            SpeedController speedController = climberMotor.getSpeedControllers()[i];
-            group.addTest(new SpeedControllerTest("climberMotor(" + i + ")", speedController));
+        group.addTest(new SpeedControllerTest("climberMotors", climberMotors));
+        for (int i = 0; i < climberMotors.getSpeedControllers().length; i++) {
+            SpeedController speedController = climberMotors.getSpeedControllers()[i];
+            group.addTest(new SpeedControllerTest("climberMotors(" + i + ")", speedController));
         }
         group.addTest(new DigitalSensorTest("topLimit", topLimit));
         group.addTest(new DigitalSensorTest("bottomLimit", bottomLimit));
