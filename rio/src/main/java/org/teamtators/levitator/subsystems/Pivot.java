@@ -160,9 +160,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void setPivotPower(double pivotPower) {
         if (!isPivotLocked()) {
-            pivotMotorUpdater.set(pivotPower);
+            /*pivotMotorUpdater*/pivotMotor.set(pivotPower);
         } else {
-            pivotMotorUpdater.set(0);
+            /*pivotMotorUpdater*/pivotMotor.set(0);
         }
     }
 
@@ -220,15 +220,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             return centerAngle;
         }
         if (lift.isBelowHeight(Lift.HeightPreset.NEED_CENTER)) {
-            double maxAngle = centerAngle + config.centerTolerance;
-            double minAngle = centerAngle - config.centerTolerance;
+            double maxAngle = centerAngle + config.centerTolerance - 5.0;
+            double minAngle = centerAngle - config.centerTolerance + 5.0;
             return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
         }
         return desiredAngle;
     }
 
     public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(pivotMotorUpdater);
+        return Arrays.asList(/*pivotMotorUpdater*/);
     }
 
 

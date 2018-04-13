@@ -117,19 +117,19 @@ pivot:
   pivotLockSensor: { channel: 16, type: PNP }
 
   pivotController:
-    kpP: 0.04 # 0.04
+    kpP: 0.15
     kiP: 0.0 # 0.04
-    kpV: 0.001
-    kfV: 0.002
-    kMinOutput: 0.0537
-    kfA: 0.0005
+    kpV: 0.0010
+    kfV: 0.0015
+    kMinOutput: 0.054
+    kfA: 0.00075
     kHoldPower: 0.0
     minPosition: -90.0
     maxPosition: 90.0
-    maxOutput: 0.4
-    minOutput: -0.4
-    maxAcceleration: 180.0
-    travelVelocity: 90.0
+    maxOutput: 0.8
+    minOutput: -0.8
+    maxAcceleration: 360.0
+    travelVelocity: 360.0
     endVelocity: 0.0
 #    logData: true
   pivotHoldPower: 0.15
