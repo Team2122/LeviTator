@@ -48,7 +48,8 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
             pivot.clearForceRotationFlag();
         }
         boolean allowKnob = !pivot.isRotationForced();
-        if (allowKnob) {
+        double angleDelta = Math.abs(pivot.getDesiredPivotAngle() - knobAngle);
+        if (allowKnob && angleDelta > 2.0) {
             pivot.setDesiredPivotAngle(knobAngle, false);
         }
     }

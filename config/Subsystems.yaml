@@ -119,10 +119,10 @@ pivot:
   pivotController:
     kpP: 0.15
     kiP: 0.0 # 0.04
-    kpV: 0.0010
+    kpV: 0.00075
     kfV: 0.0015
     kMinOutput: 0.054
-    kfA: 0.001
+    kfA: 0.00075
     kHoldPower: 0.0
     minPosition: -90.0
     maxPosition: 90.0
@@ -131,7 +131,7 @@ pivot:
     maxAcceleration: 270.0
     travelVelocity: 270.0
     endVelocity: 0.0
-#    logData: true
+    logData: true
   pivotHoldPower: 0.15
   anglePresets:
     LEFT: -90
@@ -146,7 +146,7 @@ pivot:
   centerTolerance: 15.0
 
   pivotSweepPower: 0.2
-  startSweepAngle: 5.0
+  startSweepAngle: 2.0
   lockAngle: 30
   sweepTimeoutSeconds: 5.0
   lockedPeriod: 0.1
