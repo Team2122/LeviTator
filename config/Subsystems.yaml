@@ -112,7 +112,7 @@ lift:
 pivot:
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
   pivotEncoder: { aChannel: 6, bChannel: 7, reverse: false,
-    distancePerPulse: 0.087890625 } # 360 degrees / 4096 CPR
+    distancePerPulse: 0.3515625 } # 360 degrees / 1024 CPR
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
 

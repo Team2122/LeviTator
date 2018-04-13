@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.138801261829653,
+  "dividerPosition": 0.14181438998957246,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -89,7 +89,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Drive/leftMotor",
                   "_title": "leftMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -101,7 +101,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Drive/rightMotor",
                   "_title": "rightMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -134,14 +134,14 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Picker/leftMotor",
                   "_title": "leftMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Picker/rightMotor",
                   "_title": "rightMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -192,14 +192,14 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Climber/climberMotor",
                   "_title": "climberMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Climber/slaveMotor",
                   "_title": "slaveMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -224,53 +224,6 @@
               ]
             }
           },
-          "8,0": {
-            "size": [
-              2,
-              4
-            ],
-            "content": {
-              "_type": "Subsystem Layout",
-              "_source0": "network_table:///LiveWindow/Pivot",
-              "_title": "Pivot",
-              "_children": [
-                {
-                  "_type": "Speed Controller",
-                  "_source0": "network_table:///LiveWindow/Pivot/pivotMotor",
-                  "_title": "pivotMotor",
-                  "controllable": true,
-                  "orientation": "HORIZONTAL"
-                },
-                {
-                  "_type": "Voltage View",
-                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder",
-                  "_title": "pivotEncoder",
-                  "min": -90.0,
-                  "max": 90.0,
-                  "center": 0.0,
-                  "orientation": "HORIZONTAL",
-                  "numTickMarks": 5.0
-                },
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder/Value",
-                  "_title": "pivotEncoder/Value"
-                },
-                {
-                  "_type": "Toggle Button",
-                  "_source0": "network_table:///LiveWindow/Pivot/pivotLockSolenoid/Value",
-                  "_title": "pivotLockSolenoid/Value"
-                },
-                {
-                  "_type": "Boolean Box",
-                  "_source0": "network_table:///LiveWindow/Pivot/pivotLockSensor/Value",
-                  "_title": "pivotLockSensor/Value",
-                  "colorWhenTrue": "#7CFC00FF",
-                  "colorWhenFalse": "#8B0000FF"
-                }
-              ]
-            }
-          },
           "6,0": {
             "size": [
               2,
@@ -285,7 +238,7 @@
                   "_type": "Speed Controller",
                   "_source0": "network_table:///LiveWindow/Lift/liftMotor",
                   "_title": "liftMotor",
-                  "controllable": true,
+                  "controllable": false,
                   "orientation": "HORIZONTAL"
                 },
                 {
@@ -320,6 +273,43 @@
               "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[0]",
               "_title": "LiveWindow/Ungrouped/PowerDistributionPanel[0]",
               "showIndicatorText": true
+            }
+          },
+          "8,0": {
+            "size": [
+              2,
+              4
+            ],
+            "content": {
+              "_type": "Subsystem Layout",
+              "_source0": "network_table:///LiveWindow/Pivot",
+              "_title": "LiveWindow/Pivot",
+              "_children": [
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotMotor",
+                  "_title": "pivotMotor",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Encoder",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder",
+                  "_title": "pivotEncoder"
+                },
+                {
+                  "_type": "Toggle Button",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotLockSolenoid/Value",
+                  "_title": "pivotLockSolenoid/Value"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotLockSensor/Value",
+                  "_title": "pivotLockSensor/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                }
+              ]
             }
           }
         }
