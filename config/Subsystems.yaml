@@ -131,7 +131,7 @@ pivot:
     maxAcceleration: 270.0
     travelVelocity: 270.0
     endVelocity: 0.0
-    logData: true
+#    logData: true
   pivotHoldPower: 0.15
   anglePresets:
     LEFT: -90

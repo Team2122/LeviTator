@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Updater {
     private static final Logger logger = LoggerFactory.getLogger(Updater.class);
-    private static final double DEFAULT_PERIOD = 1.0 / 120.0;
+    private static final double DEFAULT_PERIOD = 1.0 / 100.0;
     private final Thread m_thread;
     private final ReentrantLock m_processLock = new ReentrantLock();
     private final AtomicInteger m_notifier = new AtomicInteger();
@@ -26,7 +26,7 @@ public class Updater {
     private double period;
     private double m_expirationTime;
     private final Updatable updatable;
-    private double lastStepTime;
+    private long lastStepTime;
 
     public Updater(Updatable updatable) {
         this(updatable, DEFAULT_PERIOD);
@@ -107,14 +107,16 @@ public class Updater {
 
     private void run() {
         if (!isRunning()) return;
-        double time = RobotController.getFPGATime();
-        double delta = time - lastStepTime;
+        long time = RobotController.getFPGATime();
+        long delta = time - lastStepTime;
+        double deltaSeconds = delta / 1000000.0;
         lastStepTime = time;
         try {
-            updatable.update(delta);
-            double elapsed = RobotController.getFPGATime() - time;
-            if (elapsed > period && elapsed > .1) {
-                logger.warn("Updatable " + updatable.getClass().getName() + " exceeded period ({} > {})", elapsed, period);
+            updatable.update(deltaSeconds);
+            long elapsed = RobotController.getFPGATime() - time;
+            double elapsedSeconds = elapsed / 1000000.0;
+            if (elapsedSeconds > period) {
+                logger.warn("Updatable " + updatable.getClass().getName() + " exceeded period ({} > {})", elapsedSeconds, period);
                 Profiler profiler = updatable.getProfiler();
                 if (profiler != null) {
                     profiler.setLogger(logger);

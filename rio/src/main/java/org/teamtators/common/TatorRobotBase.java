@@ -48,15 +48,15 @@ public abstract class TatorRobotBase implements RobotStateListener, Updatable, F
     protected final ManualTester tester = new ManualTester();
     protected final AutomatedTester automatedTester = new AutomatedTester(getScheduler());
 
-    protected final Updater updater = new Updater(this, 1 / 120.0);
+    protected final Updater updater = new Updater(this, 1 / 100.0);
     protected final UpdatableCollection controllers = new UpdatableCollection("Controllers");
     protected final UpdatableCollection motors = new UpdatableCollection("Motors");
-    protected final Updater motorUpdater = new Updater(motors, 1 / 120.0);
-    protected final Updater controllerUpdater = new Updater(controllers, 1 / 120.0);
+    protected final Updater motorUpdater = new Updater(motors, 1 / 100.0);
+    protected final Updater controllerUpdater = new Updater(controllers, 1 / 100.0);
     protected final DashboardUpdater smartDashboardUpdater = new DashboardUpdater(this, Dashboard.Type.TATOR_DASHBOARD);
     protected final Updater dashboardUpdater = new Updater(smartDashboardUpdater, 1 / 10.0);
     protected final DataCollector dataCollector = DataCollector.getDataCollector();
-    protected final Updater dataCollectorUpdater = new Updater(dataCollector, 1.0 / 60.0);
+    protected final Updater dataCollectorUpdater = new Updater(dataCollector, 1.0 / 50.0);
     protected List<Controller<?, ?>> gameControllers = Collections.emptyList();
     protected final Timer stateTimer = new Timer();
     protected double lastDelta = 0.0;
