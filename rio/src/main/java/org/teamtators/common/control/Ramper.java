@@ -75,6 +75,14 @@ public class Ramper implements Updatable, Configurable<Ramper.Config> {
         return output;
     }
 
+    public boolean isOnlyUp() {
+        return onlyUp;
+    }
+
+    public void setOnlyUp(boolean onlyUp) {
+        this.onlyUp = onlyUp;
+    }
+
     public static class Config {
         public double maxAcceleration;
         public boolean onlyUp = true;

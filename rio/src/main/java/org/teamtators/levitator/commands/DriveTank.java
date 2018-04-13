@@ -10,7 +10,6 @@ import org.teamtators.levitator.TatorRobot;
 import org.teamtators.levitator.subsystems.Drive;
 import org.teamtators.levitator.subsystems.Lift;
 import org.teamtators.levitator.subsystems.OperatorInterface;
-import org.teamtators.levitator.subsystems.Subsystems;
 
 public class DriveTank extends Command implements Configurable<DriveTank.Config> {
     private final Drive drive;
@@ -20,9 +19,9 @@ public class DriveTank extends Command implements Configurable<DriveTank.Config>
     private JoystickModifiers modifiers;
     private Config config;
 
-    private Ramper rightRamper;
-    private Ramper leftRamper;
-    private Timer timer;
+    private Ramper rightRamper = new Ramper();
+    private Ramper leftRamper = new Ramper();
+    private Timer timer = new Timer();
 
 
     public DriveTank(TatorRobot robot) {
@@ -35,17 +34,32 @@ public class DriveTank extends Command implements Configurable<DriveTank.Config>
     }
 
     @Override
+    protected void initialize() {
+        super.initialize();
+        timer.start();
+    }
+
+    @Override
     public boolean step() {
         double left = oi.getDriveLeft();
         double right = oi.getDriveRight();
 
         double liftHeight = lift.getCurrentHeight();
         double scale = 1;
+        double maxAcceleration;
 
-        if (liftHeight > config.slowHeight) {
+        if (liftHeight > config.slowerHeight) {
+            scale = config.slowerScaler;
+            maxAcceleration = config.maxAccelerationSlower;
+        } else if (liftHeight > config.slowHeight) {
             scale = config.slowScaler;
+            maxAcceleration = config.maxAccelerationSlow;
+        } else {
+            maxAcceleration = config.maxAcceleration;
         }
 
+        leftRamper.setMaxAcceleration(maxAcceleration);
+        rightRamper.setMaxAcceleration(maxAcceleration);
         modifiers.scale = scale;
 
         left = modifiers.apply(left);
@@ -58,23 +72,26 @@ public class DriveTank extends Command implements Configurable<DriveTank.Config>
         leftRamper.update(delta);
         rightRamper.update(delta);
 
-        drive.drivePowers(left, right);
+        drive.drivePowers(leftRamper.getOutput(), rightRamper.getOutput());
         return false;
     }
 
     @Override
     public void configure(Config config) {
         this.config = config;
+        leftRamper.setOnlyUp(false);
+        rightRamper.setOnlyUp(false);
         this.modifiers = config.modifiers;
-        rightRamper.configure(config.ramper);
-        leftRamper.configure(config.ramper);
     }
 
     public static class Config {
         public JoystickModifiers modifiers;
+        public double maxAcceleration;
         public double slowHeight;
         public double slowScaler;
-
-        public Ramper.Config ramper;
+        public double maxAccelerationSlow;
+        public double slowerHeight;
+        public double slowerScaler;
+        public double maxAccelerationSlower;
     }
 }

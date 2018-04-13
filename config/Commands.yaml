@@ -2,6 +2,11 @@ DriveTank:
   modifiers: { deadzone: 0.1, exponent: 2.0 }
   slowHeight: 40
   slowScaler: 0.5
+  maxAcceleration: 12.0
+  maxAccelerationSlow: 2.0
+  slowerHeight: 70
+  slowerScaler: 0.3
+  maxAccelerationSlower: 1.0
 
 PickerPick:
   pickPowers: { left: 0.8, right: 0.8 }
@@ -116,24 +121,24 @@ LiftContinuous:
   knobTolerance: 5.0
 
 $TestDrive:
-  - { class: DriveStraight, angle: 0.0, distance: 144.0, endSpeed: 0.0 }
+#  - { class: DriveStraight, angle: 0.0, distance: 144.0, endSpeed: 0.0 }
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
-#  - class: SetPose
-#    x: 0.0
-#    y: 0.0
-#    yaw: -90
-#  - class: DrivePath
-#    speed: 140
-#    arcSpeed: 60
-#    radius: 36
-#    reverse: true
-#    path:
-#      - { x: 0, y: 0 }
-#      - { x: 0, y: 78 }
-#      - { x: 78, y: 78 }
-#      - { x: 78, y: 0 }
-#      - { x: 0, y: 0 }
+  - class: SetPose
+    x: 0.0
+    y: 0.0
+    yaw: -90
+  - class: DrivePath
+    speed: 140
+    arcSpeed: 60
+    radius: 36
+    reverse: true
+    path:
+      - { x: 0, y: 0 }
+      - { x: 0, y: 78 }
+      - { x: 78, y: 78 }
+      - { x: 78, y: 0 }
+      - { x: 0, y: 0 }
 
 PickerAutoPick:
   velocity: 0.4

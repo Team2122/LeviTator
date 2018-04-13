@@ -399,6 +399,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     logger.info("Pivot homed");
                     pivot.setDesiredAnglePreset(AnglePreset.CENTER);
                     pivot.homed = true;
+                    locking = true;
                 } else {
                     return;
                 }
