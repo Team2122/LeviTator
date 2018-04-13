@@ -22,7 +22,6 @@ import org.teamtators.common.tester.AutomatedTestMessage;
 import org.teamtators.common.tester.ManualTest;
 import org.teamtators.common.tester.ManualTestGroup;
 import org.teamtators.common.tester.automated.MotorCurrentTest;
-import org.teamtators.common.tester.automated.MotorEncoderTest;
 import org.teamtators.common.tester.components.DigitalSensorTest;
 import org.teamtators.common.tester.components.SolenoidTest;
 import org.teamtators.common.tester.components.SpeedControllerTest;
@@ -35,7 +34,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private final TatorRobot robot;
     private SpeedControllerGroup climberMotor;
     private WPI_TalonSRX masterMotor;
-//    private MotorPowerUpdater climberMotorUpdater;
+    //    private MotorPowerUpdater climberMotorUpdater;
     private DigitalSensor topLimit;
     private DigitalSensor bottomLimit;
     private Solenoid releaser;
@@ -165,9 +164,10 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     public List<AutomatedTest> createAutomatedTests() {
         return Arrays.asList(
                 new MotorCurrentTest("ClimberMotorCurrentTest", this::setPower, this::getClimberCurrent),
-                new MotorEncoderTest("DriveLeftMotorCurrentTest", this::setLeftPower, this::getLeftCurrent),
+                new ClimberBottomLimitTest("ClimberBottomLimitTest", 0.0, 0.0)
         );
     }
+
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerGroupConfig climberMotor;
