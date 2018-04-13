@@ -1,80 +1,118 @@
 package org.teamtators.common.control;
 
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.hal.NotifierJNI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Updates an Updatable at a constant period.
  *
  * @author Alex Mikhalev
  */
-public class Updater implements Runnable {
+public class Updater {
     private static final Logger logger = LoggerFactory.getLogger(Updater.class);
     private static final double DEFAULT_PERIOD = 1.0 / 120.0;
-    private static final double S_TO_NS = 1000000000.0;
-    private Notifier notifier;
-    private final Updatable updatable;
+    private final Thread m_thread;
+    private final ReentrantLock m_processLock = new ReentrantLock();
+    private final AtomicInteger m_notifier = new AtomicInteger();
+    private final AtomicBoolean m_running = new AtomicBoolean(false);
     private double period;
-    private boolean running = false;
+    private double m_expirationTime;
+    private final Updatable updatable;
     private double lastStepTime;
 
     public Updater(Updatable updatable) {
         this(updatable, DEFAULT_PERIOD);
     }
 
-//    public Updater(Updatable updatable, double period) {
-//        this(updatable, period, Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r,
-//                "Updater-" + updatable.getName())));
-//    }
-
     public Updater(Updatable updatable, double period) {
         if (updatable == null)
             throw new NullPointerException("updatable cannot be null");
         this.updatable = updatable;
         this.period = period;
-//        executorService.scheduleAtFixedRate(this, 0, (long) (S_TO_NS * this.period), TimeUnit.NANOSECONDS);
-        this.notifier = new Notifier(this::run);
+
+        m_notifier.set(NotifierJNI.initializeNotifier());
+
+        m_thread = new Thread(this::updaterThread, "Updater-" + updatable.getName());
+        m_thread.setDaemon(true);
+    }
+
+    private void updateAlarm() {
+        int notifier = this.m_notifier.get();
+        if (notifier == 0) {
+            return;
+        }
+        NotifierJNI.updateNotifierAlarm(notifier, (long) (m_expirationTime * 1e6));
     }
 
     public void start() {
         if (isRunning()) return;
-        running = true;
-        lastStepTime = getTime();
-        notifier.startPeriodic(period);
-    }
-
-    private double getTime() {
-        return System.nanoTime() / S_TO_NS;
+        if (!m_thread.isAlive()) {
+            m_thread.start();
+        }
+        m_running.set(true);
+        lastStepTime = RobotController.getFPGATime();
+        m_processLock.lock();
+        try {
+            m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
+            updateAlarm();
+        } finally {
+            m_processLock.unlock();
+        }
     }
 
     public void stop() {
-        running = false;
-        notifier.stop();
+        m_running.set(false);
+        NotifierJNI.cancelNotifierAlarm(m_notifier.get());
     }
 
     public boolean isRunning() {
-        return running;
+        return m_running.get();
     }
 
     public Updatable getUpdatable() {
         return updatable;
     }
 
-    @Override
-    public void run() {
-        if (!running) return;
-        double time = getTime();
+    private void updaterThread() {
+        while (!Thread.interrupted()) {
+            int notifier = this.m_notifier.get();
+            if (notifier == 0) {
+                break;
+            }
+            long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
+            if (curTime == 0) {
+                break;
+            }
+
+            m_processLock.lock();
+            try {
+                m_expirationTime += period;
+                updateAlarm();
+            } finally {
+                m_processLock.unlock();
+            }
+
+            run();
+        }
+
+    }
+
+    private void run() {
+        if (!isRunning()) return;
+        double time = RobotController.getFPGATime();
         double delta = time - lastStepTime;
         lastStepTime = time;
         try {
             updatable.update(delta);
-            double elapsed = getTime() - time;
+            double elapsed = RobotController.getFPGATime() - time;
             if (elapsed > period && elapsed > .1) {
                 logger.warn("Updatable " + updatable.getClass().getName() + " exceeded period ({} > {})", elapsed, period);
                 Profiler profiler = updatable.getProfiler();
