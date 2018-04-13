@@ -64,6 +64,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         previousTraveled = 0.0;
         totalLength = segments.getArcLength();
         report = null;
+        currentPose = drive.getPose();
+        twist = new Twist2d();
         setSpeedPower(0.0);
     }
 

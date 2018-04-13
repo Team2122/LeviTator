@@ -29,8 +29,8 @@ public class DriveOutputs {
 
     public DriveOutputs normalize(double maxValue) {
         double greatest = Math.max(Math.abs(left), Math.abs(right));
-        greatest = Math.max(greatest, maxValue);
-        return new DriveOutputs(left / greatest, right / greatest);
+        double scale = maxValue / Math.max(greatest, maxValue);
+        return new DriveOutputs(left * scale, right * scale);
     }
 
     public DriveOutputs maximize() {

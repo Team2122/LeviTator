@@ -54,7 +54,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     private Config config;
     private double speed;
 
-    private DriveMode driveMode;
+    private DriveMode driveMode = DriveMode.Stop;
 
     public Drive() {
         super("Drive");
@@ -185,10 +185,16 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
         setDriveMode(DriveMode.Segments);
         driveSegmentsFollower.setSegments(segments);
         driveSegmentsFollower.start();
+        leftController.start();
+        rightController.start();
+        outputController.start();
     }
 
     private void stopSegments() {
         driveSegmentsFollower.stop();
+        leftController.stop();
+        rightController.stop();
+        outputController.stop();
         stopPowers();
     }
 
@@ -202,7 +208,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
     public void stop() {
         switch (driveMode) {
             case Stop:
-                break;
             case Power:
                 stopPowers();
                 break;
@@ -225,7 +230,6 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
                 stopSegments();
                 break;
         }
-        drivePowers(0, 0);
     }
 
     public boolean isStraightProfileOnTarget() {
@@ -390,6 +394,7 @@ public class Drive extends Subsystem implements Configurable<Drive.Config>, Tank
 
     @Override
     public void onEnterRobotState(RobotState state) {
+        stop();
         if (state == RobotState.TELEOP || state == RobotState.AUTONOMOUS || state == RobotState.TEST) {
             gyro.finishCalibration();
         }

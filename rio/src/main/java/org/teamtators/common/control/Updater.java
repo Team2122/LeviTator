@@ -115,7 +115,7 @@ public class Updater {
             updatable.update(deltaSeconds);
             long elapsed = RobotController.getFPGATime() - time;
             double elapsedSeconds = elapsed / 1000000.0;
-            if (elapsedSeconds > 5 * period) {
+            if (elapsedSeconds > 10 * period) {
                 logger.warn("Updatable " + updatable.getClass().getName() + " exceeded period ({} > {})", elapsedSeconds, period);
                 Profiler profiler = updatable.getProfiler();
                 if (profiler != null) {

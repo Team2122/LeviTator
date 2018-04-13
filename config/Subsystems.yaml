@@ -26,7 +26,7 @@ drive:
       D: 0.0
       F: .0074
 #      logData: true
-  maxSpeed: 168
+  maxSpeed: 136
   straightMotionFollower:
       kpP: 1.0
       kiP: 0.0
@@ -52,7 +52,7 @@ drive:
       maxIError: 2.0
   #    logData: true
   driveSegmentsFollower:
-    lookAhead: { minX: 9, minY: 12, maxX: 120, maxY: 21 }
+    lookAhead: { minX: 9, minY: 9, maxX: 120, maxY: 18 }
     logData: true
     speedFollower:
       kpP: 2.0
@@ -60,11 +60,11 @@ drive:
       kpV: 0.0
       kfV: 1.0
       kMinOutput: 0.0
-      kfA: 0.1
+      kfA: 0.05
       maxIError: 10.0
       maxAcceleration: 100.0
 #      logData: true
-  tankKinematics: { effectiveTrackWidth: 27.0 }
+  tankKinematics: { effectiveTrackWidth: 30.0 }
 picker:
   leftMotor: { type: VICTOR_SPX, config: { id: 1 } }
   rightMotor: { type: VICTOR_SPX, config: { id: 2, inverted: true } }
