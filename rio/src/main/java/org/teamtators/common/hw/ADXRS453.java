@@ -539,7 +539,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
             return;
         short rawRate = (short) (data >>> 10);
         if (isCalibrating) {
-            calibrationValues.add(rawRate);
+            calibrationValues.push(rawRate);
         } else {
             rawRateSum += rawRate;
         }

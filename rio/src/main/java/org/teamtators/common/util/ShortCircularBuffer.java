@@ -16,7 +16,7 @@ public class ShortCircularBuffer extends AbstractQueue<Short> {
     int size;
 
     public ShortCircularBuffer(int capacity) {
-        Preconditions.checkArgument(capacity > 0, "capacity must be a positive integer");
+        Preconditions.checkArgument(capacity >= 0, "capacity must be a positive integer");
         buffer = new short[capacity];
         start = 0;
         size = 0;
