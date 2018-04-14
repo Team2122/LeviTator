@@ -372,6 +372,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     public void setManualOverride(boolean override) {
         this.manualOverride = override;
         this.homed = false;
+        homeTimer.start();
         if (!manualOverride) {
             enable();
         }
