@@ -43,6 +43,8 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     private Timer homeTimer = new Timer();
     private double savedHeight;
 
+    private boolean manualOverride = false;
+
     public Lift() {
         super("Lift");
 
@@ -363,6 +365,19 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         return config.heightController.maxPosition;
     }
 
+    public boolean isManualOverride() {
+        return manualOverride;
+    }
+
+    public void setManualOverride(boolean override) {
+        this.manualOverride = override;
+        this.homed = false;
+        if (!manualOverride) {
+            enable();
+        }
+        pivot.setManualOverride(override);
+    }
+
     public enum HeightPreset {
         HOME,
         PICK,
@@ -394,6 +409,12 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
     }
 
     private void updateHeight() {
+
+        if (manualOverride) {
+            disable();
+            return;
+        }
+
         if (!homed) {
             if (!homeTimer.isRunning()) {
                 homeTimer.start();
@@ -435,7 +456,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             logger.info("Press A to set lift target to joystick value. Hold X to enable lift profiler");
             disable();
         }
-
 
 
         @Override

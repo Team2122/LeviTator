@@ -1,6 +1,7 @@
 package org.teamtators.levitator.commands;
 
 import org.teamtators.common.config.Configurable;
+import org.teamtators.common.math.Epsilon;
 import org.teamtators.common.scheduler.Command;
 import org.teamtators.common.scheduler.RobotState;
 import org.teamtators.levitator.TatorRobot;
@@ -15,6 +16,9 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     private Pivot pivot;
     private Config config;
     private OperatorInterface operatorInterface;
+
+    private boolean sliderSafe = false;
+    private boolean knobSafe = false;
 
     public LiftContinuous(TatorRobot robot) {
         super("LiftContinuous");
@@ -43,13 +47,25 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
     }
 
     private void updateKnob(double knobAngle) {
-        if(pivot.isRotationForced() &&
+        if (pivot.isRotationForced() &&
                 Math.abs(knobAngle - pivot.getDesiredPivotAngle()) < config.knobTolerance) {
             pivot.clearForceRotationFlag();
         }
         boolean allowKnob = !pivot.isRotationForced();
         if (allowKnob) {
             pivot.setDesiredPivotAngle(knobAngle, false);
+        }
+
+
+        if (pivot.isManualOverride()) {
+            if (!knobSafe && Epsilon.isEpsilonZero(knobAngle, 5)) {
+                knobSafe = true;
+            }
+            if (knobSafe) {
+                pivot.setPivotPower(knobAngle / 90.0);
+            }
+        } else {
+            knobSafe = false;
         }
     }
 
@@ -67,6 +83,18 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
         boolean allowSlider = !lift.isHeightForced();
         if (allowSlider && heightDelta > config.sliderThreshold) {
             lift.setDesiredHeight(sliderHeight, false);
+        }
+
+        if (lift.isManualOverride()) {
+            double sliderValueRaw = operatorInterface.getSliderValueRaw();
+            if (!sliderSafe && Epsilon.isEpsilonZero(sliderValueRaw, 0.05)) {
+                sliderSafe = true;
+            }
+            if (sliderSafe) {
+                lift.setLiftPower(sliderValueRaw);
+            }
+        } else {
+            sliderSafe = false;
         }
     }
 
