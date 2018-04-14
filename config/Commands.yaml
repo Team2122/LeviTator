@@ -359,15 +359,11 @@ $CenterAutoRSwitch:
 
 $LiftSequenceScaleLowLeft:
   - WaitForPick
-#  - WaitForCube
-#  - { class: Wait, period: 0.5 }
   - $LiftScaleLow
   - PivotLeft
 
 $LiftSequenceScaleLowRight:
   - WaitForPick
-#  - WaitForCube
-#  - { class: Wait, period: 0.5 }
   - $LiftScaleLow
   - PivotRight
 
@@ -441,8 +437,8 @@ $AutoStartLeftScaleLeftScaleLeft:
     radius: 36
     path:
       - { x: -80, y: 224 }
-      - { x: -90, y: 255 }
-      - { x: -112, y: 280 }
+      - { x: -94, y: 250 }
+      - { x: -108, y: 285 }
   - WaitForLeft
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeploy
@@ -451,8 +447,8 @@ $AutoStartLeftScaleLeftScaleLeft:
     parallel: true
     speed: 120
     path:
-      - { x: -112, y: 280 }
-      - { x: -90, y: 255 }
+      - { x: -112, y: 285 }
+      - { x: -94, y: 250 }
       - { x: -66, y: 228, arcSpeed: 40, speed: 40 }
       - { x: -52, y: 220 }
   - WaitForCube
@@ -464,8 +460,9 @@ $AutoStartLeftScaleLeftScaleLeft:
     speed: 120
     path:
       - { x: -52, y: 220 }
-      - { x: -90, y: 240, radius: 36 }
-      - { x: -120, y: 270 }
+      - { x: -66, y: 228 }
+      - { x: -94, y: 250 }
+      - { x: -106, y: 290 }
   - WaitForLeft
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeploy

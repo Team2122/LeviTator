@@ -222,9 +222,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             return centerAngle;
         }
         if (lift.isBelowHeight(Lift.HeightPreset.NEED_CENTER)) {
-            double maxAngle = centerAngle + config.centerTolerance - 5.0;
-            double minAngle = centerAngle - config.centerTolerance + 5.0;
-            return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
+//            double maxAngle = centerAngle + config.centerTolerance - 5.0;
+//            double minAngle = centerAngle - config.centerTolerance + 5.0;
+//            return Math.min(Math.max(desiredAngle, minAngle), maxAngle);
+            return centerAngle;
         }
         return desiredAngle;
     }
