@@ -130,6 +130,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 angle, distance));
         targetAngle = angle;
         pivotController.moveToPosition(angle);
+        logger.debug("Profile: {}", pivotController.getCalculator().getProfile());
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
@@ -243,6 +244,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 break;
             case DISABLED:
                 disable();
+                targetAngle = Double.NaN;
                 break;
         }
     }
@@ -417,7 +419,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 pivot.setPivotLockSolenoid(true);
                 if (sweepTarget == 0) {
                     pivot.setPivotPower(0.0);
+                    pivot.disablePivotController();
                 } else {
+                    /*
                     //Check if this is the first step of locking or we overshot our target
                     if (sweepTarget > 0 ? (currentAngle >= sweepTarget) : (currentAngle <= sweepTarget)) {
                         logger.warn("Pivot sweep missed lock, sweeping other direction");
@@ -426,6 +430,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     //Apply the configured power with a sign that is the same as our target (i.e. positive power moves right, increasing angle)
                     pivot.setPivotPower(config.pivotSweepPower * Math.signum(sweepTarget));
                     //If our solenoid is locked in or the timer ran out
+                    */
+                    pivot.setTargetAngle(centerAngle);
+                    pivot.enablePivotController();
                 }
                 if (sweepTarget != 0) {
                     if (locked.get()) {
@@ -452,7 +459,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                         locking = true;
                         sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
                         //Disable PID
-                        pivot.disablePivotController();
+//                        pivot.disablePivotController();
                         //Start the timer
                         sweepTimer.restart();
                     } else {
