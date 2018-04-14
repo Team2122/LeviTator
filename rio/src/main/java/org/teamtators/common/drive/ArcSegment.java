@@ -12,6 +12,38 @@ public class ArcSegment extends DriveSegmentBase {
     private Rotation endAngle;
     private double radius;
 
+    public ArcSegment fromStraightSegments(StraightSegment straight1, StraightSegment straight2, PathPoint point2) {
+        double length2 = straight2.getLength();
+        Rotation heading = straight1.getHeading();
+        Rotation nextHeading = straight2.getHeading();
+        Rotation deltaHeading = nextHeading.sub(heading);
+        Rotation angle = deltaHeading.complement();
+        Rotation halfAngle = angle.mult(0.5);
+        double availableTakeOffLength = Math.min(straight1.getLength(), length2);
+        double takeOffLength = Math.abs(radius / halfAngle.tan());
+        if (availableTakeOffLength < takeOffLength) {
+            DrivePath.logger.warn("Decreasing radius on arc because distance between points is too small: " +
+                    availableTakeOffLength + " < " + takeOffLength);
+            radius = Math.abs(availableTakeOffLength * halfAngle.tan());
+            takeOffLength = Math.abs(radius / halfAngle.tan());
+        }
+
+        double centerToPointLength = Math.abs(radius / halfAngle.sin());
+        Rotation halfHeading = heading.inverse().sub(halfAngle);
+        Translation2d arcCenter = new Pose2d(point2.getTranslation(), halfHeading)
+                .extend(centerToPointLength).getTranslation();
+        ArcSegment arc = new ArcSegment();
+        arc.setStartSpeed(point2.getArcSpeed());
+        arc.setTravelSpeed(point2.getArcSpeed());
+        arc.setEndSpeed(point2.getArcSpeed());
+        arc.setCenter(arcCenter);
+        arc.setRadius(radius);
+        arc.setStartAngle(heading);
+        arc.setEndAngle(nextHeading);
+        arc.setReverse(point2.isReverse());
+        return arc;
+    }
+
     public Translation2d getCenter() {
         return center;
     }

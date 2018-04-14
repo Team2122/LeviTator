@@ -2,7 +2,7 @@ package org.teamtators.common.math;
 
 import com.google.common.base.Preconditions;
 
-import static org.teamtators.common.math.Epsilon.isEpsilonNegative;
+import static org.teamtators.common.math.Epsilon.isEpsilonNegativeOrZero;
 import static org.teamtators.common.math.Epsilon.isEpsilonZero;
 
 /**

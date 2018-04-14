@@ -43,7 +43,7 @@ public class Epsilon {
     }
 
     public static boolean isEpsilonPositive(double a, double epsilon) {
-        return a >= -epsilon;
+        return a >= epsilon;
     }
 
     public static boolean isEpsilonPositive(double a) {
@@ -51,10 +51,26 @@ public class Epsilon {
     }
 
     public static boolean isEpsilonNegative(double a, double epsilon) {
-        return a <= epsilon;
+        return a <= -epsilon;
     }
 
     public static boolean isEpsilonNegative(double a) {
         return isEpsilonNegative(a, EPSILON);
+    }
+
+    public static boolean isEpsilonPositiveOrZero(double a, double epsilon) {
+        return a >= -epsilon;
+    }
+
+    public static boolean isEpsilonPositiveOrZero(double a) {
+        return isEpsilonPositiveOrZero(a, EPSILON);
+    }
+
+    public static boolean isEpsilonNegativeOrZero(double a, double epsilon) {
+        return a <= epsilon;
+    }
+
+    public static boolean isEpsilonNegativeOrZero(double a) {
+        return isEpsilonNegativeOrZero(a, EPSILON);
     }
 }
