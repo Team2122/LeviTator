@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import jdk.nashorn.internal.objects.AccessorPropertyDescriptor;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.*;
@@ -45,6 +46,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     private Config config;
     private boolean manualOverride;
+    private boolean homeIncremental = false;
+    private AnalogPotentiometer pivotAnalog;
 
     public Pivot() {
         super("Pivot");
@@ -71,7 +74,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public double getCurrentPivotAngle() {
-        return pivotEncoder.getDistance();
+        return homeIncremental ? pivotAnalog.get() : pivotEncoder.getDistance();
     }
 
     private void resetPivotAngle() {
@@ -256,6 +259,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         ManualTestGroup tests = super.createManualTests();
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
         tests.addTest(new EncoderTest("pivotEncoder", pivotEncoder));
+        tests.addTest(new AnalogPotentiometerTest("pivotAnalog", pivotAnalog));
         tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
@@ -272,6 +276,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         this.pivotMotor = config.pivotMotor.create();
         this.pivotEncoder = config.pivotEncoder.create();
+        this.pivotAnalog = config.pivotAnalog.create();
         this.pivotLockSolenoid = config.pivotLockSolenoid.create();
         this.pivotLockSensor = config.pivotLockSensor.create();
 
@@ -281,6 +286,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         ((Sendable) pivotMotor).setName("Pivot", "pivotMotor");
         pivotEncoder.setName("Pivot", "pivotEncoder");
+        pivotAnalog.setName("Pivot", "pivotAnalog");
         pivotLockSolenoid.setName("Pivot", "pivotLockSolenoid");
         pivotLockSensor.setName("Pivot", "pivotLockSensor");
 
@@ -295,6 +301,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         SpeedControllerConfig.free(pivotMotor);
         pivotEncoder.free();
+        pivotAnalog.free();
         pivotLockSolenoid.free();
         pivotLockSensor.free();
     }
@@ -311,10 +318,16 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         }
     }
 
+    public void homeIncrementalEncoder() {
+        this.homeIncremental = true;
+        setDesiredAnglePreset(AnglePreset.CENTER);
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
         public EncoderConfig pivotEncoder;
+        public AnalogPotentiometerConfig pivotAnalog;
         public SolenoidConfig pivotLockSolenoid;
         public DigitalSensorConfig pivotLockSensor;
 
@@ -420,6 +433,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     logger.info("Pivot homed");
                     pivot.setDesiredAnglePreset(AnglePreset.CENTER);
                     pivot.homed = true;
+                    if(homeIncremental) {
+                        pivot.homeIncremental = false;
+                        pivot.pivotEncoder.reset();
+                    }
                     locking = true;
                 } else {
                     return;
