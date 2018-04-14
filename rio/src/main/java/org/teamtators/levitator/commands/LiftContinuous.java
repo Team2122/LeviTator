@@ -63,7 +63,7 @@ public class LiftContinuous extends Command implements Configurable<LiftContinuo
                 knobSafe = true;
             }
             if (knobSafe) {
-                pivot.setPivotPower(knobAngle / 90.0);
+                pivot.setPivotPower(operatorInterface.getPivotKnobRaw());
             }
         } else {
             knobSafe = false;

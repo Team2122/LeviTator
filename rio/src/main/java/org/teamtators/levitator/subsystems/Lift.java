@@ -430,7 +430,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 return;
             }
             setLiftPower(config.homingPower);
-            if (!isAtBottomLimit() && false && !homeTimeout) {
+            if (!isAtBottomLimit() && !homeTimeout) {
                 return;
             }
             logger.info("Lift homed");

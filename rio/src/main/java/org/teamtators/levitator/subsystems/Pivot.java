@@ -307,6 +307,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.manualOverride = override;
         if(!override) {
             enable();
+            homed = false;
         }
     }
 
@@ -405,7 +406,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         @Override
         public void doUpdate(double delta) {
             if(manualOverride) {
-                disable();
+                pivotLockSolenoid.set(false);
+                disablePivotController();
+                return;
             }
             Pivot pivot = Pivot.this;
             if (!pivot.isHomed()) {

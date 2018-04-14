@@ -46,7 +46,7 @@ gunnerSecondary:
   1: start whenPressed $PickerReleaseMedium
   2: toggle whenPressed ClimberOverBar
   3: toggle whenPressed ClimberSubBar
-  4: start afterHeld ToggleLiftRecoveryMode
+  4: start whenPressed ToggleLiftRecoveryMode
   5: start whenPressed PickerRetract
   6: whilePressed ClimberForceUp
   7: whilePressed ClimberForceDown
