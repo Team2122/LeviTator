@@ -29,10 +29,10 @@ driver:
 
 gunner:
   LEFT_PINKY: start whenPressed PickerSwitchDeploy #whilePressed PickerReleaseSoft
+  LEFT_RING: start whenPressed PivotLeft
   LEFT_MIDDLE:
     - start whenPressed PickerDefaultExtend
     - start whenReleased PickerDefaultRetract
-  LEFT_RING: start whenPressed PivotLeft
   LEFT_INDEX: start whenPressed PivotRight
   LEFT_THUMB: start whenPressed PickerExtendToggle
   RIGHT_THUMB: start whenPressed $LiftHome
