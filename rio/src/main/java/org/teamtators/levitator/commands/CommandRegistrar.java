@@ -45,6 +45,8 @@ public class CommandRegistrar {
         commandStore.putCommand("LiftRecall", new LiftRecall(robot));
         commandStore.putCommand("LiftSave", Commands.instant(lift::saveCurrentHeight));
 
+        commandStore.putCommand("ToggleLiftRecoveryMode", Commands.instant(() -> lift.setManualOverride(!lift.isManualOverride())));
+
         commandStore.putCommand("BumpLiftUp", Commands.instant(lift::bumpLiftUp));
         commandStore.putCommand("BumpLiftDown", Commands.instant(lift::bumpLiftDown));
 

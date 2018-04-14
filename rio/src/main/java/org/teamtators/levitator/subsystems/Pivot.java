@@ -44,6 +44,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private Timer sweepTimer = new Timer();
 
     private Config config;
+    private boolean manualOverride;
 
     public Pivot() {
         super("Pivot");
@@ -295,6 +296,17 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotLockSensor.free();
     }
 
+    public boolean isManualOverride() {
+        return manualOverride;
+    }
+
+    public void setManualOverride(boolean override) {
+        this.manualOverride = override;
+        if(!override) {
+            enable();
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
@@ -389,6 +401,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         @Override
         public void doUpdate(double delta) {
+            if(manualOverride) {
+                disable();
+            }
             Pivot pivot = Pivot.this;
             if (!pivot.isHomed()) {
                 pivot.disablePivotController();
