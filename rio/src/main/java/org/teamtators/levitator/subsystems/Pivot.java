@@ -74,10 +74,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public double getCurrentPivotAngle() {
-        return pivotEncoder.getDistance() + encoderOffset;
+        return pivotEncoder.getDistance() - encoderOffset;
     }
 
     private void resetPivotAngle() {
+        logger.debug("Reset pivot angle");
         pivotEncoder.reset();
     }
 
@@ -115,6 +116,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public void setTargetAngle(double angle) {
+        sync();
         double safeAngle = getSafePivotAngle(angle);
         if (safeAngle != angle) {
             if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
@@ -134,20 +136,19 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 angle, distance));
         targetAngle = angle;
         pivotController.moveToPosition(angle);
-        sync();
 //        logger.trace("Profile: {}", pivotController.getCalculator().getProfile());
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
     private void sync() {
-        double distance = pivotEncoder.getDistance();
+        double distance = getCurrentPivotAngle();
         double analogValue = pivotAnalog.get();
         double delta = (distance - analogValue);
-        if(delta >= config.angleTolerance) {
-            encoderOffset = (distance - analogValue);
-            logger.info("!~Resynchronizing incremental encoder and potentiometer. New offset: {}", encoderOffset);
-            logger.info("Distance value: {} Analog value: {}", distance, analogValue);
-            logger.info("New read: {}", getCurrentPivotAngle());
+        if (Math.abs(delta) >= config.angleTolerance) {
+            encoderOffset += delta;
+            logger.warn("!~Resynchronizing incremental encoder and potentiometer. New offset: {}", encoderOffset);
+            logger.warn("Distance value: {} Analog value: {}", distance, analogValue);
+            logger.warn("New read: {}", getCurrentPivotAngle());
         }
     }
 
@@ -449,6 +450,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 pivot.setPivotLockSolenoid(true);
                 if (pivot.isPivotLocked()) {
                     pivot.resetPivotAngle();
+                    pivotAnalog.setOffset(0);
+                    pivotAnalog.setOffset(-pivotAnalog.get());
                     logger.info("Pivot homed");
                     pivot.setDesiredAnglePreset(AnglePreset.CENTER);
                     pivot.homed = true;
@@ -464,9 +467,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             if ((safePivotAngle != centerAngle || !isWithinLockAngle) && locking) {
                 locking = false;
                 logger.debug("Moving away from center, disengaging lock");
-                if (isWithinLockAngle) {
-                    resetPivotAngle();
-                }
+//                if (isWithinLockAngle) {
+//                    resetPivotAngle();
+//                }
             }
             if (locking) {
                 //Extend the solenoid to lock
@@ -493,7 +496,13 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     if (isPivotLocked()) {
                         //Reset sweep target
                         logger.debug("Pivot locked");
-                        resetPivotAngle();
+
+                        if(Epsilon.isEpsilonZero(pivotAnalog.get(), config.angleTolerance)) {
+                            resetPivotAngle();
+                            encoderOffset = 0;
+                        } else {
+                            sync();
+                        }
                         sweepTarget = 0;
                     } /* else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
                         logger.warn("Pivot could not lock, timeout elapsed");
@@ -513,6 +522,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                         logger.debug("Pivot moving center, will engage lock");
                         //Start locking
                         locking = true;
+                        sync();
                         sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
                         //Disable PID
 //                        pivot.disablePivotController();
