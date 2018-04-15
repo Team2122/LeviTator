@@ -47,6 +47,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private boolean manualOverride;
     private AnalogPotentiometer pivotAnalog;
 
+    private double encoderOffset = 0.0;
+
     public Pivot() {
         super("Pivot");
 
@@ -72,7 +74,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public double getCurrentPivotAngle() {
-        return pivotEncoder.getDistance();
+        return pivotEncoder.getDistance() + encoderOffset;
     }
 
     private void resetPivotAngle() {
@@ -132,14 +134,22 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 angle, distance));
         targetAngle = angle;
         pivotController.moveToPosition(angle);
-        //sync();
+        sync();
 //        logger.trace("Profile: {}", pivotController.getCalculator().getProfile());
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
-    /*private void sync() {
-        pivotEncoder.
-    }*/
+    private void sync() {
+        double distance = pivotEncoder.getDistance();
+        double analogValue = pivotAnalog.get();
+        double delta = (distance - analogValue);
+        if(delta >= config.angleTolerance) {
+            encoderOffset = (distance - analogValue);
+            logger.info("!~Resynchronizing incremental encoder and potentiometer. New offset: {}", encoderOffset);
+            logger.info("Distance value: {} Analog value: {}", distance, analogValue);
+            logger.info("New read: {}", getCurrentPivotAngle());
+        }
+    }
 
     public void enable() {
         pivotUpdatable.start();
@@ -168,9 +178,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void setPivotPower(double pivotPower) {
         if (!isPivotLocked()) {
-            /*pivotMotorUpdater*/pivotMotor.set(pivotPower);
+            /*pivotMotorUpdater*/
+            pivotMotor.set(pivotPower);
         } else {
-            /*pivotMotorUpdater*/pivotMotor.set(0);
+            /*pivotMotorUpdater*/
+            pivotMotor.set(0);
         }
     }
 
@@ -278,7 +290,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.config = config;
 
         this.pivotMotor = config.pivotMotor.create();
-        this.pivotEncoder = config.pivotEncoder.create();
         this.pivotAnalog = config.pivotAnalog.create();
 //        this.pivotEncoder = config.pivotEncoder.create();
         this.pivotEncoderA = new DigitalInput(config.pivotEncoder.getaChannel());
@@ -325,7 +336,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void setManualOverride(boolean override) {
         this.manualOverride = override;
-        if(!override) {
+        if (!override) {
             enable();
             homed = false;
         }
@@ -426,7 +437,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         @Override
         public void doUpdate(double delta) {
-            if(manualOverride) {
+            if (manualOverride) {
                 pivotLockSolenoid.set(false);
                 disablePivotController();
                 return;
@@ -519,6 +530,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     //Set the pivot target angle to the desired angle
                     pivot.setTargetAngle(desiredPivotAngle);
                 }
+            }
+            if (pivot.pivotController.isFinished()) {
+                sync();
             }
         }
     }
