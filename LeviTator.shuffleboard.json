@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.14494264859228362,
+  "dividerPosition": 0.14511041009463724,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -70,7 +70,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///LiveWindow/Lift/liftEncoder/Distance",
-              "_title": "LiveWindow/Lift/liftEncoder/Distance"
+              "_title": "liftEncoder"
             }
           },
           "3,0": {
@@ -92,9 +92,9 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///LiveWindow/Pivot/pivotLockSensor/Value",
-              "_title": "LiveWindow/Pivot/pivotLockSensor/Value",
-              "colorWhenTrue": "#CC3333FF",
-              "colorWhenFalse": "#00FF00FF"
+              "_title": "pivotLockSensor",
+              "colorWhenTrue": "#99CC99FF",
+              "colorWhenFalse": "#990000FF"
             }
           },
           "2,1": {
@@ -105,7 +105,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///LiveWindow/Lift/limitSensorBottom/Value",
-              "_title": "LiveWindow/Lift/limitSensorBottom/Value",
+              "_title": "limitSensorBottom",
               "colorWhenTrue": "#7CFC00FF",
               "colorWhenFalse": "#8B0000FF"
             }
@@ -118,7 +118,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///LiveWindow/Lift/limitSensorTop/Value",
-              "_title": "LiveWindow/Lift/limitSensorTop/Value",
+              "_title": "limitSensorTop",
               "colorWhenTrue": "#7CFC00FF",
               "colorWhenFalse": "#8B0000FF"
             }
@@ -406,7 +406,7 @@
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///LiveWindow/Pivot/pivotEncoderAbsolute/Value",
+              "_source0": "network_table:///LiveWindow/Pivot/pivotAnalog/Value",
               "_title": "LiveWindow/Pivot/pivotEncoderAbsolute/Value"
             }
           }
