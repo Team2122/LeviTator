@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Lift extends Subsystem implements Configurable<Lift.Config> {
+    private static final boolean ENABLE_HOME = false;
     private Pivot pivot;
 
     private SpeedControllerGroup liftMotor;
@@ -164,7 +165,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
 
     private void enableLiftController() {
         if (!liftController.isRunning()) {
-            targetHeight = getCurrentHeight();
+//            targetHeight = getCurrentHeight();
             liftController.moveToPosition(targetHeight);
             liftController.start();
         }
@@ -277,15 +278,6 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
         if (desiredHeight > config.heightController.maxPosition) {
             desiredHeight = config.heightController.maxPosition;
         }
-        if (!pivot.isPivotLocked()) { // if the pivot is not locked
-            if (isAtHeight(HeightPreset.HOME) && // if we are already below NEED_LOCK
-                    pivot.isWithinTab()) { // and we are able to lock
-                return currentLiftHeight; // then don't move
-            }
-            if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
-                return needLockHeight; // then descend to the minimum height at which we can be unlocked
-            }
-        }
         if (!pivot.isPivotInCenter()) { // if the picker is out far enough that we can't go below NEED_CENTER
             if (Epsilon.isEpsilonLessThan(currentLiftHeight, needCenterHeight,
                     config.heightTolerance)) { // if we are not above the elevators
@@ -293,6 +285,15 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
             }
             if (desiredHeight < needCenterHeight) { // if we want to descend to below the elevators
                 return needCenterHeight; // then descend to the minimum height at which we can rotate
+            }
+        }
+        if (!pivot.isPivotLocked()) { // if the pivot is not locked
+            if (isAtHeight(HeightPreset.HOME) && // if we are already below NEED_LOCK
+                    pivot.isWithinTab()) { // and we are able to lock
+                return currentLiftHeight; // then don't move
+            }
+            if (desiredHeight < needLockHeight) { // if we want to descend to below NEED_LOCK
+                return needLockHeight; // then descend to the minimum height at which we can be unlocked
             }
         }
         return desiredHeight; // if picker is all good, go wherever we need to
@@ -431,7 +432,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 return;
             }
             setLiftPower(config.homingPower);
-            if (!isAtBottomLimit() && !homeTimeout) {
+            if (!isAtBottomLimit() && !homeTimeout && ENABLE_HOME) {
                 return;
             }
             logger.info("Lift homed");

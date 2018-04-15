@@ -45,10 +45,10 @@
         <!--<appender-ref ref="AsyncServer"/>-->
     </root>
 
-    <logger name="org.teamtators.common.scheduler.Scheduler" level="TRACE" />
-    <logger name="org.teamtators.common.config.ConfigSequentialCommand" level="TRACE" />
-    <logger name="org.teamtators.common.scheduler.Command" level="TRACE" />
-    <logger name="org.teamtators.levitator.commands.AutoSelector" level="TRACE" />
+    <!--<logger name="org.teamtators.common.scheduler.Scheduler" level="TRACE" />-->
+    <!--<logger name="org.teamtators.common.config.ConfigSequentialCommand" level="TRACE" />-->
+    <!--<logger name="org.teamtators.common.scheduler.Command" level="TRACE" />-->
+    <!--<logger name="org.teamtators.levitator.commands.AutoSelector" level="TRACE" />-->
     <!--<logger name="org.teamtators.levitator.subsystems.Drive" level="TRACE" />-->
     <!--<logger name="org.teamtators.limbo.commands.DriveShift(Drive.ShiftHigh)" level="TRACE" />-->
     <!--<logger name="org.teamtators.levitator.commands.PickerAutoPick(PickerAutoPick)" level="TRACE" />-->

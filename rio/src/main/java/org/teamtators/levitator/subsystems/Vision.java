@@ -208,9 +208,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     }
 
     private UsbCameraInfo[] getCameras() {
-        UsbCameraInfo[] usbCameras = UsbCamera.enumerateUsbCameras();
-        logger.info("CameraServer reports {} usb cameras", usbCameras.length);
-        return usbCameras;
+        return UsbCamera.enumerateUsbCameras();
     }
 
     public void configure(Config config) {

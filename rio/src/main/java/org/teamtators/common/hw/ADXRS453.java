@@ -77,6 +77,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     private double calibrationPeriod;
 
     private PIDSourceType pidSource = PIDSourceType.kDisplacement;
+    private int lastFaults;
+    private int lastStatus;
 
     /**
      * Creates a new ADXRS453
@@ -157,6 +159,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
             calibrationOffset = 0;
             isCalibrating = false;
             calibrationValues.clear();
+            lastFaults = 0;
+            lastStatus = 0;
         } finally {
             writeLock.unlock();
         }
@@ -356,11 +360,17 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     }
 
     private boolean checkFaults(int data) {
-        boolean hasFaults = (data & kFaultBits) != 0;
+        int faults = data & kFaultBits;
+        boolean hasFaults = faults != 0;
         StringBuilder logMessage;
         if (hasFaults) {
+            if (faults == lastFaults) {
+                return false;
+            }
+            lastFaults = faults;
             logMessage = new StringBuilder("Faults detected:");
         } else {
+            lastFaults = faults;
             return true;
         }
         if ((data & kChk) != 0) {
@@ -389,10 +399,14 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         if (!checkParity(data))
             return false;
         int status = data & kStatusBits;
+        boolean isSame = status == lastStatus;
+        lastStatus = status;
         switch (status) {
             case kInvalidData:
-                logger.warn("Invalid data received");
-                checkFaults(data);
+                if (!isSame) {
+                    logger.warn("Invalid data received");
+                    checkFaults(data);
+                }
                 return false;
             case kValidData:
             case kTestData:
@@ -480,7 +494,8 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         if (!checkPartID()) {
             return;
         }
-
+        write(send);
+        Thread.sleep(STARTUP_DELAY_MS);
         int cmd = fixParity(kSensorData);
         spi.initAuto(DATA_SIZE * ACCUMULATOR_DEPTH);
         ByteBuffer cmdBytes = dataToBytes(cmd);

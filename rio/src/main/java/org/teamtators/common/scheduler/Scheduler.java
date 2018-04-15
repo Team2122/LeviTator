@@ -102,26 +102,26 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
         for (CommandRun run : runningCommands.values()) {
             profiler.start(run.command.getName());
             if (run.cancel) {
-                logger.trace("Cancelling command {} by request", run.command.getName());
+//                logger.trace("Cancelling command {} by request", run.command.getName());
                 finishRun(run, true);
                 continue;
             } else if (!run.command.isValidInState(robotState)) {
-                logger.trace("Cancelling command {} because of state conflict in {}", run.command.getName(),
-                        robotState);
+//                logger.trace("Cancelling command {} because of state conflict in {}", run.command.getName(),
+//                        robotState);
                 finishRun(run, true);
                 continue;
             } else if (!run.initialized) {
                 if (!run.command.startRun(run.context)) {
-                    logger.trace("Command {} not ready to run yet because of requirements", run.command.getName());
+//                    logger.trace("Command {} not ready to run yet because of requirements", run.command.getName());
                     continue;
                 } else {
-                    logger.trace("Initialized command {}", run.command.getName());
+//                    logger.trace("Initialized command {}", run.command.getName());
                 }
                 run.initialized = true;
             }
             boolean finished = run.command.step();
             if (finished || run.cancel) {
-                logger.trace("Command {} finished, it was cancelled?: {}", run.command.getName(), run.cancel);
+//                logger.trace("Command {} finished, it was cancelled?: {}", run.command.getName(), run.cancel);
                 finishRun(run, run.cancel);
             }
         }

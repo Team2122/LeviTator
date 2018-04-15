@@ -84,21 +84,21 @@ public class ConfigCommandStore extends CommandStore {
             String commandName = field.getKey();
             char prefix = commandName.charAt(0);
             if (prefix == '$') { // Sequential command config
-                logger.trace("Creating CommandGroup '" + commandName + "'");
+//                logger.trace("Creating CommandGroup '" + commandName + "'");
                 putCommand(commandName, new ConfigSequentialCommand(this));
             } else if (prefix == '^') {
                 String defaultFor = commandName.substring(1);
-                logger.trace("Adding default config for command '" + defaultFor + "'");
+//                logger.trace("Adding default config for command '" + defaultFor + "'");
                 defaultConfigs.put(defaultFor, field.getValue());
             } else {
-                logger.trace("Creating command '" + commandName + "'");
+//                logger.trace("Creating command '" + commandName + "'");
                 createCommandFromConfig(commandName, field.getValue());
             }
         }
         HashMap<String, Command> commandsMapCopy = new HashMap<>(getCommands());
         for (Map.Entry<String, Command> commandEntry : commandsMapCopy.entrySet()) {
             Command command = commandEntry.getValue();
-            logger.trace("Configuring command '" + command.getName() + "'");
+//            logger.trace("Configuring command '" + command.getName() + "'");
             JsonNode config = json.get(command.getName());
             configureCommand(command, config);
         }
@@ -112,7 +112,7 @@ public class ConfigCommandStore extends CommandStore {
 
     public void configureCommand(Command command, JsonNode config) throws ConfigException {
         if (config == null) {
-            logger.trace("Missing config for command '" + command.getName() + "'");
+//            logger.trace("Missing config for command '" + command.getName() + "'");
             return;
         }
         if (config.isObject() && config.has("class")) {

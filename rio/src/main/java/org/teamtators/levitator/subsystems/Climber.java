@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
@@ -54,11 +55,11 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         double pow = power;
         if (!force) {
             if (isAtTopLimit() && power > 0) {
-                logger.warn("Attempted to give climber power {} at top limit", power);
+//                logger.warn("Attempted to give climber power {} at top limit", power);
                 pow = 0;
             }
             if (isAtBottomLimit() && power < 0) {
-                logger.warn("Attempted to give climber power {} at bottom limit", power);
+//                logger.warn("Attempted to give climber power {} at bottom limit", power);
                 pow = 0;
             }
         }

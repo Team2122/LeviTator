@@ -35,8 +35,8 @@ public class DriveSegmentsFollower extends AbstractUpdatable
     private double speedPower;
     private LogDataProvider logDataProvider = new LogDataProvder();
     private Pose2d currentPose;
-    private Twist2d twist;
-    private DriveOutputs driveOutputs;
+    private Twist2d twist = new Twist2d();
+    private DriveOutputs driveOutputs = new DriveOutputs();
     private boolean logData;
     private Profiler profiler;
     private double lookahead;
@@ -110,7 +110,7 @@ public class DriveSegmentsFollower extends AbstractUpdatable
         if (!speedFollower.isRunning()) {
             speedFollower.start();
         }
-        logger.trace("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
+//        logger.trace("driving segment \n{} with profile \n{}", seg, speedFollower.getCalculator().getProfile());
     }
 
     void updatePursuitReport(Pose2d currentPose, double centerWheelRate) {
