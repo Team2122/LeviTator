@@ -36,6 +36,8 @@ public class CommandRegistrar {
         commandStore.registerCommand("PickerAutoPick", () -> new PickerAutoPick(robot));
         commandStore.putCommand("PickerDefaultExtend", Commands.instant(picker::setDefaultExtend));
         commandStore.putCommand("PickerDefaultRetract", Commands.instant(picker::setDefaultRetract));
+        commandStore.putCommand("PickerLock", Commands.instant(picker::lockArms));
+        commandStore.putCommand("PickerUnlock", Commands.instant(picker::unlockArms));
 
         // Lift commands
         Lift lift = robot.getSubsystems().getLift();
@@ -57,6 +59,7 @@ public class CommandRegistrar {
 
         commandStore.putCommand("BumpPivotRight", Commands.instant(pivot::bumpPivotRight));
         commandStore.putCommand("BumpPivotLeft", Commands.instant(pivot::bumpPivotLeft));
+        commandStore.putCommand("PivotSync", Commands.instant(pivot::sync));
 
         commandStore.registerCommand("AutoSelector", () -> new AutoSelector(robot));
 

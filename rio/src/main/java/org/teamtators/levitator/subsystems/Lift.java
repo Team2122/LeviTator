@@ -287,7 +287,7 @@ public class Lift extends Subsystem implements Configurable<Lift.Config> {
                 return needCenterHeight; // then descend to the minimum height at which we can rotate
             }
         }
-        if (!pivot.isPivotLocked()) { // if the pivot is not locked
+        if (!pivot.isPivotLocked() || !pivot.isWithinTab()) { // if the pivot is not locked
             if (isAtHeight(HeightPreset.HOME) && // if we are already below NEED_LOCK
                     pivot.isWithinTab()) { // and we are able to lock
                 return currentLiftHeight; // then don't move

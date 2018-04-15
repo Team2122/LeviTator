@@ -116,7 +116,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public void setTargetAngle(double angle) {
-        sync();
+//        sync();
         double safeAngle = getSafePivotAngle(angle);
         if (safeAngle != angle) {
             if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
@@ -140,15 +140,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
-    private void sync() {
+    public void sync() {
         double distance = getCurrentPivotAngle();
         double analogValue = pivotAnalog.get();
         double delta = (distance - analogValue);
         if (Math.abs(delta) >= config.angleTolerance) {
             encoderOffset += delta;
-            logger.warn("!~Resynchronizing incremental encoder and potentiometer. New offset: {}", encoderOffset);
-            logger.warn("Distance value: {} Analog value: {}", distance, analogValue);
-            logger.warn("New read: {}", getCurrentPivotAngle());
+            logger.warn("!~Resynchronizing incremental encoder and potentiometer. quad: {}, analog: {}, newOffset: {}",
+                    distance, analogValue, encoderOffset);
+            targetAngle = Double.NaN;
         }
     }
 
@@ -501,7 +501,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                             resetPivotAngle();
                             encoderOffset = 0;
                         } else {
-                            sync();
+//                            sync();
                         }
                         sweepTarget = 0;
                     } /* else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
@@ -522,7 +522,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                         logger.debug("Pivot moving center, will engage lock");
                         //Start locking
                         locking = true;
-                        sync();
+//                        sync();
                         sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
                         //Disable PID
 //                        pivot.disablePivotController();
@@ -542,7 +542,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 }
             }
             if (pivot.pivotController.isFinished()) {
-                sync();
+//                sync();
             }
         }
     }
