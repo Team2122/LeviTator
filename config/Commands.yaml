@@ -163,10 +163,8 @@ $TestDrive:
     reverse: true
     path:
       - { x: 0, y: 0 }
-      - { x: 0, y: 78 }
-      - { x: 78, y: 78 }
-      - { x: 78, y: 0 }
-      - { x: 0, y: 0 }
+      - { x: 0, y: 282 }
+  - PrintPose
 
 PickerAutoPick:
   velocity: 0.4
@@ -235,7 +233,7 @@ SetPoseLeft:
 SetPoseRight:
   class: SetPose
   x: 109
-  y: 19
+  y: 22
   yaw: -90
 
 SetPoseCenter:
@@ -318,65 +316,82 @@ SlowDown:
 
 $CenterAuto:
   - SetPoseCenter
+  - { parallel: true, name: PickerRegrip }
   - { class: DriveStraight, distance: 12, speed: 100, endSpeed: 80.0 }
 #  - { parallel: true, name: $LiftSwitchLow }
   - { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $CenterAutoLSwitch, R: $CenterAutoRSwitch }
 
+$CenterAutoLSwitch1:
+  - { class: DriveStraight, angle: 0, distance: -48, speed: 120, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: 60, maxAcceleration: 400 }
+  - { class: DriveStraight, angle: 60, distance: 36.0, speed: 120, endSpeed: 40 }
+  - { class: DriveStraight, parallel: true, angle: 60, distance: 8.0, speed: 40 }
+
 $CenterAutoLSwitch:
   - class: DrivePath
-    speed: 100
+    speed: 80
+    arcSpeed: 50
     radius: 36
     path:
 #      - { x: 2, y: 19 }
       - { x: 2, y: 31 }
       - { x: 2, y: 45 }
-      - { x: -36, y: 100 }
+      - { x: -40, y: 100 }
       - { x: -40, y: 124 }
-  - { class: DriveStraight, angle: 0, distance: 6, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 0, distance: 10, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -48, maxAcceleration: 100 }
-  - { class: DriveRotate, angle: 60, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: 60, distance: 44.0 }
+  - { name: $CenterAutoLSwitch1, parallel: true }
   - WaitForCube
-  - { class: DriveStraight, angle: 60, distance: -4.0 }
+  - { class: DriveStraight, angle: 60, distance: -4.0, endSpeed: 60 }
   - WaitForPick
-  - { class: DriveStraight, angle: 60, distance: -36, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 60, distance: -36, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: 0, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: 0, distance: 54.0, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 0, distance: 54.0, speed: 120, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -32, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 0, distance: -32, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: 60, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: 60, distance: 30.0 }
+  - { class: DriveStraight, angle: 60, distance: 22.0, speed: 120, endSpeed: 40 }
+  - { class: DriveStraight, parallel: true, angle: 60, distance: 8.0, speed: 40 }
+  - WaitForCube
+  - { class: DriveStraight, angle: 90, distance: -100.0 }
+
+$CenterAutoRSwitchPick1:
+  - { class: DriveStraight, angle: 0, distance: -48, speed: 120, maxAcceleration: 160 }
+  - { class: DriveRotate, angle: -60, maxAcceleration: 400 }
+  - { class: DriveStraight, angle: -60, distance: 36.0, speed: 120, endSpeed: 40 }
+  - { class: DriveStraight, angle: -60, distance: 8.0, speed: 40 }
 
 $CenterAutoRSwitch:
   - class: DrivePath
-    speed: 100
+    speed: 80
+    arcSpeed: 50
     radius: 36
     path:
 #      - { x: 2, y: 19 }
       - { x: 2, y: 31 }
       - { x: 2, y: 45 }
-      - { x: 38, y: 100 }
-      - { x: 42, y: 124 }
-  - { class: DriveStraight, angle: 0, distance: 6, maxAcceleration: 100 }
+      - { x: 46, y: 100 }
+      - { x: 46, y: 124 }
+  - { class: DriveStraight, angle: 0, distance: 10, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -44, maxAcceleration: 100 }
-  - { class: DriveRotate, angle: -60, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: -60, distance: 34.0 }
+  - { name: $CenterAutoRSwitchPick1, parallel: true }
   - WaitForCube
-  - { class: DriveStraight, angle: -60, distance: -4.0 }
+  - { class: DriveStraight, angle: -60, distance: -4.0, endSpeed: 60 }
   - WaitForPick
-  - { class: DriveStraight, angle: -60, distance: -28, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: -60, distance: -36, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: 0, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: 0, distance: 50.0, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 0, distance: 54.0, speed: 120, maxAcceleration: 160 }
   - PickerSwitchDeploy
   - { parallel: true, name: PickerPick }
-  - { class: DriveStraight, angle: 0, distance: -34, maxAcceleration: 100 }
+  - { class: DriveStraight, angle: 0, distance: -32, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: -60, maxAcceleration: 400 }
-  - { class: DriveStraight, angle: -60, distance: 34.0 }
+  - { class: DriveStraight, angle: -60, distance: 22.0, speed: 120, endSpeed: 40 }
+  - { class: DriveStraight, parallel: true, angle: -60, distance: 8.0, speed: 40 }
+  - WaitForCube
+  - { class: DriveStraight, angle: -90, distance: -100.0 }
 
 $LiftSequenceScaleLowLeft:
   - WaitForPick
@@ -416,6 +431,7 @@ $StartLeftScaleLeftPick:
       - { x: -80, y: 224 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
+  - PickerLock
 
 $StartRightScaleRight:
   - { parallel: true, name: $LiftSequenceScaleLowRight }
@@ -426,8 +442,8 @@ $StartRightScaleRight:
     path:
 #      - { x: 109, y: 19 }
       - { x: 109, y: 79 }
-      - { x: 109, y: 252, speed: 60, arcSpeed: 60, radius: 12 }
-      - { x: 114, y: 264 }
+      - { x: 109, y: 264, speed: 60, arcSpeed: 60, radius: 12 }
+      - { x: 113, y: 276 }
   - WaitForRight
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeployHard
@@ -439,12 +455,13 @@ $StartRightScaleRightPick:
     speed: 120
     radius: 36
     path:
-      - { x: 114, y: 264 }
+      - { x: 113, y: 276 }
 #      - { x: 109, y: 252, radius: 12 }
       - { x: 90, y: 240, arcSpeed: 40, speed: 40.0 }
-      - { x: 84, y: 218 }
+      - { x: 80, y: 224 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
+  - PickerLock
 
 $StartLeftScaleLeft2:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
@@ -480,9 +497,9 @@ $StartRightScaleRight2:
     speed: 120
     radius: 36
     path:
-      - { x: 84, y: 218 }
-      - { x: 90, y: 250 }
-      - { x: 108, y: 276 }
+      - { x: 80, y: 224 }
+      - { x: 94, y: 250 }
+      - { x: 108, y: 288 }
   - WaitForRight
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeploy
@@ -493,8 +510,8 @@ $StartRightScaleRight2:
     path:
       - { x: 112, y: 288 }
       - { x: 94, y: 250 }
-      - { x: 72, y: 230, arcSpeed: 40, speed: 40 }
-      - { x: 54, y: 212 }
+      - { x: 68, y: 224, arcSpeed: 40, speed: 40 }
+      - { x: 58, y: 216 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
 
@@ -526,8 +543,8 @@ $AutoStartRightScaleRightScaleRight:
     parallel: true
     speed: 120
     path:
-      - { x: 52, y: 220 }
-      - { x: 66, y: 228 }
+      - { x: 58, y: 216 }
+      - { x: 68, y: 224 }
       - { x: 94, y: 250 }
       - { x: 106, y: 290 }
   - WaitForRight
@@ -538,19 +555,20 @@ $AutoStartLeftScaleLeftSwitchLeft:
   - $StartLeftScaleLeft
   - $StartLeftScaleLeftPick
   - $StartLeftScaleLeft2
-  - { class: DriveStraight, angle: -10, distance: -10 }
-  - WaitForPick
+  - { class: DriveStraight, angle: 0, distance: -4 }
+  - PickerRetract
   - { class: Wait, period: 0.5 }
-  - { class: DriveStraight, angle: 0, distance: 34 }
+  - { class: DriveStraight, angle: 0, distance: 28 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleRightSwitchRight:
   - $StartRightScaleRight
   - $StartRightScaleRightPick
-  - { class: DriveStraight, angle: 20, distance: -8 }
-  - WaitForPick
-  - { class: Wait, period: 1 }
-  - { class: DriveStraight, angle: 20 , distance: 28 }
+  - $StartRightScaleRight2
+  - { class: DriveStraight, angle: 0, distance: -4 }
+  - PickerRetract
+  - { class: Wait, period: 0.5 }
+  - { class: DriveStraight, angle: 0, distance: 28 }
   - PickerSwitchDeploy
 
 $AutoStartLeftScaleLeftSwitchRight:
@@ -578,41 +596,26 @@ $AutoStartLeftScaleLeftSwitchRight:
 
 $AutoStartRightScaleRightSwitchLeft:
   - $StartRightScaleRight
-  - { parallel: true, name: PickerPick }
+  - $StartRightScaleRightPick
+  - WaitForPick
+  - class: DrivePath
+    reverse: true
+    path:
+      - { x: 80, y: 224 }
+      - { x: 90, y: 240 }
+      - { x: 100, y: 250 }
+  - $LiftSwitch
+  - PivotLeft
   - class: DrivePath
     speed: 100
     radius: 36
-    parallel: true
     path:
-      - { x: 114, y: 300 }
-      - { x: 109, y: 268 }
+      - { x: 100, y: 276 }
       - { x: 90, y: 240 }
-      - { x: 30, y: 240, speed: 60  }
-      - { x: -28, y: 240, radius: 24, arcSpeed: 30, speed: 40 }
-      - { x: -35, y: 220, speed: 30 }
-  - WaitForCube
-  - { class: DriveStraight, angle: 30, distance: -4, maxAcceleration: 160 }
-  - WaitForPick
-  - { class: Wait, period: 1.0 }
-  - { class: DriveStraight, angle: 30, distance: 19, maxAcceleration: 160 }
-  - PickerSwitchDeploy
-#  - class: DrivePath
-#    reverse: true
-#    speed: 100
-#    radius: 28
-#    path:
-#      - { x: 76, y: 212 }
-#      - { x: 76, y: 240 }
-#      - { x: 104, y: 240 }
-#  - LiftSwitchLow
-#  - class: DrivePath
-#    speed: 100
-#    radius: 36
-#    path:
-#      - { x: 104, y: 240 }
-#      - { x: 30, y: 240  }
-#      - { x: -20, y: 230 }
-#      - { x: -40, y: 210 }
+      - { x: -102, y: 240, speed: 60 }
+      - { x: -102, y: 160 }
+  - WaitForLeft
+  - $PickerAutoDeploySoft
 
 $StartRightScaleLeft:
   - class: DrivePath
@@ -644,6 +647,7 @@ $StartRightScaleLeftPick:
   - { class: Wait, period: 1.0 }
   - WaitForCube
   - { class: DriveStraight, distance: -6, endSpeed: 60 }
+  - PickerLock
 
 $StartLeftScaleRight:
   - class: DrivePath
@@ -674,6 +678,8 @@ $StartLeftScaleRightPick:
       - { x: 78, y: 226 }
   - { class: Wait, period: 1.0 }
   - WaitForCube
+  - { class: DriveStraight, distance: -6, endSpeed: 60 }
+  - PickerLock
 
 $AutoStartLeftDriveRight:
   - LiftHome
@@ -745,25 +751,26 @@ $AutoStartLeftScaleRightScaleRight:
       - { x: 108, y: 298 }
       - { x: 80, y: 260 }
       - { x: 66, y: 240, arcSpeed: 40, speed: 30 }
-      - { x: 52, y: 224 }
+      - { x: 56, y: 224 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
 
 $AutoStartRightScaleLeftSwitchLeft:
   - $StartRightScaleLeft
   - $StartRightScaleLeftPick
-  - WaitForPick
+  - { class: DriveStraight, angle: -20, distance: -4 }
+  - PickerRetract
   - { class: Wait, period: 0.5 }
-  - { class: DriveStraight, angle: -10, distance: 32 }
+  - { class: DriveStraight, angle: -20, distance: 28 }
   - PickerSwitchDeploy
 
 $AutoStartLeftScaleRightSwitchRight:
   - $StartLeftScaleRight
   - $StartLeftScaleRightPick
-  - { class: DriveStraight, angle: 10, distance: -4 }
-  - WaitForPick
+  - { class: DriveStraight, angle: 20, distance: -4 }
+  - PickerRetract
   - { class: Wait, period: 0.5 }
-  - { class: DriveStraight, angle: 10, distance: 26 }
+  - { class: DriveStraight, angle: 20, distance: 28 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleLeftSwitchRight:
@@ -885,7 +892,7 @@ $StartRightSwitchRightPick:
     path:
       - { x: 100, y: 250 }
       - { x: 90, y: 240, arcSpeed: 40, speed: 40.0 }
-      - { x: 80, y: 220 }
+      - { x: 76, y: 220 }
   - WaitForCube
   - { class: DriveStraight, distance: -4 }
   - WaitForPick
@@ -895,7 +902,7 @@ $AutoStartRightSwitchRightScaleLeft:
   - class: DrivePath
     reverse: true
     path:
-      - { x: 80, y: 224 }
+      - { x: 76, y: 220 }
       - { x: 90, y: 240 }
       - { x: 100, y: 250 }
   - class: DrivePath
@@ -918,7 +925,7 @@ $AutoStartLeftSwitchLeftDriveRight:
   - class: DrivePath
     reverse: true
     path:
-      - { x: -80, y: 224 }
+      - { x: -80, y: 220 }
       - { x: -90, y: 240 }
       - { x: -100, y: 250 }
   - class: DrivePath

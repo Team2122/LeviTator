@@ -227,14 +227,14 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
     }
 
     protected double computeOutput(double delta) {
-        positionError = calculator.getPosition() - getCurrentPosition();
-        velocityError = calculator.getVelocity() - getCurrentVelocity();
+        positionError = getTargetPosition() - getCurrentPosition();
+        velocityError = getTargetVelocity() - getCurrentVelocity();
 
         double output = holdPower;
 
-        if (Epsilon.isEpsilonPositive(calculator.getVelocity())) {
+        if (Epsilon.isEpsilonPositive(getTargetVelocity())) {
             output += config.kMinOutput;
-        } else if (Epsilon.isEpsilonNegative(calculator.getVelocity())) {
+        } else if (Epsilon.isEpsilonNegative(getTargetVelocity())) {
             output -= config.kMinOutput;
         } else if (Epsilon.isEpsilonZero(calculator.getAcceleration()) &&
                 Epsilon.isEpsilonZero(positionError, config.tolerance)) {
@@ -242,7 +242,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         }
 
         output += positionError * config.kpP + velocityError * config.kpV +
-                calculator.getVelocity() * config.kfV + calculator.getAcceleration() * config.kfA;
+                getTargetVelocity() * config.kfV + calculator.getAcceleration() * config.kfA;
 
         double endPositionError = calculator.getProfile().getDistance() - getCurrentPosition();
         if (Math.abs(endPositionError) <= config.maxIError) {
@@ -256,6 +256,14 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
             return 0;
 
         return output;
+    }
+
+    public double getTargetVelocity() {
+        return calculator.getVelocity();
+    }
+
+    public double getTargetPosition() {
+        return calculator.getPosition();
     }
 
     public synchronized void start() {
@@ -408,7 +416,7 @@ public class TrapezoidalProfileFollower extends AbstractUpdatable implements Dat
         @Override
         public List<Object> getValues() {
             synchronized (TrapezoidalProfileFollower.this) {
-                return Arrays.asList(calculator.getPosition(), calculator.getVelocity(), calculator.getAcceleration(),
+                return Arrays.asList(getTargetPosition(), getTargetVelocity(), calculator.getAcceleration(),
                         currentPosition, currentVelocity, output, onTarget);
             }
         }

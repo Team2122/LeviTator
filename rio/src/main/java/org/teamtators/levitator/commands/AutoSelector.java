@@ -39,7 +39,7 @@ public class AutoSelector extends Command implements Configurable<AutoSelector.C
     protected void initialize() {
         hasStarted = false;
 
-        String toStart = "$NoAuto";
+        String toStart = "NoAuto";
         if (type == SelectorType.FIELD_CONFIGURATION) {
             FieldSide side = auto.getFieldConfiguration(config.object);
             switch (side) {

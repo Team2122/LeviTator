@@ -53,7 +53,7 @@ drive:
   #    logData: true
   driveSegmentsFollower:
     lookAhead: { minX: 9, minY: 9, maxX: 120, maxY: 18 }
-    logData: true
+#    logData: true
     speedFollower:
       kpP: 2.0
       kiP: 0.0
@@ -118,7 +118,7 @@ lift:
   homingPower: -0.2
 pivot:
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: { aChannel: 6, bChannel: 7, reverse: false, samplesToAverage: 50,
+  pivotEncoder: { aChannel: 6, bChannel: 7, reverse: false, samplesToAverage: 1,
     distancePerPulse: 0.3515625 } # 360 degrees / 1024 CPR
   pivotAnalog: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
@@ -131,19 +131,19 @@ pivot:
   pivotController:
     kpP: 0.15
     kiP: 0.0 # 0.04
-    kpV: 0.00025
+    kpV: 0.0 # 0.00025
     kfV: 0.0015
     kMinOutput: 0.054
-    kfA: 0.00075
+    kfA: 0.0005
     kHoldPower: 0.0
     minPosition: -90.0
     maxPosition: 90.0
     maxOutput: 0.8
     minOutput: -0.8
-    maxAcceleration: 600.0
+    maxAcceleration: 800.0
     travelVelocity: 200.0
     endVelocity: 0.0
-#    logData: true
+    logData: true
   pivotHoldPower: 0.15
   anglePresets:
     LEFT: -90

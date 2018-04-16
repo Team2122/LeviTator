@@ -47,7 +47,7 @@ gunnerSecondary:
   2: toggle whenPressed ClimberOverBar
   3: toggle whenPressed ClimberSubBar
   4: start whenPressed ToggleLiftRecoveryMode
-  5: start whenPressed PickerRetract
+  5: start whenPressed PivotSync
   6: whilePressed ClimberForceUp
   7: whilePressed ClimberForceDown
   8: start whenPressed $LiftSwitch

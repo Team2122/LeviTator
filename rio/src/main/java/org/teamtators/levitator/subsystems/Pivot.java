@@ -54,7 +54,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         pivotController = new TrapezoidalProfileFollower("pivotController");
         pivotController.setPositionProvider(this::getCurrentPivotAngle);
-        pivotController.setVelocityProvider(this::getCurrentPivotVelocity);
+        pivotController.setVelocityProvider(() -> pivotController.getTargetVelocity());
         pivotController.setOutputConsumer(this::setPivotPower);
         pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
@@ -80,10 +80,17 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private void resetPivotAngle() {
         logger.debug("Reset pivot angle");
         pivotEncoder.reset();
+        targetAngle = Double.NaN;
     }
 
     public double getCurrentPivotVelocity() {
-        return pivotEncoder.getRate();
+        double rate = pivotEncoder.getRate();
+        if (rate > 300.0) {
+            rate = 300;
+        } else if (rate < -300) {
+            rate = -300;
+        }
+        return rate;
     }
 
     public double getDesiredPivotAngle() {
@@ -136,7 +143,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 angle, distance));
         targetAngle = angle;
         pivotController.moveToPosition(angle);
-//        logger.trace("Profile: {}", pivotController.getCalculator().getProfile());
+        logger.trace("Profile: {}", pivotController.getCalculator().getProfile());
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
     }
 
@@ -213,7 +220,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     public boolean isWithinTab() {
         return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
                 getAnglePreset(AnglePreset.CENTER),
-                5);
+                4);
     }
 
     public boolean isLockable() {
@@ -497,9 +504,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                         //Reset sweep target
                         logger.debug("Pivot locked");
 
+                        pivot.disablePivotController();
+                        pivot.setPivotPower(0.0);
                         if(Epsilon.isEpsilonZero(pivotAnalog.get(), config.angleTolerance)) {
-                            resetPivotAngle();
                             encoderOffset = 0;
+                            resetPivotAngle();
                         } else {
 //                            sync();
                         }
