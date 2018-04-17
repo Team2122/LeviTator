@@ -57,7 +57,6 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     private static final int kStatusBits = 0b11 << 26;
 
     private final SPI spi;
-    private final SPI.Port port;
     private final AtomicBoolean hasStarted = new AtomicBoolean(false);
     private final Thread startup;
 
@@ -83,13 +82,12 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
     /**
      * Creates a new ADXRS453
      *
-     * @param port The SPI port to attach to
+     * @param spi The SPI object to use
      */
-    public ADXRS453(SPI.Port port) {
+    public ADXRS453(SPI spi) {
         super();
         setName("ADXRS453");
-        this.spi = new SPI(port);
-        this.port = port;
+        this.spi = spi;
         spi.setClockRate(SPI_CLOCK_RATE);
         spi.setMSBFirst();
         spi.setSampleDataOnRising();
@@ -98,6 +96,15 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
         setCalibrationPeriod(5.0);
         startup = new Thread(this::startup, "ADXRS453.Startup");
         fullReset();
+    }
+
+    /**
+     * Creates a new ADXRS453
+     *
+     * @param port The SPI port to attach to
+     */
+    public ADXRS453(SPI.Port port) {
+        this(new SPI(port));
     }
 
     private static int fixParity(int data) {
@@ -516,7 +523,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
             sampleCount = 0;
             rawRateSum = 0;
             while (hasData) {
-                int availableBytes = SPIJNI.spiReadAutoReceivedData(port.value, accumulatorBuffer, 0, 0);
+                int availableBytes = spi.readAutoReceivedData(accumulatorBuffer, 0, 0);
 
                 availableBytes -= availableBytes % DATA_SIZE;
                 if (availableBytes > DATA_SIZE * ACCUMULATOR_DEPTH) {
@@ -528,7 +535,7 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
                     hasData = false;
                 }
 
-                SPIJNI.spiReadAutoReceivedData(port.value, accumulatorBuffer, availableBytes, 0);
+                spi.readAutoReceivedData(accumulatorBuffer, availableBytes, 0);
 
                 for (int i = 0; i < availableBytes; i += DATA_SIZE) {
                     int data = accumulatorBuffer.getInt(i);
