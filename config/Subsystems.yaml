@@ -123,7 +123,7 @@ pivot:
   pivotAnalog: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 90
+    offset: 49
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
@@ -193,12 +193,12 @@ climber:
         id: 7
         inverted: true
         neutralToFullTime: 0.25
-    - type: TALON_SRX # TODO: COMP_BOT: VICTOR_SPX
+    - type: VICTOR_SPX
       config:
         id: 8
         inverted: false
         neutralToFullTime: 0.25
-    - type: TALON_SRX # TODO: COMP_BOT: VICTOR_SPX
+    - type: VICTOR_SPX
       config:
         id: 9
         inverted: false

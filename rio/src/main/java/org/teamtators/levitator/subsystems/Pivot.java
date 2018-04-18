@@ -53,7 +53,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         super("Pivot");
 
         pivotController = new TrapezoidalProfileFollower("pivotController");
-        pivotController.setPositionProvider(this::getCurrentPivotAngle);
+        pivotController.setPositionProvider(this::getAngleAbsolute);
         pivotController.setVelocityProvider(() -> pivotController.getTargetVelocity());
         pivotController.setOutputConsumer(this::setPivotPower);
         pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
@@ -75,6 +75,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public double getCurrentPivotAngle() {
         return pivotEncoder.getDistance() - encoderOffset;
+    }
+
+    public double getAngleAbsolute() {
+        return pivotAnalog.get();
     }
 
     private void resetPivotAngle() {
@@ -149,7 +153,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void sync() {
         double distance = getCurrentPivotAngle();
-        double analogValue = pivotAnalog.get();
+        double analogValue = getAngleAbsolute();
         double delta = (distance - analogValue);
         if (Math.abs(delta) >= config.angleTolerance) {
             encoderOffset += delta;
@@ -204,7 +208,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public boolean isPivotLockedRaw() {
-        return pivotLockSensor.get();
+        return !pivotLockSensor.get();
     }
 
     public boolean isPivotLocked() {
@@ -458,7 +462,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 if (pivot.isPivotLocked()) {
                     pivot.resetPivotAngle();
                     pivotAnalog.setOffset(0);
-                    pivotAnalog.setOffset(-pivotAnalog.get());
+                    pivotAnalog.setOffset(-getAngleAbsolute());
                     logger.info("Pivot homed");
                     pivot.setDesiredAnglePreset(AnglePreset.CENTER);
                     pivot.homed = true;
@@ -506,7 +510,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
                         pivot.disablePivotController();
                         pivot.setPivotPower(0.0);
-                        if(Epsilon.isEpsilonZero(pivotAnalog.get(), config.angleTolerance)) {
+                        if(Epsilon.isEpsilonZero(getAngleAbsolute(), config.angleTolerance)) {
                             encoderOffset = 0;
                             resetPivotAngle();
                         } else {
