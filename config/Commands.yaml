@@ -53,20 +53,20 @@ PickerAutoDeployHard:
 
 $PickerAutoDeployHard:
   - { parallel: true, name: PickerAutoDeployHard }
-  - { class: Wait, period: 0.5 }
   - PivotCenter
+  - WaitForCenter
   - LiftHome
-  - { class: Wait, period: 0.4 }
+  - WaitForLock
 
 PickerAutoDeploySoft:
   { class: PickerQuickDeploy, timeBeforeKick: 0.4, kickPower: 0.5, timeBeforeRetract: 1.0, timeToKick: 0.8 }
 
 $PickerAutoDeploySoft:
   - { parallel: true, name: PickerAutoDeploySoft }
-  - { class: Wait, period: 1.6 }
   - PivotCenter
+  - WaitForCenter
   - LiftHome
-  - { class: Wait, period: 0.4 }
+  - WaitForLock
 
 PickerSwitchDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
@@ -152,19 +152,23 @@ $TestDrive:
 #  - { class: DriveStraight, angle: 0.0, distance: 144.0, endSpeed: 0.0 }
 #  - { class: DriveArc, angle: -90, radius: -48, endSpeed: 60 }
 #  - { class: DriveStraight, distance: -138, angle: -90, endSpeed: 60 }
-  - class: SetPose
-    x: 0.0
-    y: 0.0
-    yaw: -90
-  - class: DrivePath
-    speed: 120
-    arcSpeed: 60
-    radius: 24
-    reverse: true
-    path:
-      - { x: 0, y: 0 }
-      - { x: 0, y: 282 }
-  - PrintPose
+#  - class: SetPose
+#    x: 0.0
+#    y: 0.0
+#    yaw: -90
+#  - class: DrivePath
+#    speed: 120
+#    arcSpeed: 60
+#    radius: 24
+#    reverse: true
+#    path:
+#      - { x: 0, y: 0 }
+#      - { x: 0, y: 282 }
+#  - PrintPose
+  - LiftSwitch
+  - PivotLeft
+  - WaitForLeft
+  - $PickerAutoDeploy
 
 PickerAutoPick:
   velocity: 0.4
