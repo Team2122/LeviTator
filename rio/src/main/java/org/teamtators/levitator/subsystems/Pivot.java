@@ -1,10 +1,11 @@
 package org.teamtators.levitator.subsystems;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.SpeedController;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.*;
 import org.teamtators.common.control.*;
-import org.teamtators.common.control.Timer;
 import org.teamtators.common.controllers.LogitechF310;
 import org.teamtators.common.hw.AnalogPotentiometer;
 import org.teamtators.common.hw.DigitalSensor;
@@ -25,16 +26,14 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     private SpeedController pivotMotor;
     private MotorPowerUpdater pivotMotorUpdater;
     private AbstractUpdatable pivotUpdatable;
-    private DigitalInput pivotEncoderA;
-    private DigitalInput pivotEncoderB;
-    private Encoder pivotEncoder;
+    private AnalogPotentiometer pivotEncoder;
     private Solenoid pivotLockSolenoid;
     private DigitalSensor pivotLockSensor;
 
-    private TrapezoidalProfileFollower pivotController;
+    private /*TrapezoidalProfileFollower*/ StupidController pivotController;
+    private InputDerivative pivotVelocity;
     private BooleanSampler locked = new BooleanSampler(this::isPivotLockedRaw);
 
-    private boolean homed = false;
     private double desiredPivotAngle;
     private double targetAngle;
     private double lastAttemptedAngle;
@@ -45,18 +44,17 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     private Config config;
     private boolean manualOverride;
-    private AnalogPotentiometer pivotAnalog;
-
-    private double encoderOffset = 0.0;
 
     public Pivot() {
         super("Pivot");
 
-        pivotController = new TrapezoidalProfileFollower("pivotController");
-        pivotController.setPositionProvider(this::getCurrentPivotAngle);
-        pivotController.setVelocityProvider(() -> pivotController.getTargetVelocity());
+        pivotVelocity = new InputDerivative("pivotAngleDerivative", this::getCurrentPivotAngle);
+        pivotController = new /*TrapezoidalProfileFollower*/StupidController("pivotController");
+//        pivotController.setPositionProvider(this::getCurrentPivotAngle);
+//        pivotController.setVelocityProvider(pivotVelocity);
+        pivotController.setInputProvider(this::getCurrentPivotAngle);
         pivotController.setOutputConsumer(this::setPivotPower);
-        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
+//        pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
 
         pivotUpdatable = new PivotUpdatable();
     }
@@ -69,28 +67,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.lift = lift;
     }
 
-    public boolean isHomed() {
-        return homed;
-    }
-
     public double getCurrentPivotAngle() {
-        return pivotEncoder.getDistance() - encoderOffset;
-    }
-
-    private void resetPivotAngle() {
-        logger.debug("Reset pivot angle");
-        pivotEncoder.reset();
-        targetAngle = Double.NaN;
-    }
-
-    public double getCurrentPivotVelocity() {
-        double rate = pivotEncoder.getRate();
-        if (rate > 300.0) {
-            rate = 300;
-        } else if (rate < -300) {
-            rate = -300;
-        }
-        return rate;
+        return pivotEncoder.get();
     }
 
     public double getDesiredPivotAngle() {
@@ -123,7 +101,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public void setTargetAngle(double angle) {
-//        sync();
         double safeAngle = getSafePivotAngle(angle);
         if (safeAngle != angle) {
             if (targetAngle == safeAngle && lastAttemptedAngle == angle) {
@@ -142,21 +119,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
                 angle, distance));
         targetAngle = angle;
-        pivotController.moveToPosition(angle);
-        logger.trace("Profile: {}", pivotController.getCalculator().getProfile());
+        pivotController./*moveToPosition*/setSetpoint(angle);
         pivotController.setHoldPower(Math.signum(angle) * config.pivotHoldPower);
-    }
-
-    public void sync() {
-        double distance = getCurrentPivotAngle();
-        double analogValue = pivotAnalog.get();
-        double delta = (distance - analogValue);
-        if (Math.abs(delta) >= config.angleTolerance) {
-            encoderOffset += delta;
-            logger.warn("!~Resynchronizing incremental encoder and potentiometer. quad: {}, analog: {}, newOffset: {}",
-                    distance, analogValue, encoderOffset);
-            targetAngle = Double.NaN;
-        }
     }
 
     public void enable() {
@@ -186,11 +150,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
     public void setPivotPower(double pivotPower) {
         if (!isPivotLocked()) {
-            /*pivotMotorUpdater*/
-            pivotMotor.set(pivotPower);
+            pivotMotorUpdater.set(pivotPower);
         } else {
-            /*pivotMotorUpdater*/
-            pivotMotor.set(0);
+            pivotMotorUpdater.set(0);
         }
     }
 
@@ -200,11 +162,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getUpdatables() {
-        return Arrays.asList(pivotUpdatable, pivotController);
+        return Arrays.asList(pivotVelocity, pivotUpdatable, pivotController);
     }
 
     public boolean isPivotLockedRaw() {
-        return pivotLockSensor.get();
+        return !pivotLockSensor.get();
     }
 
     public boolean isPivotLocked() {
@@ -220,7 +182,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     public boolean isWithinTab() {
         return Epsilon.isEpsilonEqual(getCurrentPivotAngle(),
                 getAnglePreset(AnglePreset.CENTER),
-                4);
+                5);
     }
 
     public boolean isLockable() {
@@ -257,7 +219,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public List<Updatable> getMotorUpdatables() {
-        return Arrays.asList(/*pivotMotorUpdater*/);
+        return Arrays.asList(pivotMotorUpdater);
     }
 
 
@@ -272,7 +234,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 break;
             case DISABLED:
                 disable();
-                targetAngle = Double.NaN;
                 break;
         }
     }
@@ -281,12 +242,11 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     public ManualTestGroup createManualTests() {
         ManualTestGroup tests = super.createManualTests();
         tests.addTest(new SpeedControllerTest("pivotMotor", pivotMotor));
-        tests.addTest(new EncoderTest("pivotEncoder", pivotEncoder));
-        tests.addTest(new AnalogPotentiometerTest("pivotAnalog", pivotAnalog));
+        tests.addTest(new AnalogPotentiometerTest("pivotEncoder", pivotEncoder));
         tests.addTest(new SolenoidTest("pivotLockSolenoid", pivotLockSolenoid));
         tests.addTest(new DigitalSensorTest("pivotLockSensor", pivotLockSensor));
 
-        tests.addTest(new MotionCalibrationTest(pivotController));
+        tests.addTest(new /*MotionCalibrationTest*/ControllerTest(pivotController, 90.0));
 
         tests.addTest(new PivotTest());
         return tests;
@@ -298,13 +258,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.config = config;
 
         this.pivotMotor = config.pivotMotor.create();
-        this.pivotAnalog = config.pivotAnalog.create();
-//        this.pivotEncoder = config.pivotEncoder.create();
-        this.pivotEncoderA = new DigitalInput(config.pivotEncoder.getaChannel());
-        this.pivotEncoderB = new DigitalInput(config.pivotEncoder.getbChannel());
-        this.pivotEncoder = new Encoder(pivotEncoderA, pivotEncoderB, config.pivotEncoder.isReverse(),
-                config.pivotEncoder.getEncodingType());
-        this.pivotEncoder.setDistancePerPulse(config.pivotEncoder.getDistancePerPulse());
+        this.pivotEncoder = config.pivotEncoder.create();
         this.pivotLockSolenoid = config.pivotLockSolenoid.create();
         this.pivotLockSensor = config.pivotLockSensor.create();
 
@@ -314,15 +268,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         ((Sendable) pivotMotor).setName("Pivot", "pivotMotor");
         pivotEncoder.setName("Pivot", "pivotEncoder");
-        pivotAnalog.setName("Pivot", "pivotAnalog");
-        pivotEncoderA.setName("Pivot", "pivotEncoderA");
-        pivotEncoderB.setName("Pivot", "pivotEncoderB");
         pivotLockSolenoid.setName("Pivot", "pivotLockSolenoid");
         pivotLockSensor.setName("Pivot", "pivotLockSensor");
 
         pivotMotorUpdater = new MotorPowerUpdater(pivotMotor);
-
-        homed = false;
     }
 
     @Override
@@ -331,9 +280,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
 
         SpeedControllerConfig.free(pivotMotor);
         pivotEncoder.free();
-        pivotAnalog.free();
-        pivotEncoderA.free();
-        pivotEncoderB.free();
         pivotLockSolenoid.free();
         pivotLockSensor.free();
     }
@@ -346,19 +292,18 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         this.manualOverride = override;
         if (!override) {
             enable();
-            homed = false;
+//            homed = false;
         }
     }
 
     @SuppressWarnings("WeakerAccess")
     public static class Config {
         public SpeedControllerConfig pivotMotor;
-        public EncoderConfig pivotEncoder;
-        public AnalogPotentiometerConfig pivotAnalog;
+        public AnalogPotentiometerConfig pivotEncoder;
         public SolenoidConfig pivotLockSolenoid;
         public DigitalSensorConfig pivotLockSensor;
 
-        public TrapezoidalProfileFollower.Config pivotController;
+        public /*TrapezoidalProfileFollower*/ StupidController.Config pivotController;
         public double pivotHoldPower;
 
         public Map<AnglePreset, Double> anglePresets;
@@ -401,10 +346,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         public void onButtonDown(LogitechF310.Button button) {
             switch (button) {
                 case B:
-                    double angle = (config.pivotController.maxPosition - config.pivotController.minPosition)
-                            * ((axisValue + 1) / 2) + config.pivotController.minPosition;
+                    double angle = (config.pivotController./*maxPosition*/maxSetpoint - config.pivotController./*minPosition*/minSetpoint)
+                            * ((axisValue + 1) / 2) + config.pivotController./*minPosition*/minSetpoint;
                     logger.info("Moving pivot to angle {}", angle);
-                    pivotController.moveToPosition(angle);
+                    pivotController./*moveToPosition*/setSetpoint(angle);
                     break;
                 case Y:
                     enable();
@@ -451,22 +396,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 return;
             }
             Pivot pivot = Pivot.this;
-            if (!pivot.isHomed()) {
-                pivot.disablePivotController();
-                pivot.setPivotPower(0.0);
-                pivot.setPivotLockSolenoid(true);
-                if (pivot.isPivotLocked()) {
-                    pivot.resetPivotAngle();
-                    pivotAnalog.setOffset(0);
-                    pivotAnalog.setOffset(-pivotAnalog.get());
-                    logger.info("Pivot homed");
-                    pivot.setDesiredAnglePreset(AnglePreset.CENTER);
-                    pivot.homed = true;
-                    locking = true;
-                } else {
-                    return;
-                }
-            }
             double centerAngle = pivot.getAnglePreset(AnglePreset.CENTER);
             double currentAngle = pivot.getCurrentPivotAngle();
             double safePivotAngle = pivot.getSafePivotAngle(desiredPivotAngle);
@@ -474,19 +403,13 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             if ((safePivotAngle != centerAngle || !isWithinLockAngle) && locking) {
                 locking = false;
                 logger.debug("Moving away from center, disengaging lock");
-//                if (isWithinLockAngle) {
-//                    resetPivotAngle();
-//                }
             }
             if (locking) {
                 //Extend the solenoid to lock
                 pivot.setPivotLockSolenoid(true);
                 if (sweepTarget == 0) {
                     pivot.setPivotPower(0.0);
-                    pivot.disablePivotController();
-//                    resetPivotAngle();
                 } else {
-                    /*
                     //Check if this is the first step of locking or we overshot our target
                     if (sweepTarget > 0 ? (currentAngle >= sweepTarget) : (currentAngle <= sweepTarget)) {
                         logger.warn("Pivot sweep missed lock, sweeping other direction");
@@ -495,27 +418,15 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     //Apply the configured power with a sign that is the same as our target (i.e. positive power moves right, increasing angle)
                     pivot.setPivotPower(config.pivotSweepPower * Math.signum(sweepTarget));
                     //If our solenoid is locked in or the timer ran out
-                    */
-                    pivot.setTargetAngle(centerAngle);
-                    pivot.enablePivotController();
                 }
                 if (sweepTarget != 0) {
-                    if (isPivotLocked()) {
+                    if (locked.get()) {
                         //Reset sweep target
                         logger.debug("Pivot locked");
-
-                        pivot.disablePivotController();
-                        pivot.setPivotPower(0.0);
-                        if(Epsilon.isEpsilonZero(pivotAnalog.get(), config.angleTolerance)) {
-                            encoderOffset = 0;
-                            resetPivotAngle();
-                        } else {
-//                            sync();
-                        }
                         sweepTarget = 0;
-                    } /* else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
+                    } else if (sweepTimer.periodically(config.sweepTimeoutSeconds)) {
                         logger.warn("Pivot could not lock, timeout elapsed");
-                    } */
+                    }
                 } else {
                     if (!pivot.isPivotLocked()) {
                         sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
@@ -531,10 +442,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                         logger.debug("Pivot moving center, will engage lock");
                         //Start locking
                         locking = true;
-//                        sync();
                         sweepTarget = -Math.signum(currentAngle) * config.startSweepAngle;
                         //Disable PID
-//                        pivot.disablePivotController();
+                        pivot.disablePivotController();
                         //Start the timer
                         sweepTimer.restart();
                     } else {
@@ -549,9 +459,6 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     //Set the pivot target angle to the desired angle
                     pivot.setTargetAngle(desiredPivotAngle);
                 }
-            }
-            if (pivot.pivotController.isFinished()) {
-//                sync();
             }
         }
     }

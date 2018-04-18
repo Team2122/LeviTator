@@ -118,32 +118,36 @@ lift:
   homingPower: -0.2
 pivot:
   pivotMotor: { type: VICTOR_SPX, config: { id: 5, inverted: false } }
-  pivotEncoder: { aChannel: 6, bChannel: 7, reverse: false, samplesToAverage: 1,
-    distancePerPulse: 0.3515625 } # 360 degrees / 1024 CPR
-  pivotAnalog: {
+  pivotEncoder: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 90
+    offset: 116
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
 
   pivotController:
-    kpP: 0.15
-    kiP: 0.0 # 0.04
-    kpV: 0.0 # 0.00025
-    kfV: 0.0015
-    kMinOutput: 0.054
-    kfA: 0.0005
-    kHoldPower: 0.0
-    minPosition: -90.0
-    maxPosition: 90.0
-    maxOutput: 0.8
-    minOutput: -0.8
-    maxAcceleration: 800.0
-    travelVelocity: 200.0
-    endVelocity: 0.0
-    logData: true
+#    kpP: 0.04 # 0.04
+#    kiP: 0.0 # 0.04
+#    kpV: 0.001
+#    kfV: 0.002
+#    kMinOutput: 0.0537
+#    kfA: 0.0005
+#    kHoldPower: 0.0
+#    minPosition: -90.0
+#    maxPosition: 90.0
+#    maxOutput: 0.4
+#    minOutput: -0.4
+#    maxAcceleration: 180.0
+#    travelVelocity: 90.0
+#    endVelocity: 0.0
+    target: { within: 3.0 }
+    minSetpoint: -90.0
+    maxSetpoint: 90.0
+    maxAcceleration: 1.2
+    movePower: 0.4
+    endRamp: 20.0
+#    logData: true
   pivotHoldPower: 0.15
   anglePresets:
     LEFT: -90
@@ -158,7 +162,7 @@ pivot:
   centerTolerance: 15.0
 
   pivotSweepPower: 0.2
-  startSweepAngle: 2.0
+  startSweepAngle: 5.0
   lockAngle: 30
   sweepTimeoutSeconds: 5.0
   lockedPeriod: 0.1
@@ -193,12 +197,12 @@ climber:
         id: 7
         inverted: true
         neutralToFullTime: 0.25
-    - type: TALON_SRX # TODO: COMP_BOT: VICTOR_SPX
+    - type: VICTOR_SPX
       config:
         id: 8
         inverted: false
         neutralToFullTime: 0.25
-    - type: TALON_SRX # TODO: COMP_BOT: VICTOR_SPX
+    - type: VICTOR_SPX
       config:
         id: 9
         inverted: false
