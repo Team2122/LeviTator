@@ -43,7 +43,7 @@ gunner:
     - start whenPressed ClimberRelease
     - start whenReleased ClimberUnrelease
 gunnerSecondary:
-  1: start whenPressed $PickerReleaseMedium
+  1: toggle whenPressed PickerPick
   2: toggle whenPressed ClimberOverBar
   3: toggle whenPressed ClimberSubBar
   4: start whenPressed ToggleLiftRecoveryMode
@@ -52,7 +52,7 @@ gunnerSecondary:
   7: whilePressed ClimberForceDown
   8: start whenPressed $LiftSwitch
   9: start whenPressed $LiftScaleHigh
-  10: start whenPressed PivotCenter
+  10: toggle whenPressed PickerPickForce
   11: toggle whenPressed ClimberClimb
   12: start whenPressed LiftRecall
 #  12: start whenPressed $PickerReleaseHard

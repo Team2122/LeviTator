@@ -48,6 +48,10 @@ public class BooleanSampler implements Configurable<BooleanSampler.Config> {
         this.period = config.period;
     }
 
+    public void reset() {
+        timer.stop();
+    }
+
     public static class Config {
         public double period;
     }

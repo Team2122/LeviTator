@@ -38,6 +38,8 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         unjamming = false;
         unjamRight = false;
         picker.unlockArms();
+        jammed.reset();
+        finished.reset();
     }
 
     @Override
@@ -47,7 +49,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         this.cubeRight = picker.isCubeDetectedRight();
 
         boolean jammed = this.jammed.get();
-        boolean finished = this.finished.get();
+        boolean finished = this.finished.get() && !config.force;
 
         if (jammed && !unjamming && (!unjamTimer.isRunning() || unjamTimer.hasPeriodElapsed(config.afterUnjamWait))) {
             logger.trace("Jam detected, unjamming");
@@ -60,7 +62,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
             unjamRight = !unjamRight;
         }
 
-        if (unjamming) {
+        if (unjamming && !config.force) {
             picker.setRollerPowers(unjamRight ? config.unjamPowers.right : config.unjamPowers.left,
                     unjamRight ? config.unjamPowers.left : config.unjamPowers.right);
         } else {
@@ -73,7 +75,7 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
     @Override
     protected void finish(boolean interrupted) {
         super.finish(interrupted);
-        if (interrupted) {
+        if (interrupted && !config.force) {
             picker.setRollerPower(0.0);
         } else {
             picker.setRollerPowers(config.holdPowers);
@@ -97,5 +99,6 @@ public class PickerPick extends Command implements Configurable<PickerPick.Confi
         public double finishDetectPeriod;
         public double unjamPeriod;
         public double afterUnjamWait;
+        public boolean force = false;
     }
 }

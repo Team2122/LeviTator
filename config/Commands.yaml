@@ -8,6 +8,15 @@ DriveTank:
   slowerScaler: 0.3
   maxAccelerationSlower: 1.0
 
+^PickerPick:
+  pickPowers: { left: 0.8, right: 0.8 }
+  unjamPowers: { left: 1.0, right: -0.8 }
+  holdPowers: { left: 0.15, right: 0.15 }
+  jamDetectPeriod: 0.1
+  unjamPeriod: 0.15
+  afterUnjamWait: 0.3
+  finishDetectPeriod: 0.0
+
 PickerPick:
   pickPowers: { left: 0.8, right: 0.8 }
   unjamPowers: { left: 1.0, right: -0.8 }
@@ -16,6 +25,17 @@ PickerPick:
   unjamPeriod: 0.15
   afterUnjamWait: 0.3
   finishDetectPeriod: 0.0
+  force: false
+PickerPickForce:
+  class: PickerPick
+  pickPowers: { left: 0.8, right: 0.8 }
+  unjamPowers: { left: 1.0, right: -0.8 }
+  holdPowers: { left: 0.15, right: 0.15 }
+  jamDetectPeriod: 1000
+  unjamPeriod: 0.0
+  afterUnjamWait: 0.3
+  finishDetectPeriod: 1000
+  force: true
 
 WaitForPick: { class: WaitFor, command: PickerPick }
 
