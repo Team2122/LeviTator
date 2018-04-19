@@ -388,7 +388,7 @@ $CenterAutoLSwitch:
   - { class: DriveStraight, angle: 0, distance: -32, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: 60, maxAcceleration: 400 }
   - { class: DriveStraight, angle: 60, distance: 22.0, speed: 120, endSpeed: 40 }
-  - { class: DriveStraight, parallel: true, angle: 60, distance: 8.0, speed: 40 }
+  - { class: DriveStraight, parallel: true, angle: 60, distance: 12.0, speed: 40 }
   - WaitForCube
   - { class: DriveStraight, angle: 90, distance: -100.0 }
 
@@ -424,7 +424,7 @@ $CenterAutoRSwitch:
   - { class: DriveStraight, angle: 0, distance: -32, speed: 120, maxAcceleration: 160 }
   - { class: DriveRotate, angle: -60, maxAcceleration: 400 }
   - { class: DriveStraight, angle: -60, distance: 22.0, speed: 120, endSpeed: 40 }
-  - { class: DriveStraight, parallel: true, angle: -60, distance: 8.0, speed: 40 }
+  - { class: DriveStraight, parallel: true, angle: -60, distance: 12.0, speed: 40 }
   - WaitForCube
   - { class: DriveStraight, angle: -90, distance: -100.0 }
 
@@ -478,7 +478,7 @@ $StartRightScaleRight:
 #      - { x: 109, y: 19 }
       - { x: 109, y: 79 }
       - { x: 109, y: 264, speed: 60, arcSpeed: 60, radius: 12 }
-      - { x: 114, y: 276 }
+      - { x: 116, y: 276 }
   - WaitForRight
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeployHard
@@ -490,7 +490,7 @@ $StartRightScaleRightPick:
     speed: 120
     radius: 36
     path:
-      - { x: 114, y: 276 }
+      - { x: 116, y: 276 }
 #      - { x: 109, y: 252, radius: 12 }
       - { x: 90, y: 240, arcSpeed: 40, speed: 40.0 }
       - { x: 84, y: 228 }
@@ -517,7 +517,7 @@ $StartLeftScaleLeft2:
     parallel: true
     speed: 120
     path:
-      - { x: -112, y: 288 }
+      - { x: -108, y: 288 }
       - { x: -94, y: 250 }
       - { x: -68, y: 228, arcSpeed: 40, speed: 40 }
       - { x: -60, y: 222 }
@@ -543,7 +543,7 @@ $StartRightScaleRight2:
     parallel: true
     speed: 120
     path:
-      - { x: 112, y: 288 }
+      - { x: 108, y: 288 }
       - { x: 94, y: 250 }
       - { x: 68, y: 228, arcSpeed: 40, speed: 40 }
       - { x: 60, y: 222 }
@@ -613,7 +613,7 @@ $AutoStartLeftScaleLeftSwitchRight:
   - class: DrivePath
     reverse: true
     path:
-      - { x: -80, y: 224 }
+      - { x: -82, y: 228 }
       - { x: -90, y: 240 }
       - { x: -100, y: 250 }
   - $LiftSwitch
@@ -636,7 +636,7 @@ $AutoStartRightScaleRightSwitchLeft:
   - class: DrivePath
     reverse: true
     path:
-      - { x: 80, y: 224 }
+      - { x: 82, y: 228 }
       - { x: 90, y: 240 }
       - { x: 100, y: 250 }
   - $LiftSwitch
