@@ -123,13 +123,13 @@ pivot:
   pivotAnalog: {
     channel: 0, fullRange: 360.0, minValue: -180, continuous: true,
     averageBits: 4, oversampleBits: 4,
-    offset: 49
+    offset: 32
   }
   pivotLockSolenoid: { channel: 1 }
   pivotLockSensor: { channel: 16, type: PNP }
 
   pivotController:
-    kpP: 0.15
+    kpP: 0.05
     kiP: 0.0 # 0.04
     kpV: 0.0 # 0.00025
     kfV: 0.0015

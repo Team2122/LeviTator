@@ -53,7 +53,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         super("Pivot");
 
         pivotController = new TrapezoidalProfileFollower("pivotController");
-        pivotController.setPositionProvider(this::getAngleAbsolute);
+        pivotController.setPositionProvider(this::getCurrentPivotAngle);
         pivotController.setVelocityProvider(() -> pivotController.getTargetVelocity());
         pivotController.setOutputConsumer(this::setPivotPower);
         pivotController.setOnTargetPredicate(ControllerPredicates.alwaysFalse());
@@ -74,7 +74,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public double getCurrentPivotAngle() {
-        return pivotEncoder.getDistance() - encoderOffset;
+//        return pivotEncoder.getDistance() - encoderOffset;
+        return getAngleAbsolute();
     }
 
     public double getAngleAbsolute() {

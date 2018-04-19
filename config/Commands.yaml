@@ -47,6 +47,11 @@ $PickerAutoDeploy:
   - PivotCenter
   - LiftHome
   - { class: Wait, period: 0.4 }
+#  - PickerAutoDeploy
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerAutoDeployHard:
   { class: PickerQuickDeploy, timeBeforeKick: 0.1, kickPower: 0.85, timeToKick: 0.8 }
@@ -57,6 +62,11 @@ $PickerAutoDeployHard:
   - PivotCenter
   - LiftHome
   - { class: Wait, period: 0.4 }
+#  - PickerAutoDeployHard
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerAutoDeploySoft:
   { class: PickerQuickDeploy, timeBeforeKick: 0.4, kickPower: 0.5, timeBeforeRetract: 1.0, timeToKick: 0.8 }
@@ -67,6 +77,11 @@ $PickerAutoDeploySoft:
   - PivotCenter
   - LiftHome
   - { class: Wait, period: 0.4 }
+#  - PickerAutoDeploySoft
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerSwitchDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
@@ -89,7 +104,7 @@ PickerReleaseSoft:
 PickerSmartDeploy:
   class: PickerSmartDeploy
   powers:
-    SOFTEST: { kickPower: 0.25, timeBeforeKick: 0.3, timeBeforeRetract: 0.8, timeToKick: 1.0 }
+    SOFTEST: { kickPower: 0.3, timeBeforeKick: 0.3, timeBeforeRetract: 10, timeToKick: 1.0 }
     SOFT: { kickPower: 0.4, timeBeforeKick: 0.3, timeBeforeRetract: 0.8, timeToKick: 1.0 }
     MEDIUM: { kickPower: 0.6, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.8 }
     HARD: { kickPower: 0.8, timeBeforeKick: 0.2, timeBeforeRetract: 0.4, timeToKick: 0.6 }
@@ -428,7 +443,7 @@ $StartLeftScaleLeftPick:
       - { x: -114, y: 276 }
 #      - { x: -109, y: 252, radius: 12 }
       - { x: -90, y: 240, arcSpeed: 40, speed: 40.0 }
-      - { x: -80, y: 224 }
+      - { x: -84, y: 228 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
   - PickerLock
@@ -443,7 +458,7 @@ $StartRightScaleRight:
 #      - { x: 109, y: 19 }
       - { x: 109, y: 79 }
       - { x: 109, y: 264, speed: 60, arcSpeed: 60, radius: 12 }
-      - { x: 113, y: 276 }
+      - { x: 114, y: 276 }
   - WaitForRight
   - { class: WaitForPath, remainingDistance: 4.0 }
   - $PickerAutoDeployHard
@@ -455,10 +470,10 @@ $StartRightScaleRightPick:
     speed: 120
     radius: 36
     path:
-      - { x: 113, y: 276 }
+      - { x: 114, y: 276 }
 #      - { x: 109, y: 252, radius: 12 }
       - { x: 90, y: 240, arcSpeed: 40, speed: 40.0 }
-      - { x: 80, y: 224 }
+      - { x: 84, y: 228 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
   - PickerLock
@@ -471,7 +486,7 @@ $StartLeftScaleLeft2:
     speed: 120
     radius: 36
     path:
-      - { x: -80, y: 224 }
+      - { x: -84, y: 228 }
       - { x: -94, y: 250 }
       - { x: -108, y: 288 }
   - WaitForLeft
@@ -484,8 +499,8 @@ $StartLeftScaleLeft2:
     path:
       - { x: -112, y: 288 }
       - { x: -94, y: 250 }
-      - { x: -66, y: 228, arcSpeed: 40, speed: 40 }
-      - { x: -52, y: 220 }
+      - { x: -68, y: 228, arcSpeed: 40, speed: 40 }
+      - { x: -60, y: 222 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
 
@@ -497,7 +512,7 @@ $StartRightScaleRight2:
     speed: 120
     radius: 36
     path:
-      - { x: 80, y: 224 }
+      - { x: 84, y: 228 }
       - { x: 94, y: 250 }
       - { x: 108, y: 288 }
   - WaitForRight
@@ -510,8 +525,8 @@ $StartRightScaleRight2:
     path:
       - { x: 112, y: 288 }
       - { x: 94, y: 250 }
-      - { x: 68, y: 224, arcSpeed: 40, speed: 40 }
-      - { x: 58, y: 216 }
+      - { x: 68, y: 228, arcSpeed: 40, speed: 40 }
+      - { x: 60, y: 222 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
 
@@ -525,8 +540,8 @@ $AutoStartLeftScaleLeftScaleLeft:
     parallel: true
     speed: 120
     path:
-      - { x: -52, y: 220 }
-      - { x: -66, y: 228 }
+      - { x: -60, y: 222 }
+      - { x: -68, y: 228 }
       - { x: -94, y: 250 }
       - { x: -106, y: 290 }
   - WaitForLeft
@@ -543,8 +558,8 @@ $AutoStartRightScaleRightScaleRight:
     parallel: true
     speed: 120
     path:
-      - { x: 58, y: 216 }
-      - { x: 68, y: 224 }
+      - { x: 60, y: 222 }
+      - { x: 68, y: 228 }
       - { x: 94, y: 250 }
       - { x: 106, y: 290 }
   - WaitForRight
@@ -628,7 +643,7 @@ $StartRightScaleLeft:
       - { x: 109, y: 240, radius: 48 }
       - { x: 0, y: 240, speed: 70 }
       - { x: -70, y: 240, radius: 48, arcSpeed: 50, speed: 50 }
-      - { x: -102, y: 284 }
+      - { x: -108, y: 284 }
   - { class: WaitForPath, remainingDistance: 100.0 }
   - $LiftScaleLow
   - PivotLeft
@@ -641,7 +656,7 @@ $StartRightScaleLeftPick:
   - class: DrivePath
     parallel: true
     path:
-      - { x: -110, y: 290, speed: 80 }
+      - { x: -108, y: 284, speed: 80 }
       - { x: -90, y: 270, radius: 36, speed: 20.0 }
       - { x: -82, y: 232 }
   - { class: Wait, period: 1.0 }
@@ -660,7 +675,7 @@ $StartLeftScaleRight:
       - { x: -109, y: 240, radius: 48 }
       - { x: 0, y: 240, speed: 70 }
       - { x: 70, y: 240, radius: 48, arcSpeed: 50, speed: 50 }
-      - { x: 104, y: 290 }
+      - { x: 108, y: 290 }
   - { class: WaitForPath, remainingDistance: 100.0 }
   - $LiftScaleLow
   - PivotRight
@@ -673,7 +688,7 @@ $StartLeftScaleRightPick:
   - class: DrivePath
     parallel: true
     path:
-      - { x: 104, y: 290, speed: 80 }
+      - { x: 108, y: 290, speed: 80 }
       - { x: 86, y: 264, radius: 36, speed: 20.0 }
       - { x: 78, y: 226 }
   - { class: Wait, period: 1.0 }
@@ -716,7 +731,7 @@ $AutoStartRightScaleLeftScaleLeft:
     path:
       - { x: -74, y: 224 }
       - { x: -78, y: 240 }
-      - { x: -108, y: 298 }
+      - { x: -112, y: 298 }
   - WaitForLeft
   - $PickerAutoDeploy
   - { parallel: true, name: PickerPick }
@@ -724,10 +739,10 @@ $AutoStartRightScaleLeftScaleLeft:
     parallel: true
     speed: 80
     path:
-      - { x: -108, y: 298 }
+      - { x: -112, y: 298 }
       - { x: -80, y: 260 }
-      - { x: -66, y: 240, arcSpeed: 40, speed: 30 }
-      - { x: -52, y: 224 }
+      - { x: -70, y: 240, arcSpeed: 40, speed: 30 }
+      - { x: -60, y: 224 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
 
@@ -740,7 +755,7 @@ $AutoStartLeftScaleRightScaleRight:
     path:
       - { x: 74, y: 224 }
       - { x: 78, y: 240 }
-      - { x: 108, y: 298 }
+      - { x: 112, y: 298 }
   - WaitForRight
   - $PickerAutoDeploy
   - { parallel: true, name: PickerPick }
@@ -748,7 +763,7 @@ $AutoStartLeftScaleRightScaleRight:
     parallel: true
     speed: 80
     path:
-      - { x: 108, y: 298 }
+      - { x: 112, y: 298 }
       - { x: 80, y: 260 }
       - { x: 66, y: 240, arcSpeed: 40, speed: 30 }
       - { x: 56, y: 224 }
