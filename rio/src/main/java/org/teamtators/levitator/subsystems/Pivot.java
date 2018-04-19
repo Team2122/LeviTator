@@ -78,6 +78,10 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         return getAngleAbsolute();
     }
 
+    public double getAngleQuadrature() {
+        return pivotEncoder.getDistance();
+    }
+
     public double getAngleAbsolute() {
         return pivotAnalog.get();
     }
@@ -478,7 +482,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             boolean isWithinLockAngle = isLockable();
             if ((safePivotAngle != centerAngle || !isWithinLockAngle) && locking) {
                 locking = false;
-                logger.debug("Moving away from center, disengaging lock");
+                logger.debug("Moving away from center, disengaging lock (absolute: {}, quadrature: {})",
+                        getAngleAbsolute(), getAngleQuadrature());
 //                if (isWithinLockAngle) {
 //                    resetPivotAngle();
 //                }
@@ -507,7 +512,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 if (sweepTarget != 0) {
                     if (isPivotLocked()) {
                         //Reset sweep target
-                        logger.debug("Pivot locked");
+                        logger.debug("Pivot locked (absolute: {}, quadrature: {})",
+                                        getAngleAbsolute(), getAngleQuadrature());
 
                         pivot.disablePivotController();
                         pivot.setPivotPower(0.0);
@@ -533,7 +539,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                 if (safePivotAngle == centerAngle) {
                     boolean isWithinSweepAngle = currentAngle > -config.startSweepAngle && currentAngle < config.startSweepAngle;
                     if (isWithinSweepAngle) {
-                        logger.debug("Pivot moving center, will engage lock");
+                        logger.debug("Pivot moving center, will engage lock (absolute: {}, quadrature: {})",
+                                        getAngleAbsolute(), getAngleQuadrature());
                         //Start locking
                         locking = true;
 //                        sync();
@@ -555,9 +562,9 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
                     pivot.setTargetAngle(desiredPivotAngle);
                 }
             }
-            if (pivot.pivotController.isFinished()) {
+//            if (pivot.pivotController.isFinished()) {
 //                sync();
-            }
+//            }
         }
     }
 }
