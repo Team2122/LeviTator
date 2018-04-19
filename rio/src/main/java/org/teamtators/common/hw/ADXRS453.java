@@ -181,15 +181,15 @@ public class ADXRS453 extends SensorBase implements PIDSource, Gyro {
 
     @Override
     public void finishCalibration() {
+        if (!isCalibrating) {
+            return;
+        }
+        calibrationOffset = calibrationValues.stream()
+                .mapToDouble(rawRate -> rawRate * DEGREES_PER_SECOND_PER_LSB)
+                .average()
+                .orElse(0.0);
         writeLock.lock();
         try {
-            if (!isCalibrating) {
-                return;
-            }
-            calibrationOffset = calibrationValues.stream()
-                    .mapToDouble(rawRate -> rawRate * DEGREES_PER_SECOND_PER_LSB)
-                    .average()
-                    .orElse(0.0);
             if (!Double.isFinite(calibrationOffset)) {
                 calibrationOffset = 0.0;
             }

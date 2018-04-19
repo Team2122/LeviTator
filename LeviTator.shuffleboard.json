@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.14511041009463724,
+  "dividerPosition": 0.14826498422712933,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -81,7 +81,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder/Distance",
-              "_title": "LiveWindow/Pivot/pivotEncoder/Distance"
+              "_title": "pivotQuadrature"
             }
           },
           "3,1": {
@@ -399,7 +399,7 @@
               "colorWhenFalse": "#8B0000FF"
             }
           },
-          "9,4": {
+          "9,5": {
             "size": [
               2,
               1

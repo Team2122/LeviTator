@@ -74,8 +74,8 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
     }
 
     public double getCurrentPivotAngle() {
-//        return pivotEncoder.getDistance() - encoderOffset;
-        return getAngleAbsolute();
+        return pivotEncoder.getDistance() - encoderOffset;
+//        return getAngleAbsolute();
     }
 
     public double getAngleQuadrature() {
@@ -148,7 +148,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
             }
         }
         double distance = angle - getCurrentPivotAngle();
-        logger.debug(String.format("Setting lift target angle to %.3f (degrees to move: %.3f)",
+        logger.debug(String.format("Setting pivot angle to %.3f (degrees to move: %.3f)",
                 angle, distance));
         targetAngle = angle;
         pivotController.moveToPosition(angle);

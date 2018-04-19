@@ -129,7 +129,7 @@ pivot:
   pivotLockSensor: { channel: 16, type: PNP }
 
   pivotController:
-    kpP: 0.05
+    kpP: 0.15
     kiP: 0.0 # 0.04
     kpV: 0.0 # 0.00025
     kfV: 0.0015
@@ -143,7 +143,7 @@ pivot:
     maxAcceleration: 800.0
     travelVelocity: 200.0
     endVelocity: 0.0
-    logData: true
+#    logData: true
   pivotHoldPower: 0.15
   anglePresets:
     LEFT: -90
