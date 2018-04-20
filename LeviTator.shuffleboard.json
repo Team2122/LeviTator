@@ -409,6 +409,17 @@
               "_source0": "network_table:///LiveWindow/Pivot/pivotAnalog/Value",
               "_title": "LiveWindow/Pivot/pivotEncoderAbsolute/Value"
             }
+          },
+          "9,4": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder/Distance",
+              "_title": "LiveWindow/Pivot/pivotEncoder/Distance"
+            }
           }
         }
       }

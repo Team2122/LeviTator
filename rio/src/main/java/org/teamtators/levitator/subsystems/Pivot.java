@@ -160,7 +160,7 @@ public class Pivot extends Subsystem implements Configurable<Pivot.Config> {
         double distance = getCurrentPivotAngle();
         double analogValue = getAngleAbsolute();
         double delta = (distance - analogValue);
-        if (Math.abs(delta) >= config.angleTolerance) {
+        if (Math.abs(delta) >= 2) {
             encoderOffset += delta;
             logger.warn("!~Resynchronizing incremental encoder and potentiometer. quad: {}, analog: {}, newOffset: {}",
                     distance, analogValue, encoderOffset);

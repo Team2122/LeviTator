@@ -62,46 +62,46 @@ PickerAutoDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0.1, kickPower: 0.6, timeToKick: 0.8 }
 
 $PickerAutoDeploy:
-#  - { parallel: true, name: PickerAutoDeploy }
-#  - { class: Wait, period: 0.5 }
-#  - PivotCenter
-#  - LiftHome
-#  - { class: Wait, period: 0.4 }
-  - PickerAutoDeploy
+  - { parallel: true, name: PickerAutoDeploy }
+  - { class: Wait, period: 0.5 }
   - PivotCenter
-  - WaitForCenter
   - LiftHome
-  - WaitForLock
+  - { class: Wait, period: 0.4 }
+#  - PickerAutoDeploy
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerAutoDeployHard:
   { class: PickerQuickDeploy, timeBeforeKick: 0.1, kickPower: 0.85, timeToKick: 0.8 }
 
 $PickerAutoDeployHard:
-#  - { parallel: true, name: PickerAutoDeployHard }
-#  - { class: Wait, period: 0.5 }
-#  - PivotCenter
-#  - LiftHome
-#  - { class: Wait, period: 0.4 }
-  - PickerAutoDeployHard
+  - { parallel: true, name: PickerAutoDeployHard }
+  - { class: Wait, period: 0.5 }
   - PivotCenter
-  - WaitForCenter
   - LiftHome
-  - WaitForLock
+  - { class: Wait, period: 0.4 }
+#  - PickerAutoDeployHard
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerAutoDeploySoft:
   { class: PickerQuickDeploy, timeBeforeKick: 0.4, kickPower: 0.5, timeBeforeRetract: 1.0, timeToKick: 0.8 }
 
 $PickerAutoDeploySoft:
-#  - { parallel: true, name: PickerAutoDeploySoft }
-#  - { class: Wait, period: 1.6 }
-#  - PivotCenter
-#  - LiftHome
-#  - { class: Wait, period: 0.4 }
-  - PickerAutoDeploySoft
+  - { parallel: true, name: PickerAutoDeploySoft }
+  - { class: Wait, period: 1.6 }
   - PivotCenter
-  - WaitForCenter
   - LiftHome
-  - WaitForLock
+  - { class: Wait, period: 0.4 }
+#  - PickerAutoDeploySoft
+#  - PivotCenter
+#  - WaitForCenter
+#  - LiftHome
+#  - WaitForLock
 
 PickerSwitchDeploy:
   { class: PickerQuickDeploy, timeBeforeKick: 0, timeToKick: .6, timeBeforeRetract: 0 }
@@ -831,7 +831,7 @@ $AutoStartRightScaleLeftSwitchLeft:
   - { class: DriveStraight, angle: -20, distance: -4 }
   - PickerRetract
   - { class: Wait, period: 0.5 }
-  - { class: DriveStraight, angle: -20, distance: 28 }
+  - { class: DriveStraight, angle: -20, distance: 32 }
   - PickerSwitchDeploy
 
 $AutoStartLeftScaleRightSwitchRight:
@@ -840,7 +840,7 @@ $AutoStartLeftScaleRightSwitchRight:
   - { class: DriveStraight, angle: 20, distance: -4 }
   - PickerRetract
   - { class: Wait, period: 0.5 }
-  - { class: DriveStraight, angle: 20, distance: 28 }
+  - { class: DriveStraight, angle: 20, distance: 32 }
   - PickerSwitchDeploy
 
 $AutoStartRightScaleLeftSwitchRight:
