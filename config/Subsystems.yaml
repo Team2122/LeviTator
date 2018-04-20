@@ -163,7 +163,7 @@ pivot:
   sweepTimeoutSeconds: 5.0
   lockedPeriod: 0.1
 auto:
-  autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto", "SmartScale"]
+  autoChoices: ["NoAuto", "LineCrossAuto", "Scale", "ScaleSwitch", "$CenterAuto", "SmartScale", "SmartSwitchScale"]
   defaultChoice: "LineCrossAuto"
 vision:
   width: 320

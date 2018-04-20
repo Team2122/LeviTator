@@ -315,6 +315,9 @@ ScaleSwitch:
 SmartScale:
   { class: AutoSelector, type: STARTING_POSITION, left: $SmartScaleLeft, right: $SmartScaleRight }
 
+SmartSwitchScale:
+  { class: AutoSelector, type: STARTING_POSITION, left: $SmartSwitchScaleLeft, right: $SmartSwitchScaleRight }
+
 $ScaleStartLeft:
   - $CommonDriveSequenceLeft
   - ScaleLeftChooser
@@ -357,6 +360,22 @@ SmartScaleStartLeftScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGUR
 SmartScaleStartLeftScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftSwitchLeftDriveRight, R: $AutoStartLeftDriveRight }
 SmartScaleStartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightDriveLeft, R: $AutoStartRightSwitchRightDriveLeft }
 SmartScaleStartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightScaleRight, R: $AutoStartRightScaleRightScaleRight }
+
+$SmartSwitchScaleLeft:
+  - $CommonDriveSequenceLeft
+  - SmartSwitchScaleStartLeftChooser
+
+$SmartSwitchScaleRight:
+  - $CommonDriveSequenceRight
+  - SmartSwitchScaleStartRightChooser
+
+SmartSwitchScaleStartLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: SmartSwitchScaleStartLeftScaleLeftChooser, R: SmartSwitchScaleStartLeftScaleRightChooser }
+SmartSwitchScaleStartRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 1, L: SmartSwitchScaleStartRightScaleLeftChooser, R: SmartSwitchScaleStartRightScaleRightChooser }
+
+SmartSwitchScaleStartLeftScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftScaleLeftSwitchLeft, R: $AutoStartLeftScaleLeftScaleLeft }
+SmartSwitchScaleStartLeftScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartLeftSwitchLeftDriveRight, R: $AutoStartLeftDriveRight }
+SmartSwitchScaleStartRightScaleLeftChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightDriveLeft, R: $AutoStartRightSwitchRightDriveLeft }
+SmartSwitchScaleStartRightScaleRightChooser: { class: AutoSelector, type: FIELD_CONFIGURATION, object: 0, L: $AutoStartRightScaleRightScaleRight, R: $AutoStartRightScaleRightSwitchRight }
 
 SlowDown:
   class: DriveStraight
