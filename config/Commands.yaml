@@ -484,7 +484,6 @@ $StartLeftScaleLeftPick:
       - { x: -84, y: 228 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
-  - PickerLock
 
 $StartRightScaleRight:
   - { parallel: true, name: $LiftSequenceScaleLowRight }
@@ -514,7 +513,6 @@ $StartRightScaleRightPick:
       - { x: 84, y: 228 }
   - WaitForCube
   - { class: DriveStraight, distance: -4, endSpeed: 60 }
-  - PickerLock
 
 $StartLeftScaleLeft2:
   - { parallel: true, name: $LiftSequenceScaleLowLeft }
@@ -702,7 +700,6 @@ $StartRightScaleLeftPick:
   - { class: Wait, period: 1.0 }
   - WaitForCube
   - { class: DriveStraight, distance: -6, endSpeed: 60 }
-  - PickerLock
 
 $StartLeftScaleRight:
   - class: DrivePath
@@ -734,7 +731,6 @@ $StartLeftScaleRightPick:
   - { class: Wait, period: 1.0 }
   - WaitForCube
   - { class: DriveStraight, distance: -6, endSpeed: 60 }
-  - PickerLock
 
 $AutoStartLeftDriveRight:
   - LiftHome
