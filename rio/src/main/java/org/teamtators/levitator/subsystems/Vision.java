@@ -71,7 +71,14 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
             logger.debug("Starting vision thread with existing source");
         }
 
-        usbCamera.setResolution(config.width, config.height);
+        boolean success = usbCamera.setResolution(config.width, config.height);
+        if (!success) {
+            logger.warn("Could not set camera resolution to {}x{}", config.width, config.height);
+        }
+        success = usbCamera.setFPS(config.fps);
+        if (!success) {
+            logger.warn("Could not set camera fps to {}", config.fps);
+        }
 //        usbCamera.setExposureManual(config.exposure);
         usbCamera.setExposureAuto();
 
@@ -272,6 +279,7 @@ public class Vision extends Subsystem implements Configurable<Vision.Config>, De
     public static class Config {
         public int width;
         public int height;
+        public int fps;
 
         public int exposure;
         public int contrast;
