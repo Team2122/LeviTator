@@ -208,3 +208,4 @@ climber:
   bottomLimit: { channel: 15, type: NPN }
   releaser: { channel: 2 }
   distancePerPulse: -0.08518518518518519
+
