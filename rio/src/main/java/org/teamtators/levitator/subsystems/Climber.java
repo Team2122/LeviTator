@@ -2,9 +2,11 @@ package org.teamtators.levitator.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SensorBase;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import org.teamtators.common.config.Configurable;
 import org.teamtators.common.config.helpers.DigitalSensorConfig;
 import org.teamtators.common.config.helpers.SolenoidConfig;
@@ -28,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Climber extends Subsystem implements Configurable<Climber.Config> {
+    public static final double CYCLES_PER_REV = 4096.0;
     private final TatorRobot robot;
     private SpeedControllerGroup climberMotor;
     private WPI_TalonSRX masterMotor;
@@ -37,6 +40,7 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     private Solenoid releaser;
     private Config config;
     private boolean homed;
+    private EncoderSendable encoderSendable;
 
     public Climber(TatorRobot robot) {
         super("Climber");
@@ -67,7 +71,11 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
     }
 
     public double getPosition() {
-        return masterMotor.getSelectedSensorPosition(0) / 4096.0 * config.distancePerPulse;
+        return (masterMotor.getSelectedSensorPosition(0) / CYCLES_PER_REV) * config.distancePerPulse;
+    }
+
+    public double getRate() {
+        return (masterMotor.getSelectedSensorVelocity(0) / CYCLES_PER_REV) * config.distancePerPulse / .1; // per 100 ms
     }
 
     public boolean isAtBottomLimit() {
@@ -122,6 +130,9 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         topLimit.setName("Climber", "topLimit");
         bottomLimit.setName("Climber", "bottomLimit");
         releaser.setName("Climber", "releaser");
+
+        encoderSendable = new EncoderSendable();
+        encoderSendable.setName("Climber", "encoder");
 
         homed = false;
     }
@@ -203,6 +214,16 @@ public class Climber extends Subsystem implements Configurable<Climber.Config> {
         @Override
         public void stop() {
             setPower(0.0, false);
+        }
+    }
+
+    private class EncoderSendable extends SensorBase {
+        @Override
+        public void initSendable(SendableBuilder builder) {
+            builder.setSmartDashboardType("Quadrature Encoder");
+            builder.addDoubleProperty("Distance", Climber.this::getPosition, null);
+            builder.addDoubleProperty("Rate", Climber.this::getRate, null);
+            builder.addDoubleProperty("Distance per Tick", () -> config.distancePerPulse, null);
         }
     }
 }

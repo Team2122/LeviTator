@@ -1,5 +1,5 @@
 {
-  "dividerPosition": 0.14826498422712933,
+  "dividerPosition": 0.15119916579770595,
   "tabPane": [
     {
       "title": "SmartDashboard",
@@ -84,7 +84,7 @@
               "_title": "pivotQuadrature"
             }
           },
-          "3,1": {
+          "3,2": {
             "size": [
               1,
               1
@@ -93,21 +93,8 @@
               "_type": "Boolean Box",
               "_source0": "network_table:///LiveWindow/Pivot/pivotLockSensor/Value",
               "_title": "pivotLockSensor",
-              "colorWhenTrue": "#99CC99FF",
+              "colorWhenTrue": "#00FF00FF",
               "colorWhenFalse": "#990000FF"
-            }
-          },
-          "2,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///LiveWindow/Lift/limitSensorBottom/Value",
-              "_title": "limitSensorBottom",
-              "colorWhenTrue": "#7CFC00FF",
-              "colorWhenFalse": "#8B0000FF"
             }
           },
           "2,2": {
@@ -117,10 +104,71 @@
             ],
             "content": {
               "_type": "Boolean Box",
-              "_source0": "network_table:///LiveWindow/Lift/limitSensorTop/Value",
-              "_title": "limitSensorTop",
+              "_source0": "network_table:///LiveWindow/Lift/limitSensorBottom/Value",
+              "_title": "liftBottom",
               "colorWhenTrue": "#7CFC00FF",
               "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "2,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///LiveWindow/Lift/limitSensorTop/Value",
+              "_title": "liftTop",
+              "colorWhenTrue": "#7CFC00FF",
+              "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "3,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Pivot/pivotAnalog/Value",
+              "_title": "pivotAnalog"
+            }
+          },
+          "2,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///LiveWindow/Climber/bottomLimit/Value",
+              "_title": "climberBottom",
+              "colorWhenTrue": "#7CFC00FF",
+              "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "2,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///LiveWindow/Climber/topLimit/Value",
+              "_title": "climberTop",
+              "colorWhenTrue": "#7CFC00FF",
+              "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "2,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Climber/encoder/Distance",
+              "_title": "climberEncoder"
             }
           }
         }
@@ -239,10 +287,10 @@
               ]
             }
           },
-          "4,0": {
+          "8,0": {
             "size": [
               2,
-              6
+              4
             ],
             "content": {
               "_type": "Subsystem Layout",
@@ -257,11 +305,9 @@
                   "orientation": "HORIZONTAL"
                 },
                 {
-                  "_type": "Speed Controller",
-                  "_source0": "network_table:///LiveWindow/Climber/slaveMotor",
-                  "_title": "slaveMotor",
-                  "controllable": false,
-                  "orientation": "HORIZONTAL"
+                  "_type": "Encoder",
+                  "_source0": "network_table:///LiveWindow/Climber/encoder",
+                  "_title": "encoder"
                 },
                 {
                   "_type": "Boolean Box",
@@ -285,10 +331,10 @@
               ]
             }
           },
-          "6,0": {
+          "4,0": {
             "size": [
               2,
-              4
+              6
             ],
             "content": {
               "_type": "Subsystem Layout",
@@ -324,7 +370,7 @@
               ]
             }
           },
-          "6,4": {
+          "8,4": {
             "size": [
               3,
               2
@@ -336,10 +382,10 @@
               "showIndicatorText": true
             }
           },
-          "8,0": {
+          "6,0": {
             "size": [
               2,
-              4
+              6
             ],
             "content": {
               "_type": "Subsystem Layout",
@@ -359,6 +405,11 @@
                   "_title": "pivotEncoder"
                 },
                 {
+                  "_type": "Text View",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotAnalog/Value",
+                  "_title": "pivotEncoderAbsolute/Value"
+                },
+                {
                   "_type": "Toggle Button",
                   "_source0": "network_table:///LiveWindow/Pivot/pivotLockSolenoid/Value",
                   "_title": "pivotLockSolenoid/Value"
@@ -369,56 +420,22 @@
                   "_title": "pivotLockSensor/Value",
                   "colorWhenTrue": "#7CFC00FF",
                   "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoderA/Value",
+                  "_title": "pivotEncoderA/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Pivot/pivotEncoderB/Value",
+                  "_title": "pivotEncoderB/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
                 }
               ]
-            }
-          },
-          "10,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///LiveWindow/Pivot/pivotEncoderA/Value",
-              "_title": "LiveWindow/Pivot/pivotEncoderA/Value",
-              "colorWhenTrue": "#7CFC00FF",
-              "colorWhenFalse": "#8B0000FF"
-            }
-          },
-          "10,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///LiveWindow/Pivot/pivotEncoderB/Value",
-              "_title": "LiveWindow/Pivot/pivotEncoderB/Value",
-              "colorWhenTrue": "#7CFC00FF",
-              "colorWhenFalse": "#8B0000FF"
-            }
-          },
-          "9,5": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///LiveWindow/Pivot/pivotAnalog/Value",
-              "_title": "LiveWindow/Pivot/pivotEncoderAbsolute/Value"
-            }
-          },
-          "9,4": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///LiveWindow/Pivot/pivotEncoder/Distance",
-              "_title": "LiveWindow/Pivot/pivotEncoder/Distance"
             }
           }
         }
