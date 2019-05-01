@@ -8,18 +8,22 @@ import org.teamtators.common.util.FMSData;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Scheduler implements CommandRunContext, RobotStateListener, FMSDataListener {
     private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
-    private Map<TriggerSource, List<TriggerScheduler>> triggerSchedulers = new HashMap<>();
-    private Map<String, CommandRun> runningCommands = new ConcurrentHashMap<>();
-    private Set<Command> defaultCommands = new HashSet<>();
+    private final Map<TriggerSource, List<TriggerScheduler>> triggerSchedulers = new HashMap<>();
+    private final List<CommandRun> runningCommands = Collections.synchronizedList(new LinkedList<>());
+    private AtomicReference<ListIterator<CommandRun>> runIterator = new AtomicReference<>(null);
+    private final Set<Command> defaultCommands = new HashSet<>();
 
-    private Set<RobotStateListener> stateListeners = new HashSet<>();
-    private Set<FMSDataListener> dataListeners = new HashSet<>();
+    private final Set<RobotStateListener> stateListeners = new HashSet<>();
+    private final Set<FMSDataListener> dataListeners = new HashSet<>();
 
     private RobotState robotState = RobotState.DISABLED;
     private FMSData fmsData;
@@ -99,7 +103,11 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
                 scheduler.processTrigger(active);
             }
         }
-        for (CommandRun run : runningCommands.values()) {
+        ListIterator<CommandRun> runIterator = runningCommands.listIterator();
+        this.runIterator.set(runIterator);
+        CommandRun run;
+        while (runIterator.hasNext()) {
+            run = runIterator.next();
             profiler.start(run.command.getName());
             if (run.cancel) {
 //                logger.trace("Cancelling command {} by request", run.command.getName());
@@ -125,6 +133,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
                 finishRun(run, run.cancel);
             }
         }
+        this.runIterator.set(null);
         profiler.start("defaultCommands");
         for (Command command : defaultCommands) {
             if (command.checkRequirements()
@@ -138,8 +147,18 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
 
     private void finishRun(CommandRun run, boolean cancelled) {
         run.command.finishRun(cancelled);
-        runningCommands.remove(run.command.getName());
+        runIterator.get().remove();
     }
+
+    private Stream<CommandRun> findRuns(String name) {
+        return runningCommands.stream()
+                .filter(commandRun -> commandRun.command.getName().equals(name));
+    }
+
+    private CommandRun findRun(String name) {
+        return findRuns(name).findAny().orElse(null);
+    }
+
 
     /**
      * Check if the current command is running or waiting to run
@@ -148,7 +167,7 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
      * @return Whether the named command is running or queued
      */
     public boolean containsCommand(String name) {
-        return runningCommands.containsKey(name);
+        return findRuns(name).findAny().isPresent();
     }
 
     @Override
@@ -164,20 +183,24 @@ public final class Scheduler implements CommandRunContext, RobotStateListener, F
     @Override
     public void startWithContext(Command command, CommandRunContext context) throws CommandException {
         checkNotNull(command);
-        CommandRun run = runningCommands.get(command.getName());
-        if (run != null || !command.isValidInState(robotState))
+        if (containsCommand(command.getName()) || !command.isValidInState(robotState))
             return;
         if (command.getContext() != null) {
             command.cancel();
         }
         CommandRun commandRun = new CommandRun(command);
         commandRun.context = context;
-        runningCommands.put(command.getName(), commandRun);
+        ListIterator<CommandRun> runIterator = this.runIterator.get();
+        if (runIterator != null) {
+            runIterator.add(commandRun);
+        } else {
+            runningCommands.add(commandRun);
+        }
     }
 
     public void cancelCommand(String commandName) {
         checkNotNull(commandName);
-        CommandRun run = runningCommands.get(commandName);
+        CommandRun run = findRun(commandName);
         if (run == null)
             logger.debug("Attempted to cancel not command that was not running: {}", commandName);
         else
